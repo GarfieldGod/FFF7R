@@ -1,0 +1,14 @@
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.AssemblyInfoInputs.cache
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.AssemblyInfo.cs
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.csproj.CoreCompileInputs.cache
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\bin\Debug\net9.0\MyApp.HelloWorld.exe
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\bin\Debug\net9.0\MyApp.HelloWorld.deps.json
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\bin\Debug\net9.0\MyApp.HelloWorld.runtimeconfig.json
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\bin\Debug\net9.0\MyApp.HelloWorld.dll
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\bin\Debug\net9.0\MyApp.HelloWorld.pdb
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.dll
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\refint\MyApp.HelloWorld.dll
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.pdb
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\MyApp.HelloWorld.genruntimeconfig.cache
+C:\Users\luo_zhh\Desktop\NSFW\Project\FFF7\CsWorkSpace\FFF7\MyApp.HelloWorld\obj\Debug\net9.0\ref\MyApp.HelloWorld.dll
