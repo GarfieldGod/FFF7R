@@ -1,0 +1,13 @@
+.vs
+.vscode
+Library
+Logs
+obj
+Packages
+ProjectSettings
+Temp
+UserSettings
+.vsconfig
+Assembly-CSharp.csproj
+FFF7.sln
+Assets/**/*.meta
