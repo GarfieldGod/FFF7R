@@ -1,31 +1,27 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class chess_pad : MonoBehaviour
+public class ChessInputer : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public GameObject chessPad;
+    public void GetChessInput(GameObject chessPos, GameObject chessObj) {
+        GlobalScope.ChessProperty property = GlobalScope.GetChessProperty(chessObj.name);
+        ChessSelector.RemoveChess(chessObj);
+        GameObject newChessObj = GetComponent<ChessDispenser>().InstantiateChess(ChessDispenser.DispenseChess());
+        if (newChessObj != null) {
+           ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    public void GetChessInput(GameObject chessPos, string chessName) {
-        GetCardModelOn();
-        GlobalScope.ChessProperty property = GlobalScope.GetChessProperty(chessName);
+        GetCardModelOn(chessPos, property);
         DoPosEffect(chessPos.name, property.PosEffects);
         DoCardEffect(chessPos.name, property.CardEffects);
         DoSpecialEffect(chessPos.name, property.SpecialEffects);
-        chessPos.GetComponent<chess_position>().posStatus = GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
+        chessPos.GetComponent<ChessGrid>().posStatus = GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
     }
-    void GetCardModelOn() {
-
+    void GetCardModelOn(GameObject chessPos, GlobalScope.ChessProperty property) {
+        // TODO
     }
     void DoPosEffect(string chessPosName, List<List<int>> effects) {
         var effectTask = ParseEffectsInPosition(chessPosName,  ParseEffects(effects));
@@ -40,10 +36,10 @@ public class chess_pad : MonoBehaviour
     void ExecutePosEffect(List<Tuple<string, int>> effectTask) {
         foreach (Tuple<string, int> Task in effectTask) {
             Debug.Log("TaskName : " + Task.Item1);
-            foreach (Transform child in transform)
+            foreach (Transform child in chessPad.transform)
             {
                 if (child.gameObject.name == Task.Item1) {
-                    chess_position chessPos = child.gameObject.GetComponent<chess_position>();
+                    ChessGrid chessPos = child.gameObject.GetComponent<ChessGrid>();
                     Debug.Log(child.gameObject.name + " Plus: " + Task.Item2);
                     chessPos.level += Task.Item2;
                     if (chessPos.posStatus >= GlobalScope.ChessPosStatus.OCCUPIED_FRIEND) {

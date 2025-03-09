@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using UnityEngine;
 
-public class chess_position : MonoBehaviour
+public class ChessGrid : MonoBehaviour
 {
     public GlobalScope.ChessPosStatus posStatus = GlobalScope.ChessPosStatus.EMPTY;
     public int level = 0;

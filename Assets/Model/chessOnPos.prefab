@@ -328,7 +328,7 @@ GameObject:
   - component: {fileID: 8277531145572775158}
   - component: {fileID: 2940748345442876424}
   m_Layer: 0
-  m_Name: chess
+  m_Name: chessOnPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

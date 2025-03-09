@@ -3,16 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Xml.Serialization;
+using TMPro;
 using UnityEngine;
 
-
-public class player_operate : MonoBehaviour
+public class PlayerOperation : MonoBehaviour
 {
     public GameObject currentChessObject = null;
     public GameObject CHESSNULL;
-    public GameObject chessPad;
     public int highestLevel = 1;
     // Start is called before the first frame update
+    public bool preview = false;
     void Start()
     {
         currentChessObject = CHESSNULL;
@@ -22,6 +22,11 @@ public class player_operate : MonoBehaviour
     void Update()
     {
         playerClick();
+        ScreenPosToWorldPos(Input.mousePosition);
+    }
+
+    UnityEngine.Vector3 ScreenPosToWorldPos(UnityEngine.Vector3 mouseScreenPosition){
+        return Camera.main.ScreenToWorldPoint(new UnityEngine.Vector3(mouseScreenPosition.x, mouseScreenPosition.y, Camera.main.nearClipPlane));
     }
 
     void playerClick() {
@@ -35,7 +40,13 @@ public class player_operate : MonoBehaviour
                 if (GlobalScope.chessNameSet.Contains(hitOne.name)) {
                     if (CheckIfSelectVaild(hitOne)) {
                         Debug.Log("Select is vaild.");
+                        if(currentChessObject != CHESSNULL) {
+                            ChessSelector.CancelPreview();
+                            currentChessObject = CHESSNULL;
+                        }
                         currentChessObject = hitOne;
+                        ChessSelector.DoPreview(hitOne.GetComponent<Chess>());
+                        preview = true;
                     } else {
                         Debug.Log("Select is Invaild.");
                     }
@@ -44,11 +55,16 @@ public class player_operate : MonoBehaviour
                 if (currentChessObject != CHESSNULL && GlobalScope.chessPositionNameSet.Contains(hitOne.name)) {
                     if (CheckIfInputVaild(hitOne, currentChessObject)) {
                         Debug.Log("Input is vaild.");
-                        chessPad.GetComponent<chess_pad>().GetChessInput(hitOne, currentChessObject.name);
+                        GetComponent<ChessInputer>().GetChessInput(hitOne, currentChessObject);
                     } else  {
                         Debug.Log("Input is Invaild.");
                     }
                 }
+            }
+        } else if (Input.GetMouseButtonDown(1)){
+            if(preview) {
+                ChessSelector.CancelPreview();
+                currentChessObject = CHESSNULL;
             }
         }
     }
@@ -61,7 +77,7 @@ public class player_operate : MonoBehaviour
     }
 
     bool CheckIfInputVaild (GameObject chessPositionObject, GameObject chessObject) {
-        chess_position chessPos = chessPositionObject.GetComponent<chess_position>();
+        ChessGrid chessPos = chessPositionObject.GetComponent<ChessGrid>();
         if (chessPos.posStatus >= GlobalScope.ChessPosStatus.EMPTY) {
             return false;
         }

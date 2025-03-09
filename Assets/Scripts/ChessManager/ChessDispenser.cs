@@ -5,30 +5,8 @@ using UnityEngine;
 
 public class ChessDispenser : MonoBehaviour
 {
-    public GameObject chessSelector;
+    public GameObject chessSelectorPos;
     public GameObject chessPrefab;
-    // Start is called before the first frame update
-    void Awake()
-    {
-        GlobalScope.LoadChessProperties();
-    }
-    void Start()
-    {
-        StartAGame();
-    }
-    void StartAGame() {
-        chessPool = new List<string>{
-            "Card001", "Card001", "Card001", "Card001", "Card001",
-            "Card002", "Card002", "Card002", "Card002", "Card002",
-            "Card003", "Card003", "Card003", "Card003", "Card003",
-        };
-        Debug.Log("Instantiate chessPool success.");
-        for( int i = 0 ; i < 5 ; i++ ) {
-            ChessSelector.PushBackChess(InstantiateChess(DispenseChess()));
-        }
-    }
-    void Update() {}
-
     public static List<string> chessPool = new List<string>{};
     public static string DispenseChess() {
         if (chessPool.Count == 0) {
@@ -54,26 +32,30 @@ public class ChessDispenser : MonoBehaviour
             ChessSelector.chessList.Remove(chess);
         }
         foreach(Chess chess in popChessList) {
-            ChessSelector.PushBackChess(InstantiateChess(DispenseChess()));
+            ChessSelector.PushBackChess(InstantiateChess(DispenseChess()).GetComponent<Chess>());
         }
         foreach(Chess chess in popChessList) {
-            chessPool.Add(chess.name);
+            chessPool.Add(chess.chessName);
         }
     }
 
-    public Chess InstantiateChess(string chessName)
+    public GameObject InstantiateChess(string chessName)
     {
-        GameObject instantiateBody = Instantiate(chessPrefab, chessSelector.transform);
+        if (chessName == null) {
+            return null;
+        }
+        GameObject instantiateBody = Instantiate(chessPrefab, chessSelectorPos.transform);
         GlobalScope.ChessProperty instantiateData = GlobalScope.GetChessProperty(chessName);
         if (instantiateData != null) {
-            return new Chess(instantiateData, instantiateBody);
+            instantiateBody.GetComponent<Chess>().InstantiateChessProperty(instantiateData);
+            return instantiateBody;
         }
         return null;
     }
 
     public int GetChessNumInChessSelector() {
         int result = 0;
-        foreach(Transform child in chessSelector.transform) {
+        foreach(Transform child in chessSelectorPos.transform) {
             result++;
         }
         return result;
