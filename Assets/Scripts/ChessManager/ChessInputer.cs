@@ -41,7 +41,6 @@ public class ChessInputer : MonoBehaviour
                 if (child.gameObject.name == Task.Item1) {
                     ChessGrid chessPos = child.gameObject.GetComponent<ChessGrid>();
                     Debug.Log(child.gameObject.name + " Plus: " + Task.Item2);
-                    chessPos.level += Task.Item2;
                     if (chessPos.posStatus >= GlobalScope.ChessPosStatus.OCCUPIED_FRIEND) {
                         continue;
                     }
@@ -50,7 +49,7 @@ public class ChessInputer : MonoBehaviour
                         chessLevel = (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND;
                     }
                     chessPos.posStatus = (GlobalScope.ChessPosStatus)chessLevel;
-                    chessPos.level = chessLevel;
+                    // chessPos.level = chessLevel;
                 }
             }
         }

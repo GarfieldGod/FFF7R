@@ -7,7 +7,6 @@ using UnityEngine;
 public class ChessGrid : MonoBehaviour
 {
     public GlobalScope.ChessPosStatus posStatus = GlobalScope.ChessPosStatus.EMPTY;
-    public int level = 0;
     GameObject levelOne;
     GameObject levelTwo;
     GameObject levelThree;
@@ -27,6 +26,13 @@ public class ChessGrid : MonoBehaviour
     }
     public void UpdateStatus() {
 
+    }
+    public int GetChessLevel() {
+        int result = (int)posStatus % 10;
+        if(result > 3) {
+            return -1;
+        }
+        return result;
     }
     public void ShowPosLevel() {
         switch (posStatus) {

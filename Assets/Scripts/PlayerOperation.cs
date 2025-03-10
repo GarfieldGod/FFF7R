@@ -78,10 +78,7 @@ public class PlayerOperation : MonoBehaviour
 
     bool CheckIfInputVaild (GameObject chessPositionObject, GameObject chessObject) {
         ChessGrid chessPos = chessPositionObject.GetComponent<ChessGrid>();
-        if (chessPos.posStatus >= GlobalScope.ChessPosStatus.EMPTY) {
-            return false;
-        }
-        int chessPosLevel = chessPos.level;
+        int chessPosLevel = chessPos.GetChessLevel();
         if (chessPosLevel <= 0 || chessPosLevel < GlobalScope.GetChessProperty(chessObject.name).Level) {
             return false;
         }

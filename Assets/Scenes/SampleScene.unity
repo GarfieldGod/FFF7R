@@ -485,7 +485,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &95013934
 GameObject:
   m_ObjectHideFlags: 0
@@ -639,7 +638,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &113879845
 GameObject:
   m_ObjectHideFlags: 0
@@ -1471,7 +1469,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &280309610
 GameObject:
   m_ObjectHideFlags: 0
@@ -2653,7 +2650,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &585489029
 GameObject:
   m_ObjectHideFlags: 0
@@ -3797,8 +3793,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e86e12207b4c047a538a680ef8287a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posStatus: 1
-  level: 1
+  posStatus: 10
 --- !u!1 &896787857
 GameObject:
   m_ObjectHideFlags: 0
@@ -4100,8 +4095,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e86e12207b4c047a538a680ef8287a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posStatus: 1
-  level: 1
+  posStatus: 10
 --- !u!1 &950305284
 GameObject:
   m_ObjectHideFlags: 0
@@ -5059,8 +5053,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e86e12207b4c047a538a680ef8287a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posStatus: 11
-  level: 1
+  posStatus: 10
 --- !u!1 &1132753933
 GameObject:
   m_ObjectHideFlags: 0
@@ -5248,7 +5241,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &1146798127
 GameObject:
   m_ObjectHideFlags: 0
@@ -5547,7 +5539,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c6f78e560ee4545a21230344d6d75f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chessSelectorPos: {fileID: 0}
+  chessSelectorPos: {fileID: 1868156435}
   chessPrefab: {fileID: 6843332277066807301, guid: 6d7668f307071a549a39542685f3fce8, type: 3}
 --- !u!114 &1160788025
 MonoBehaviour:
@@ -7610,7 +7602,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &1544640967
 GameObject:
   m_ObjectHideFlags: 0
@@ -7961,8 +7952,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e86e12207b4c047a538a680ef8287a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posStatus: 11
-  level: 1
+  posStatus: 10
 --- !u!1 &1613218917
 GameObject:
   m_ObjectHideFlags: 0
@@ -8214,7 +8204,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &1668953818
 GameObject:
   m_ObjectHideFlags: 0
@@ -8482,8 +8471,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e86e12207b4c047a538a680ef8287a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posStatus: 1
-  level: 1
+  posStatus: 10
 --- !u!1 &1718586207
 GameObject:
   m_ObjectHideFlags: 0
@@ -8869,8 +8857,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e86e12207b4c047a538a680ef8287a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  posStatus: 11
-  level: 1
+  posStatus: 10
 --- !u!1 &1825712744
 GameObject:
   m_ObjectHideFlags: 0
@@ -9338,7 +9325,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &1899766341
 GameObject:
   m_ObjectHideFlags: 0
@@ -10467,7 +10453,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   posStatus: 10
-  level: 0
 --- !u!1 &2127997397
 GameObject:
   m_ObjectHideFlags: 0
