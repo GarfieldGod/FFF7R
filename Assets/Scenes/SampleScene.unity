@@ -5590,6 +5590,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e06b34d17bb5b8542b6b8d17df17336c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gameStatus: 0
+  GameTurns: 0
+  PlayerTurn: 1
 --- !u!114 &1160788029
 MonoBehaviour:
   m_ObjectHideFlags: 0

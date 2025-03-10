@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Xml.Serialization;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerOperation : MonoBehaviour
@@ -35,7 +36,7 @@ public class PlayerOperation : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit)) {
                 GameObject hitOne = hit.collider.gameObject;
-                Debug.Log("Hit Object: " + hitOne.name);
+                //Debug.Log("Hit Object: " + hitOne.name);
                 //Select Chess
                 if (GlobalScope.chessNameSet.Contains(hitOne.name)) {
                     if (CheckIfSelectVaild(hitOne)) {
@@ -56,6 +57,12 @@ public class PlayerOperation : MonoBehaviour
                     if (CheckIfInputVaild(hitOne, currentChessObject)) {
                         Debug.Log("Input is vaild.");
                         GetComponent<ChessInputer>().GetChessInput(hitOne, currentChessObject);
+                        GameObject newChessObj = GetComponent<ChessDispenser>().InstantiateChess(ChessDispenser.DispenseChess());
+                        if (newChessObj != null) {
+                        ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
+                        }
+                        currentChessObject = CHESSNULL;
+                        GetComponent<GameManager>().GameTurns++;
                     } else  {
                         Debug.Log("Input is Invaild.");
                     }
@@ -82,10 +89,15 @@ public class PlayerOperation : MonoBehaviour
         if (chessPosLevel <= 0 || chessPosLevel < GlobalScope.GetChessProperty(chessObject.name).Level) {
             return false;
         }
-        return true;
-    }
-
-    void SelectChess() {
-        Debug.Log("SelectChess.// TODO");
+        if(!GetComponent<GameManager>().PlayerTurn) {
+            return false;
+        }
+        List<Tuple<Tuple<int, int>, int>> vaildChessGrids = Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus);
+        foreach(var vaildChessGrid in vaildChessGrids) {
+            if(chessPos.chessGridPos.Item1 == vaildChessGrid.Item1.Item1 && chessPos.chessGridPos.Item2 == vaildChessGrid.Item1.Item2) {
+                return true;
+            }
+        }
+        return false;
     }
 }

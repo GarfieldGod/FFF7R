@@ -5,49 +5,106 @@ using System;
 
 public class GameManager : MonoBehaviour
 {
+    public enum GameStatus {
+        INIT,
+        REDISPENSE_CHESS,
+        GAMING,
+        COMPUTE_RESULT,
+        GAME_OVER
+    }
     ChessDispenser chessDispenser;
     static GameObject chessPad;
-    public static List<List<int>> chessGridLevel;
-    public static List<List<int>> chessGridStatus;
+
+    public GameStatus gameStatus = GameStatus.INIT;
+    public int GameTurns = 0;
+    public bool PlayerTurn = true;
+    List<string> rivalChessListGlabol;
+//----------------------------------------------------------------------------------------------------------------------------------InitGame
     void Start()
     {
         chessDispenser = GetComponent<ChessDispenser>();
         chessPad = GameObject.Find("chessPad");
-        StartAGame();
-    }
-    void StartAGame() {
-        InitChessPadStandard();
-        ChessDispenser.chessPool = new List<string>{
+        //For Test
+        List<string> rivalChessList = new List<string>{
+            "Card001",
+            "Card002", "Card002",
+            "Card003", "Card003"
+        };
+        List<string> chessPool = new List<string>{
             "Card001", "Card001", "Card001", "Card001", "Card001",
             "Card002", "Card002", "Card002", "Card002", "Card002",
             "Card003", "Card003", "Card003", "Card003", "Card003",
         };
-        Debug.Log("Instantiate chessPool success.");
-        for( int i = 0 ; i < 5 ; i++ ) {
-            ChessSelector.PushBackChess(chessDispenser.InstantiateChess(ChessDispenser.DispenseChess()).GetComponent<Chess>());
-        }
-        InitChessPadStandard();
-    }
-    void InitChessPadStandard() {
-        chessGridLevel = new List<List<int>>{
-            new List<int> { 1, 0, 0, 0, 1 },
-            new List<int> { 1, 0, 0, 0, 1 },
-            new List<int> { 1, 0, 0, 0, 1 },
-        };
-        chessGridStatus = new List<List<int>>{
-            new List<int> { 1, 10, 10, 10, 11 },
-            new List<int> { 1, 10, 10, 10, 11 },
-            new List<int> { 1, 10, 10, 10, 11 },
-        };
-        CommitChessPad();
+        InitGame(chessPool, rivalChessList);
     }
 
-    static void CommitChessPad(){
+    void InitGame(List<string> chessPool, List<string> rivalChessList) {
+        gameStatus = GameStatus.INIT;
+        InitChessPadStandard();
+        InitChessPoolAndChessSelector(chessPool, 5);
+        rivalChessListGlabol = rivalChessList;
+        gameStatus = GameStatus.REDISPENSE_CHESS;
+        // TODO
+        gameStatus = GameStatus.GAMING;
+    }
+
+    void InitChessPadStandard() {
+        GlobalScope.chessGridStatus = new List<List<int>>{
+            new List<int> { 1, 10, 10, 10, 11 },
+            new List<int> { 1, 10, 10, 10, 11 },
+            new List<int> { 1, 10, 10, 10, 11 },
+        };
+        CommitChessStatusToChessPad();
+    }
+
+    void InitChessPoolAndChessSelector(List<string> chessPoolConfig, int chessSelectorSize) {
+        ChessDispenser.chessPool = chessPoolConfig;
+        for( int i = 0 ; i < chessSelectorSize ; i++ ) {
+            ChessSelector.PushBackChess(chessDispenser.InstantiateChess(ChessDispenser.DispenseChess()).GetComponent<Chess>());
+        }
+    }
+//----------------------------------------------------------------------------------------------------------------------------------RunGame
+    void Update() {
+        // Debug.Log($"TheGameTurns: {GameTurns} , The PlayerTurn: {PlayerTurn}");
+        if (gameStatus == GameStatus.GAMING) {
+            RunGameTurns(rivalChessListGlabol);
+        }
+    }
+    bool isWaiting = false;
+    float startTime;
+    void RunGameTurns(List<string> rivalChessList) {
+        if(gameStatus == GameStatus.GAMING) {
+            if(GameTurns % 2 == 0) {
+                PlayerTurn = true;
+            } else {
+                // DoARivalTurn(rivalChessList);
+                if (PlayerTurn) {
+                    PlayerTurn = false;
+                    startTime = Time.time;
+                }
+                float elapsedTime = Time.time - startTime;
+                // Debug.Log(elapsedTime);
+                if (elapsedTime > 1.5f) {
+                    DoARivalTurn(rivalChessList);
+                }
+            }
+        }
+    }
+
+    void DoARivalTurn(List<string> chessInHand) {
+        if(chessInHand.Count != 0) {
+            GlobalScope.chessGridStatus = Rival.DoRivalInput(GlobalScope.chessGridStatus, chessInHand);
+            CommitChessStatusToChessPad();
+        }
+        GameTurns++;
+    }
+
+    public static void CommitChessStatusToChessPad(){
         for(int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0); i++) {
             for(int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
                 Transform chessGrid = chessPad.transform.Find(GlobalScope.chessPositionNameList[i, j]);
-                if(Enum.IsDefined(typeof(GlobalScope.ChessPosStatus), chessGridStatus[i][j]) && chessGrid != null) {
-                    chessGrid.GetComponent<ChessGrid>().posStatus = (GlobalScope.ChessPosStatus)chessGridStatus[i][j];
+                if(Enum.IsDefined(typeof(GlobalScope.ChessPosStatus), GlobalScope.chessGridStatus[i][j]) && chessGrid != null) {
+                    chessGrid.GetComponent<ChessGrid>().posStatus = (GlobalScope.ChessPosStatus)GlobalScope.chessGridStatus[i][j];
                 }
             }
         }

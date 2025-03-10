@@ -7,6 +7,7 @@ using Unity.VisualScripting;
 
 public class GlobalScope : MonoBehaviour
 {
+    public static List<List<int>> chessGridStatus;
     public static readonly string[,] chessPositionNameList = {
         { "upLine0", "upLine1", "upLine2", "upLine3", "upLine4" },
         { "midLine0", "midLine1", "midLine2", "midLine3", "midLine4" },

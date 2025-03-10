@@ -10,9 +10,18 @@ public class ChessGrid : MonoBehaviour
     GameObject levelOne;
     GameObject levelTwo;
     GameObject levelThree;
+    public Tuple<int, int> chessGridPos;
     // Start is called before the first frame update
     void Start()
     {
+        for(int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0) && chessGridPos == null; i++) {
+            for(int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
+                if(gameObject.name == GlobalScope.chessPositionNameList[i, j]) {
+                    chessGridPos = new Tuple<int, int>(i, j);
+                    break;
+                }
+            }
+        }
         levelOne = transform.Find("levelOne").gameObject;
         levelTwo = transform.Find("levelTwo").gameObject;
         levelThree = transform.Find("levelThree").gameObject;

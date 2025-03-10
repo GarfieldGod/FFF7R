@@ -2,58 +2,59 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Linq;
 
 public class ChessInputer : MonoBehaviour
 {
     public GameObject chessPad;
-    public void GetChessInput(GameObject chessPos, GameObject chessObj) {
+    public void GetChessInput(GameObject chessGrid, GameObject chessObj) {
+        //chessObj
         GlobalScope.ChessProperty property = GlobalScope.GetChessProperty(chessObj.name);
         ChessSelector.RemoveChess(chessObj);
-        GameObject newChessObj = GetComponent<ChessDispenser>().InstantiateChess(ChessDispenser.DispenseChess());
-        if (newChessObj != null) {
-           ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
-        }
+        //chessGrid
+        Tuple<int, int> chessGridPos = chessGrid.GetComponent<ChessGrid>().chessGridPos;
+        GetCardModelOn(chessGrid, property);
+        GlobalScope.chessGridStatus = DoPosEffect(chessGridPos, property.PosEffects, GlobalScope.chessGridStatus);
+        DoCardEffect(chessGridPos, property.CardEffects);
+        DoSpecialEffect(chessGridPos, property.SpecialEffects);
+        GameManager.CommitChessStatusToChessPad();
+    }
+    // List<List<int>> GetChessInputWithChessGridStatus(List<List<int>> ChessGridStatus, Tuple<int, int> chessGridPos, string chessName) {
+    //     List<List<int>> result = new List<List<int>>(ChessGridStatus);
+    //     DoPosEffect(chessGridPos, property.PosEffects, GlobalScope.chessGridStatus);
+    //     return result;
+    // }
+    void GetCardModelOn(GameObject chessGridPos, GlobalScope.ChessProperty property) {
+        // TODO
+    }
+    public static List<List<int>> DoPosEffect(Tuple<int, int> chessGridPos, List<List<int>> effects, List<List<int>> chessGridStatus) {
+        List<List<int>> chessGridStatusTemp = chessGridStatus.Select(innerList => new List<int>(innerList)).ToList();
+        chessGridStatusTemp[chessGridPos.Item1][chessGridPos.Item2] = (int)GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
+        var effectTask = ParseEffectsInPosition(chessGridPos,  ParseEffects(effects));
+        ExecutePosEffect(effectTask, chessGridStatusTemp);
+        return chessGridStatusTemp;
+    }
+    void DoCardEffect(Tuple<int, int> chessGridPos, List<List<int>> effects) {
+        // TODO
+    }
+    void DoSpecialEffect(Tuple<int, int> chessGridPos, HashSet<string> effects) {
+        // TODO
+    }
 
-        GetCardModelOn(chessPos, property);
-        DoPosEffect(chessPos.name, property.PosEffects);
-        DoCardEffect(chessPos.name, property.CardEffects);
-        DoSpecialEffect(chessPos.name, property.SpecialEffects);
-        chessPos.GetComponent<ChessGrid>().posStatus = GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
-    }
-    void GetCardModelOn(GameObject chessPos, GlobalScope.ChessProperty property) {
-        // TODO
-    }
-    void DoPosEffect(string chessPosName, List<List<int>> effects) {
-        var effectTask = ParseEffectsInPosition(chessPosName,  ParseEffects(effects));
-        ExecutePosEffect(effectTask);
-    }
-    void DoCardEffect(string chessPosName, List<List<int>> effects) {
-        // TODO
-    }
-    void DoSpecialEffect(string chessPosName, HashSet<string> effects) {
-        // TODO
-    }
-    void ExecutePosEffect(List<Tuple<string, int>> effectTask) {
-        foreach (Tuple<string, int> Task in effectTask) {
-            Debug.Log("TaskName : " + Task.Item1);
-            foreach (Transform child in chessPad.transform)
-            {
-                if (child.gameObject.name == Task.Item1) {
-                    ChessGrid chessPos = child.gameObject.GetComponent<ChessGrid>();
-                    Debug.Log(child.gameObject.name + " Plus: " + Task.Item2);
-                    if (chessPos.posStatus >= GlobalScope.ChessPosStatus.OCCUPIED_FRIEND) {
-                        continue;
-                    }
-                    int chessLevel = (int)chessPos.posStatus % 10 + Task.Item2;
-                    if (chessLevel > (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND) {
-                        chessLevel = (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND;
-                    }
-                    chessPos.posStatus = (GlobalScope.ChessPosStatus)chessLevel;
-                    // chessPos.level = chessLevel;
-                }
+    static void ExecutePosEffect(List<Tuple<Tuple<int, int>, int>> effectTask, List<List<int>> chessGridStatus) {
+        foreach (Tuple<Tuple<int, int>, int> Task in effectTask) {
+            int pastLevel = chessGridStatus[Task.Item1.Item1][Task.Item1.Item2];
+            if ((GlobalScope.ChessPosStatus)pastLevel >= GlobalScope.ChessPosStatus.OCCUPIED_FRIEND) {
+                continue;
             }
+            int newLevel = (pastLevel % 10) + Task.Item2;
+            if (newLevel > (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND) {
+                newLevel = (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND;
+            }
+            chessGridStatus[Task.Item1.Item1][Task.Item1.Item2] = newLevel;
         }
     }
+
     static List<Tuple<Tuple<int, int>, int>> ParseEffects(List<List<int>> effects)
     {
         var result = new List<Tuple<Tuple<int, int>, int>>();
@@ -74,29 +75,21 @@ public class ChessInputer : MonoBehaviour
         return result;
     }
 
-    static List<Tuple<string, int>> ParseEffectsInPosition(string posName, List<Tuple<Tuple<int, int>, int>> parsedEffects)
+    static List<Tuple<Tuple<int, int>, int>> ParseEffectsInPosition(Tuple<int, int> posPos, List<Tuple<Tuple<int, int>, int>> parsedEffects)
     {
-        List<Tuple<string, int>> result = new List<Tuple<string, int>>();
-        var posPos = new Tuple<int, int>(-1, -1);
-        for (int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0); i++) {
-            for (int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
-                if ( GlobalScope.chessPositionNameList[i, j] == posName) {
-                    posPos = new Tuple<int, int>(i, j);
-                }
-            }
-        }
+        List<Tuple<Tuple<int, int>, int>> result = new List<Tuple<Tuple<int, int>, int>>();
         if (posPos.Item1 < 0 || posPos.Item2 < 0) {
             return result;
         }
-        // Debug.Log($"posPos: {posPos.Item1} {posPos.Item2}");
         foreach (var effect in parsedEffects) {
             int posY = posPos.Item1 + effect.Item1.Item1;
             int posX = posPos.Item2 + effect.Item1.Item2;
             if (posY <  GlobalScope.chessPositionNameList.GetLength(0) && posY >= 0 && posX <  GlobalScope.chessPositionNameList.GetLength(1) && posX >= 0) {
+                Debug.Log($"vertical: {posY} horizontal: {posX} value: {effect.Item2}");
                 var affectedPos = new Tuple<int, int>(posY, posX);
-                var next = new Tuple<string, int>(GlobalScope.chessPositionNameList[posY, posX], effect.Item2);
+                var next = new Tuple<Tuple<int, int>, int>(affectedPos, effect.Item2);
+                // var next = new Tuple<string, int>(GlobalScope.chessPositionNameList[posY, posX], effect.Item2); //use chessGrid name in the past
                 result.Add(next);
-                // Debug.Log($"affectedPos: { GlobalScope.chessPositionNameList[posY, posX]} \tpos: ({affectedPos.Item1}, {affectedPos.Item2}) effect: {effect.Item2}");
             }
         }
         return result;
