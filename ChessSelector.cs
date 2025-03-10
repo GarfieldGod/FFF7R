@@ -25,7 +25,7 @@ public class ChessDispenser {
         List<Chess> popChessList = new List<Chess>{};
         foreach(int i in index) {
             if(i >= ChessSelector.chessList.Count) {
-                Console.WriteLine("Invaild chessIndex.");
+                Console.WriteLine("Invaild Chess Index: " + i.ToString());
                 continue;
             }
             popChessList.Add(ChessSelector.chessList[i]);
@@ -59,20 +59,20 @@ public class ChessSelector {
 
     public static void ResetAllChessPos() {
         int chessGap = ChessSelectorLength / (chessList.Count + 1);
-        Console.WriteLine("chessGap: " + chessGap);
+        // Console.WriteLine("chessGap: " + chessGap);
         for (int i = 0; i < chessList.Count; i++) {
             chessList[i].chessPos = new Tuple<int, int>(ChessSelectorPos.Item1 + (i + 1) * chessGap, ChessSelectorPos.Item2);
             // Console.WriteLine("DoSendChess chess: " + i + " Pos: " + chessList[i].chessPos.Item1);
         }
-        Console.WriteLine("chessListSize: " + chessList.Count);
-        foreach (var chess in chessList) {
-            //Console.WriteLine("ResetAllChessPos chess Pos: " + chess.chessPos.Item1);
-            for (int i = 0; i < chess.chessPos.Item1; i++) {
-                Console.Write(" ");
-            }
-            Console.Write(chess.level);
-            Console.Write("\n");
-        }
+        // Console.WriteLine("chessListSize: " + chessList.Count);
+        // foreach (var chess in chessList) {
+        //     //Console.WriteLine("ResetAllChessPos chess Pos: " + chess.chessPos.Item1);
+        //     for (int i = 0; i < chess.chessPos.Item1; i++) {
+        //         Console.Write(" ");
+        //     }
+        //     Console.Write(chess.level);
+        //     Console.Write("\n");
+        // }
     }
 
     public static bool OutChess(Chess chess) {
