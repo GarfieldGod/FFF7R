@@ -70,7 +70,6 @@ public class GameManager : MonoBehaviour
             RunGameTurns(rivalChessListGlabol);
         }
     }
-    bool isWaiting = false;
     float startTime;
     void RunGameTurns(List<string> rivalChessList) {
         if(gameStatus == GameStatus.GAMING) {
