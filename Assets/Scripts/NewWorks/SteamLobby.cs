@@ -20,16 +20,14 @@ public class SteamLobby : MonoBehaviour
         }
     }
     private NetRoom netRoom;
-    Dictionary<string, CSteamID> LobbyListMap = new Dictionary<string, CSteamID>{};
-    private const string hostAddressKey_ = "HostAddress";
-    private const string nameKey_ = "name";
-    private const string FFF7RLobbyNameKey_ = "FFF7R_";
+    private const string HostPlayerNameKey_ = "HostPlayerName";
+    private const string HostAddressKey_ = "HostAddress";
+    private const string FFF7R_LobbyNameKey_ = "FFF7R_LobbyName";
+    private const string FFF7RLobbyNamePrefix_ = "FFF7R_";
     protected Callback<LobbyMatchList_t> lobbyMatchListCallback;
-    protected Callback<LobbyDataUpdate_t> lobbyDataUpdateCallback;
     protected Callback<LobbyCreated_t> lobbyCreated;
-    protected Callback<GameLobbyJoinRequested_t> lobbyJoinRequested;
     protected Callback<LobbyEnter_t> lobbyEntered;
-
+    protected Callback<GameLobbyJoinRequested_t> lobbyJoinRequested;
     private void Start() {
         netRoom = GetComponent<NetRoom>();
         if(!SteamManager.Initialized) {
@@ -38,55 +36,33 @@ public class SteamLobby : MonoBehaviour
         }
         debugText.text = "Steam Link Success.";
         lobbyMatchListCallback = Callback<LobbyMatchList_t>.Create(GetSteamLobbyList);
-        lobbyDataUpdateCallback = Callback<LobbyDataUpdate_t>.Create(OnLobbyDataUpdate);
         lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
         lobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
         lobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnLobbyJoinRequested);
-        SteamMatchmaking.RequestLobbyList();
+        RefreshLobbyList();
     }
     private void GetSteamLobbyList(LobbyMatchList_t callback) {
-        LobbyListMap.Clear();
+        foreach (Transform child in lobbyListContent) {
+            Destroy(child.gameObject);
+        }
         for (int i = 0; i < callback.m_nLobbiesMatching; i++)
         {
             CSteamID lobbyID = SteamMatchmaking.GetLobbyByIndex(i);
-            string lobbyName = SteamMatchmaking.GetLobbyData(lobbyID, nameKey_);
-            LobbyListMap.Add(lobbyName + i.ToString(), lobbyID);
-            if(lobbyName.Contains(FFF7RLobbyNameKey_) && !LobbyListMap.ContainsKey(lobbyName + i.ToString())) {
-                LobbyListMap.Add(lobbyName + i.ToString(), lobbyID);
+            string lobbyHostAddress = SteamMatchmaking.GetLobbyData(lobbyID, HostAddressKey_);
+            string lobbyHostName = SteamMatchmaking.GetLobbyData(lobbyID, HostPlayerNameKey_);
+            string lobbyName = SteamMatchmaking.GetLobbyData(lobbyID, FFF7R_LobbyNameKey_);
+            if(lobbyName.Contains(FFF7RLobbyNamePrefix_)) {
+                GameObject lobbyListItemOne = Instantiate(lobbyListItem, lobbyListContent);
+                Text itemText = lobbyListItemOne.GetComponentInChildren<Text>();
+                if (itemText != null) {
+                    itemText.text = lobbyHostName + "的房间: " + lobbyHostAddress;
+                }
+                UnityEngine.UI.Button joinButton = lobbyListItemOne.GetComponent<UnityEngine.UI.Button>();
+                joinButton.onClick.RemoveAllListeners();
+                joinButton.onClick.AddListener(() => JoinLobby(lobbyID));
+                Debug.Log($"Lobby ID: {lobbyID}, name :{lobbyName}");
             }
-            Debug.Log($"Lobby ID: {lobbyID}, name :{lobbyName}");
-            SteamMatchmaking.RequestLobbyData(lobbyID);
         }
-    }
-    private void OnLobbyDataUpdate(LobbyDataUpdate_t callback)
-    {
-        // if (callback.m_bSuccess == 1)
-        // {
-        //     CSteamID lobbyID = new CSteamID(callback.m_ulSteamIDLobby);
-        //     string lobbyName = SteamMatchmaking.GetLobbyData(lobbyID, nameKey_);
-        //     if(lobbyName.Contains(FFF7RLobbyNameKey_)) {
-        //         LobbyListMap.Add(lobbyName, lobbyID);
-        //     }
-        //     Debug.Log($"Lobby Name: {lobbyName}");
-        // }
-    }
-    private void OnLobbyJoinRequested(GameLobbyJoinRequested_t callback) {
-        debugText.text = "Get Lobby Join Request.";
-        SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
-        
-    }
-    private void OnLobbyEntered(LobbyEnter_t callback) {
-        debugText.text = "Other Player Joined";
-        string hostAddressKey = SteamMatchmaking.GetLobbyData(new CSteamID(callback.m_ulSteamIDLobby), hostAddressKey_);
-        netRoom.networkAddress = hostAddressKey;
-
-        if(!netRoom.isNetworkActive) {
-            netRoom.StartClient();
-            debugText.text = "Joining the Host";
-        }
-    }
-    public void HostLobby() {
-        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, netRoom.maxConnections);
     }
     private void OnLobbyCreated(LobbyCreated_t callback) {
         if(callback.m_eResult != EResult.k_EResultOK) {
@@ -96,21 +72,39 @@ public class SteamLobby : MonoBehaviour
         debugText.text = "Create Steam Lobby Success.";
         netRoom.StartHost();
         CSteamID lobbyID = new CSteamID(callback.m_ulSteamIDLobby);
-        SteamMatchmaking.SetLobbyData(lobbyID, hostAddressKey_, SteamUser.GetSteamID().ToString());
-        SteamMatchmaking.SetLobbyData(lobbyID, nameKey_, "FFF7R_" + SteamUser.GetSteamID().ToString());
+        SteamMatchmaking.SetLobbyData(lobbyID, HostAddressKey_, SteamUser.GetSteamID().ToString());
+        SteamMatchmaking.SetLobbyData(lobbyID, FFF7R_LobbyNameKey_, FFF7RLobbyNamePrefix_ + SteamUser.GetSteamID().ToString() + "_" + SteamFriends.GetPersonaName());
+        SteamMatchmaking.SetLobbyData(lobbyID, HostPlayerNameKey_, SteamFriends.GetPersonaName());
+        Debug.Log("Created Lobby: " + SteamMatchmaking.GetLobbyData(lobbyID, FFF7R_LobbyNameKey_) + " HostAddressKey: " + SteamMatchmaking.GetLobbyData(lobbyID, HostAddressKey_));
+    }
+    private void OnLobbyEntered(LobbyEnter_t callback) {
+        if(callback.m_EChatRoomEnterResponse != (uint)EChatRoomEnterResponse.k_EChatRoomEnterResponseSuccess) {
+            debugText.text = "Join Steam Lobby Failed.";
+            return;
+        }
+        CSteamID lobbyID = new CSteamID(callback.m_ulSteamIDLobby);
+        string hostAddress = SteamMatchmaking.GetLobbyData(lobbyID, HostAddressKey_);
+        Debug.Log("Entered Steam Lobby: " + hostAddress);
+
+        netRoom.networkAddress = hostAddress;
+        if(!netRoom.isNetworkActive && hostAddress != "") {
+            netRoom.StartClient();
+            Debug.Log("Entered Mirror Host by Steam Lobby: " + hostAddress);
+        }
+    }
+    private void OnLobbyJoinRequested(GameLobbyJoinRequested_t callback) {
+        SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
     }
     public void RefreshLobbyList() {
+        SteamMatchmaking.AddRequestLobbyListDistanceFilter(ELobbyDistanceFilter.k_ELobbyDistanceFilterFar);
+        SteamMatchmaking.AddRequestLobbyListResultCountFilter(100);
+        SteamMatchmaking.AddRequestLobbyListStringFilter(FFF7R_LobbyNameKey_, FFF7RLobbyNamePrefix_, ELobbyComparison.k_ELobbyComparisonGreaterThan);
         SteamMatchmaking.RequestLobbyList();
-        foreach (Transform child in lobbyListContent) {
-            Destroy(child.gameObject);
-        }
-        foreach (var lobbyMapItem in LobbyListMap){
-            GameObject lobbyListItemOne = Instantiate(lobbyListItem, lobbyListContent);
-            // lobbyListItem.transform.SetParent(lobbyListContent, false);
-            Text itemText = lobbyListItemOne.GetComponentInChildren<Text>();
-            if (itemText != null) {
-                itemText.text = lobbyMapItem.Key;
-            }
-        }
+    }
+    public void HostLobby() {
+        SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypePublic, netRoom.maxConnections);
+    }
+    public void JoinLobby(CSteamID lobbyID) {
+        SteamMatchmaking.JoinLobby(lobbyID);
     }
 }
