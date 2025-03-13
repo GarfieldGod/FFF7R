@@ -26,17 +26,6 @@ public class GlobalScope
         "downLine0", "downLine1", "downLine2", "downLine3", "downLine4"
     };
     public static HashSet<string> chessNameSet = new HashSet<string>{};
-    public enum ChessPosStatus {
-        LEVEL_ONE_FRIEND = 1,
-        LEVEL_TWO_FRIEND = 2,
-        LEVEL_THREE_FRIEND = 3,
-        EMPTY = 10,
-        LEVEL_ONE_ENEMY = 11,
-        LEVEL_TWO_ENEMY = 12,
-        LEVEL_THREE_ENEMY = 13,
-        OCCUPIED_FRIEND = 14,
-        OCCUPIED_ENEMY = 15
-    }
     public class ChessProperty
     {
         public string Name;
@@ -125,4 +114,36 @@ public class GlobalScope
         LoadChessProperties();
     }
 #endif
+}
+public enum CardEffectsType {
+    DOTOALL_ONCE = 0,
+    FRIEND_ONLY_ONCE = 1,
+    ENEMY_ONLY_ONCE = 2,
+    FRIEND_INCREASE_ENEMY_REDUCE_ONCE = 3,
+    DOTOALL_LASTING = 10,
+    FRIEND_ONLY_LASTING = 11,
+    ENEMY_ONLY_LASTING = 12,
+    FRIEND_INCREASE_ENEMY_REDUCE_LASTING = 13
+}
+public enum ChessPosStatus {
+    LEVEL_ONE_FRIEND = 1,
+    LEVEL_TWO_FRIEND = 2,
+    LEVEL_THREE_FRIEND = 3,
+    EMPTY = 10,
+    LEVEL_ONE_ENEMY = 11,
+    LEVEL_TWO_ENEMY = 12,
+    LEVEL_THREE_ENEMY = 13,
+    OCCUPIED_FRIEND = 14,
+    OCCUPIED_ENEMY = 15
+}
+public struct Int2D
+{
+    public int x;
+    public int y;
+
+    public Int2D(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
 }

@@ -19,21 +19,21 @@ public class Rival
         foreach(var line in result) {
             for(int i = 0; i < line.Count; i++) {
                 switch (line[i]) {
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_ONE_FRIEND:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_TWO_FRIEND:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND:
-                        line[i] += (int)GlobalScope.ChessPosStatus.EMPTY;
+                    case (int)ChessPosStatus.LEVEL_ONE_FRIEND:
+                    case (int)ChessPosStatus.LEVEL_TWO_FRIEND:
+                    case (int)ChessPosStatus.LEVEL_THREE_FRIEND:
+                        line[i] += (int)ChessPosStatus.EMPTY;
                         break;
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_ONE_ENEMY:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_TWO_ENEMY:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_THREE_ENEMY:
-                        line[i] -= (int)GlobalScope.ChessPosStatus.EMPTY;
+                    case (int)ChessPosStatus.LEVEL_ONE_ENEMY:
+                    case (int)ChessPosStatus.LEVEL_TWO_ENEMY:
+                    case (int)ChessPosStatus.LEVEL_THREE_ENEMY:
+                        line[i] -= (int)ChessPosStatus.EMPTY;
                         break;
-                    case (int)GlobalScope.ChessPosStatus.OCCUPIED_FRIEND:
-                        line[i] = (int)GlobalScope.ChessPosStatus.OCCUPIED_ENEMY;
+                    case (int)ChessPosStatus.OCCUPIED_FRIEND:
+                        line[i] = (int)ChessPosStatus.OCCUPIED_ENEMY;
                         break;
-                    case (int)GlobalScope.ChessPosStatus.OCCUPIED_ENEMY:
-                        line[i] = (int)GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
+                    case (int)ChessPosStatus.OCCUPIED_ENEMY:
+                        line[i] = (int)ChessPosStatus.OCCUPIED_FRIEND;
                         break;
                     default:
                         break;
@@ -57,7 +57,7 @@ public class Rival
         List<Tuple<Tuple<int, int>, int>> result = new List<Tuple<Tuple<int, int>, int>>{};
         for(int i = 0; i < chessStatus.Count; i++) {
             for(int j = 0; j < chessStatus[i].Count; j++) {
-                if(chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND) {
+                if(chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
                     result.Add(new Tuple<Tuple<int, int>, int>(new Tuple<int, int>(i, j), chessStatus[i][j]));
                 }
             }
@@ -91,7 +91,7 @@ public class AiRival {
                 }
                 // List<List<int>> chessGridStatusTemp = new List<List<int>>(chessGridStatus);
                 List<List<int>> chessGridStatusTemp = chessGridStatus.Select(innerList => new List<int>(innerList)).ToList();
-                chessGridStatusTemp = ChessInputer.DoPosEffect(new Tuple<int, int>(vaildChessGrid.Item1.Item1, vaildChessGrid.Item1.Item2), property.PosEffects, chessGridStatusTemp);
+                chessGridStatusTemp = ChessInputer.DoPosEffect(new Int2D(vaildChessGrid.Item1.Item1, vaildChessGrid.Item1.Item2), property.PosEffects, chessGridStatusTemp);
                 //OtherEffect // TODO
                 if (Rival.GetAllVaildChessGrids(chessGridStatusTemp).Count >= chessPosPoint) {
                     chessPosPoint = Rival.GetAllVaildChessGrids(chessGridStatusTemp).Count;
@@ -115,7 +115,7 @@ public class AiRival {
         }
         // List<List<int>> finalChessGridStatusTemp = new List<List<int>>(chessGridStatus);
         GlobalScope.ChessProperty finalProperty = GlobalScope.GetChessProperty(finalResult.Item2);
-        finalChessGridStatusTemp = ChessInputer.DoPosEffect(new Tuple<int, int>(finalResult.Item1.Item1, finalResult.Item1.Item2), finalProperty.PosEffects, finalChessGridStatusTemp);
+        finalChessGridStatusTemp = ChessInputer.DoPosEffect(new Int2D(finalResult.Item1.Item1, finalResult.Item1.Item2), finalProperty.PosEffects, finalChessGridStatusTemp);
         for(int i = 0; i < chessInHand.Count; i++) {
             if(chessInHand[i] == finalResult.Item2) {
                 chessInHand.RemoveAt(i);
