@@ -1,17 +1,17 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Chess : MonoBehaviour
 {
+    public string cardCode;
     public string chessName;
     public int level;
     public int cost;
     public Vector3 chessPos = new Vector3(0, 0, 0);
     public GameObject chessModel = null;
-    public void InstantiateChessProperty(GlobalScope.ChessProperty property)
+    public void InstantiateChessProperty(ChessProperty property)
     {
-        gameObject.name = property.Name;
+        gameObject.name = property.CardCode;
+        cardCode = property.CardCode;
         chessName = property.Name;
         level = property.Level;
         cost = property.Cost;
@@ -49,6 +49,8 @@ public class Chess : MonoBehaviour
     }
     void Update () {
         ObjectPosToChessPos(chessPos, Quaternion.identity, 100f);
-        MouseHover();
+        if (chessModel != null) {
+            MouseHover();
+        }
     }
 }

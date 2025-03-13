@@ -1,73 +1,191 @@
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 using System.Linq;
+using Unity.VisualScripting;
 
-public class ChessInputer : MonoBehaviour
-{
+
+#if UNITY_ENGINE
+using UnityEngine;
+public struct ChessInputParmObj {
+    public GameObject chessGrid;
+    public GameObject chessObj;
+    public List<List<List<int>>> chessGridStatus;
+    public Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting;
+    public ChessInputParmObj(GameObject chessGrid, GameObject chessObj, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        this.chessGrid = chessGrid;
+        this.chessObj = chessObj;
+        this.chessGridStatus = chessGridStatus;
+        this.tasksLasting = tasksLasting;
+    }
+}
+public struct ChessInputParm {
+    public Int2D chessGridPos;
+    public ChessProperty property;
+    public List<List<List<int>>> chessGridStatus;
+    public Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting;
+    public ChessInputParm(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        this.chessGridPos = chessGridPos;
+        this.property = property;
+        this.chessGridStatus = chessGridStatus;
+        this.tasksLasting = tasksLasting;
+    }
+}
+public class ChessInputer : MonoBehaviour {
     public GameObject chessPad;
-    public void GetChessInput(GameObject chessGrid, GameObject chessObj) {
-        //chessObj
-        GlobalScope.ChessProperty property = GlobalScope.GetChessProperty(chessObj.name);
+    public static void GetChessInput(ChessInputParmObj parms) {
+        GetChessInput(parms.chessGrid, parms.chessObj, parms.chessGridStatus, parms.tasksLasting);
+    }
+    public static void GetChessInput(ChessInputParm parms) {
+        GetChessInput(parms.chessGridPos, parms.property, parms.chessGridStatus, parms.tasksLasting);
+    }
+    public static void GetChessInput(GameObject chessGrid, GameObject chessObj, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        Int2D chessGridPos = chessGrid.GetComponent<ChessGrid>().chessGridPos_;
+        ChessProperty property = GlobalScope.GetChessProperty(chessObj.name);
+        GetChessInput(chessGridPos, property, chessGridStatus, tasksLasting);
         ChessSelector.RemoveChess(chessObj);
-        //chessGrid
-        Tuple<int, int> chessGridPos = chessGrid.GetComponent<ChessGrid>().chessGridPos;
-        GetCardModelOn(chessGrid, property);
-        GlobalScope.chessGridStatus = DoPosEffect(chessGridPos, property.PosEffects, GlobalScope.chessGridStatus);
-        DoCardEffect(chessGridPos, property.CardEffects);
-        DoSpecialEffect(chessGridPos, property.SpecialEffects);
+    }
+    public static void GetChessInput(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        GetCardModelOn(chessGridPos, property);
+        chessGridStatus[0] = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridStatus[0]);
+        chessGridStatus[1] = CardEffect.DoCardEffect(chessGridPos, property, chessGridStatus, tasksLasting);
+        // DoSpecialEffect(chessGridPos, property.SpecialEffects);
         GameManager.CommitChessStatusToChessPad();
     }
-    // List<List<int>> GetChessInputWithChessGridStatus(List<List<int>> ChessGridStatus, Tuple<int, int> chessGridPos, string chessName) {
-    //     List<List<int>> result = new List<List<int>>(ChessGridStatus);
-    //     DoPosEffect(chessGridPos, property.PosEffects, GlobalScope.chessGridStatus);
-    //     return result;
-    // }
-    void GetCardModelOn(GameObject chessGridPos, GlobalScope.ChessProperty property) {
+    private static void GetCardModelOn(Int2D chessGridPos, ChessProperty property) {
+        // for(int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0); i++) {
+        //     for(int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
+        //         Transform chessGrid = chessPad.transform.Find(GlobalScope.chessPositionNameList[chessGridPos.x, chessGridPos.y]);
+        //         // chessGridPosStatus
+        //         if(Enum.IsDefined(typeof(ChessPosStatus), GlobalScope.chessGridStatus[0][i][j]) && chessGrid != null) {
+        //             chessGrid.GetComponent<ChessGrid>().posStatus_ = (ChessPosStatus)GlobalScope.chessGridStatus[0][i][j];
+        //         }
+        //         // Others TODO
+        //     }
+        // }
+    }
+}
+#endif
+
+public class SpecialEffect {
+    void DoSpecialEffect(Int2D chessGridPos, HashSet<string> effects) {
         // TODO
     }
-    public static List<List<int>> DoPosEffect(Tuple<int, int> chessGridPos, List<List<int>> effects, List<List<int>> chessGridStatus) {
-        List<List<int>> chessGridStatusTemp = chessGridStatus.Select(innerList => new List<int>(innerList)).ToList();
-        chessGridStatusTemp[chessGridPos.Item1][chessGridPos.Item2] = (int)GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
-        var effectTask = ParseEffectsInPosition(chessGridPos,  ParseEffects(effects));
+}
+
+public class CardEffect {
+    public static List<List<int>> DoCardEffect(ChessInputParm parms) {
+        return DoCardEffect(parms.chessGridPos, parms.property, parms.chessGridStatus, parms.tasksLasting);
+    }
+    public static List<List<int>> DoCardEffect(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        List<List<int>> chessGridCardEffectsStatus = chessGridStatus[1];
+        List<List<int>> chessGridPosEffectStatus = chessGridStatus[0];
+        List<List<int>> chessGridStatusTemp = chessGridCardEffectsStatus.Select(innerList => new List<int>(innerList)).ToList();
+        chessGridStatusTemp[chessGridPos.x][chessGridPos.y] = property.Level;
+        Tuple<CardEffectsType, List<List<int>>> cardEffects = property.CardEffects;
+        if(cardEffects == null || cardEffects.Item2 == null || cardEffects.Item2.Count == 0) {
+            return chessGridStatusTemp;
+        }
+        Int2D chessPadSize = new Int2D(chessGridStatusTemp.Count, chessGridStatusTemp[0].Count);
+        var effectTask = EffectsParser.ParseEffectsInPosition(chessPadSize, chessGridPos,  EffectsParser.ParseEffectsInRelative(cardEffects.Item2));
+        if(cardEffects.Item1 <= CardEffectsType.FRIEND_INCREASE_ENEMY_REDUCE_ONCE) {
+            var taskToRun = GetVaildCardEffectTasks(cardEffects.Item1, effectTask, chessGridPosEffectStatus);
+            ExecuteCardEffect(taskToRun, chessGridStatusTemp);
+        } else {
+            tasksLasting.Add(chessGridPos, effectTask);
+        }
+        return ComposeOneAndLastingCardEffects(chessGridStatusTemp, tasksLasting);
+    }
+    public static void RemoveCardLastingEffect(Int2D chessPos, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        if (tasksLasting.ContainsKey(chessPos)) {
+            tasksLasting.Remove(chessPos);
+        }
+    }
+    private static List<List<int>> ComposeOneAndLastingCardEffects(List<List<int>> chessGridCardEffectsStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        List<List<int>> chessGridCardEffectsStatusTemp = chessGridCardEffectsStatus.Select(innerList => new List<int>(innerList)).ToList();
+        foreach(var taskPair in tasksLasting) {
+            ExecuteCardEffect(taskPair.Value, chessGridCardEffectsStatusTemp);
+        }
+        return chessGridCardEffectsStatusTemp;
+    }
+    private static List<Tuple<Int2D, int>> GetVaildCardEffectTasks(CardEffectsType cardEffectsType, List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridPosEffectStatus) {
+        var absoluteCardEffectsType = (CardEffectsType)((int)cardEffectsType % 10);
+        var tasksToRun = new List<Tuple<Int2D, int>>{};
+        foreach(var task in effectTask) {
+            switch (absoluteCardEffectsType) {
+                case CardEffectsType.DOTOALL_ONCE:
+                    tasksToRun.Add(task);
+                    break;
+                case CardEffectsType.FRIEND_ONLY_ONCE:
+                    if (chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_FRIEND) {
+                        tasksToRun.Add(task);
+                    }
+                    break;
+                case CardEffectsType.ENEMY_ONLY_ONCE:
+                    if (chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_ENEMY) {
+                        tasksToRun.Add(task);
+                    }
+                    break;
+                case CardEffectsType.FRIEND_INCREASE_ENEMY_REDUCE_ONCE:
+                    if ((chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_ENEMY  && task.Item2 < 0) ||
+                        (chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_FRIEND && task.Item2 > 0)) {
+                        tasksToRun.Add(task);
+                    }
+                    break;
+                default:break;
+            }
+        }
+        return tasksToRun;
+    }
+    private static void ExecuteCardEffect(List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridStatus) {
+        foreach (Tuple<Int2D, int> Task in effectTask) {
+            int pastLevel = chessGridStatus[Task.Item1.x][Task.Item1.y];
+            int newLevel = pastLevel + Task.Item2;
+            chessGridStatus[Task.Item1.x][Task.Item1.y] = newLevel;
+        }
+    }
+}
+
+public class PosEffect {
+    public static List<List<int>> DoPosEffect(Int2D chessGridPos, List<List<int>> posEffects, List<List<int>> chessGridPosEffectStatus) {
+        List<List<int>> chessGridStatusTemp = chessGridPosEffectStatus.Select(innerList => new List<int>(innerList)).ToList();
+        chessGridStatusTemp[chessGridPos.x][chessGridPos.y] = (int)ChessPosStatus.OCCUPIED_FRIEND;
+        Int2D chessPadSize = new Int2D(chessGridStatusTemp.Count, chessGridStatusTemp[0].Count);
+        var effectTask = EffectsParser.ParseEffectsInPosition(chessPadSize, chessGridPos,  EffectsParser.ParseEffectsInRelative(posEffects));
         ExecutePosEffect(effectTask, chessGridStatusTemp);
         return chessGridStatusTemp;
     }
-    void DoCardEffect(Tuple<int, int> chessGridPos, List<List<int>> effects) {
-        // TODO
-    }
-    void DoSpecialEffect(Tuple<int, int> chessGridPos, HashSet<string> effects) {
-        // TODO
-    }
-
-    static void ExecutePosEffect(List<Tuple<Tuple<int, int>, int>> effectTask, List<List<int>> chessGridStatus) {
-        foreach (Tuple<Tuple<int, int>, int> Task in effectTask) {
-            int pastLevel = chessGridStatus[Task.Item1.Item1][Task.Item1.Item2];
-            if ((GlobalScope.ChessPosStatus)pastLevel >= GlobalScope.ChessPosStatus.OCCUPIED_FRIEND) {
+    private static void ExecutePosEffect(List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridStatus) {
+        foreach (Tuple<Int2D, int> Task in effectTask) {
+            int pastLevel = chessGridStatus[Task.Item1.x][Task.Item1.y];
+            if ((ChessPosStatus)pastLevel >= ChessPosStatus.OCCUPIED_FRIEND) {
                 continue;
             }
-            int newLevel = (pastLevel % 10) + Task.Item2;
-            if (newLevel > (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND) {
-                newLevel = (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND;
+            int newLevel = pastLevel % 10;
+            if (pastLevel <= (int)ChessPosStatus.EMPTY) {
+                newLevel += Task.Item2;
             }
-            chessGridStatus[Task.Item1.Item1][Task.Item1.Item2] = newLevel;
+            if (newLevel > (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
+                newLevel = (int)ChessPosStatus.LEVEL_THREE_FRIEND;
+            }
+            chessGridStatus[Task.Item1.x][Task.Item1.y] = newLevel;
         }
     }
+}
 
-    static List<Tuple<Tuple<int, int>, int>> ParseEffects(List<List<int>> effects)
+class EffectsParser {
+    public static List<Tuple<Int2D, int>> ParseEffectsInRelative(List<List<int>> effects)
     {
-        var result = new List<Tuple<Tuple<int, int>, int>>();
-        var midPos = new Tuple<int, int>((effects.Count - 1) / 2, (effects[0].Count - 1) / 2);
+        var result = new List<Tuple<Int2D, int>>();
+        var midPos = new Int2D((effects.Count - 1) / 2, (effects[0].Count - 1) / 2);
         for (int i = 0; i < effects.Count; i++) {
             for (int j = 0; j < effects[i].Count; j++) {
                 if (effects[i][j] != 0) {
-                    int posY = i - midPos.Item1;
-                    int posX = j - midPos.Item2;
+                    int posX = i - midPos.x;
+                    int posY = j - midPos.y;
                     if (posX != 0 || posY != 0) {
-                        var posWithValue = new Tuple<Tuple<int, int>, int>(new Tuple<int, int>(posY, posX), effects[i][j]);
+                        var posWithValue = new Tuple<Int2D, int>(new Int2D(posX, posY), effects[i][j]);
                         result.Add(posWithValue);
-                        // Debug.Log($"y: {posY} x: {posX} value: {effects[i][j]}");
+                        Log.test($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
                     }
                 }
             }
@@ -75,19 +193,19 @@ public class ChessInputer : MonoBehaviour
         return result;
     }
 
-    static List<Tuple<Tuple<int, int>, int>> ParseEffectsInPosition(Tuple<int, int> posPos, List<Tuple<Tuple<int, int>, int>> parsedEffects)
+    public static List<Tuple<Int2D, int>> ParseEffectsInPosition(Int2D chessPadSize, Int2D posPos, List<Tuple<Int2D, int>> parsedEffects)
     {
-        List<Tuple<Tuple<int, int>, int>> result = new List<Tuple<Tuple<int, int>, int>>();
-        if (posPos.Item1 < 0 || posPos.Item2 < 0) {
+        List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>();
+        if (posPos.x < 0 || posPos.y < 0) {
             return result;
         }
         foreach (var effect in parsedEffects) {
-            int posY = posPos.Item1 + effect.Item1.Item1;
-            int posX = posPos.Item2 + effect.Item1.Item2;
-            if (posY <  GlobalScope.chessPositionNameList.GetLength(0) && posY >= 0 && posX <  GlobalScope.chessPositionNameList.GetLength(1) && posX >= 0) {
-                Debug.Log($"vertical: {posY} horizontal: {posX} value: {effect.Item2}");
-                var affectedPos = new Tuple<int, int>(posY, posX);
-                var next = new Tuple<Tuple<int, int>, int>(affectedPos, effect.Item2);
+            int posX = posPos.x + effect.Item1.x;
+            int posY = posPos.y + effect.Item1.y;
+            if (posX <  chessPadSize.x && posX >= 0 && posY <  chessPadSize.y && posY >= 0) {
+                Log.test($"ParseEffectsInPosition: vertical: {posY} horizontal: {posX} value: {effect.Item2}");
+                var affectedPos = new Int2D(posX, posY);
+                var next = new Tuple<Int2D, int>(affectedPos, effect.Item2);
                 // var next = new Tuple<string, int>(GlobalScope.chessPositionNameList[posY, posX], effect.Item2); //use chessGrid name in the past
                 result.Add(next);
             }

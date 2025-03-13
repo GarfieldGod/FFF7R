@@ -35,7 +35,7 @@ public class ChessDispenser : MonoBehaviour
             ChessSelector.PushBackChess(InstantiateChess(DispenseChess()).GetComponent<Chess>());
         }
         foreach(Chess chess in popChessList) {
-            chessPool.Add(chess.chessName);
+            chessPool.Add(chess.cardCode);
         }
     }
 
@@ -45,7 +45,7 @@ public class ChessDispenser : MonoBehaviour
             return null;
         }
         GameObject instantiateBody = Instantiate(chessPrefab, chessSelectorPos.transform);
-        GlobalScope.ChessProperty instantiateData = GlobalScope.GetChessProperty(chessName);
+        ChessProperty instantiateData = GlobalScope.GetChessProperty(chessName);
         if (instantiateData != null) {
             instantiateBody.GetComponent<Chess>().InstantiateChessProperty(instantiateData);
             return instantiateBody;

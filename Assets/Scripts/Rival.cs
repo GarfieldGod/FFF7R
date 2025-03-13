@@ -1,94 +1,108 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
-using UnityEditor;
-using UnityEngine;
-using System.Linq;
 
-public class Rival : MonoBehaviour
-{
-    public static List<List<int>> DoRivalInput(List<List<int>> chessGridStatus, List<string> chessInHand) {
-        List<List<int>> RivalViewChessStatus = GetChessStatusInRivalView(chessGridStatus);
-        List<Tuple<Tuple<int, int>, int>> vaildChessGrids = GetAllVaildChessGrids(RivalViewChessStatus);
-        return DoTheBestInEveryChessOnEveryChessGrid(RivalViewChessStatus, vaildChessGrids, chessInHand);
+public class AiRival {
+    public static List<List<List<int>>> DoAiRivalInput(List<List<List<int>>> chessGridStatus, List<string> chessInHand, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        List<List<List<int>>> RivalViewChessStatus = Rival.GetChessStatusInRivalView(chessGridStatus);
+        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllVaildChessGrids(RivalViewChessStatus[0]);
+        return DoTheBestInEveryChessOnEveryChessGrid(RivalViewChessStatus, vaildChessGrids, chessInHand, tasksLasting);
     }
-    public static List<List<int>> DoTheBestInEveryChessOnEveryChessGrid(List<List<int>> chessGridStatus, List<Tuple<Tuple<int, int>, int>> vaildChessGrids, List<string> chessInHand) {
-        List<List<int>> finalChessGridStatusTemp = chessGridStatus.Select(innerList => new List<int>(innerList)).ToList();
+    private static List<List<List<int>>> DoTheBestInEveryChessOnEveryChessGrid(List<List<List<int>>> chessGridStatus, List<Tuple<Int2D, int>> vaildChessGrids, List<string> chessInHand,
+        Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        List<List<List<int>>> finalChessGridStatusTemp = GlobalScope.DeepCopy3DList(chessGridStatus);
         if(vaildChessGrids.Count == 0) {
-            return GetChessStatusInRivalView(finalChessGridStatusTemp);
+            return Rival.GetChessStatusInRivalView(finalChessGridStatusTemp);
         }
-        //PosEffct
-        //List<<Pos(y, x), CardName, score>>
-        List<Tuple<Tuple<int, int>, string, int>> result = new List<Tuple<Tuple<int, int>, string, int>>{};
+        List<Tuple<Int2D, string, int>> resultInPosEffect = DoTheBestInEveryCardForPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
+        // List<Tuple<Int2D, string, int>> resultInCardEffect = DoTheBestByEveryCardInPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
+        // List<Tuple<Int2D, string, int>> resultInSpecialEffect = DoTheBestByEveryCardInPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
+        if(resultInPosEffect.Count != 0) {
+            Tuple<Int2D, string, int> bestResultInPosEffect = FindTheHighestScore(resultInPosEffect);
+            // Tuple<Int2D, string, int> bestResultInCardEffect = FindTheHighestScore(resultInCardEffect);
+            // Tuple<Int2D, string, int> bestResultInSpecialEffect = FindTheHighestScore(resultInSpecialEffect);
+            Int2D chessGridPos = new Int2D(bestResultInPosEffect.Item1.x, bestResultInPosEffect.Item1.y);
+            ChessProperty property = GlobalScope.GetChessProperty(bestResultInPosEffect.Item2);
+            ChessInputParm parmInput = new ChessInputParm(
+                chessGridPos,
+                property,
+                finalChessGridStatusTemp,
+                tasksLasting
+            );
+            ChessInputer.GetChessInput(parmInput);
+            for(int i = 0; i < chessInHand.Count; i++) {
+                if(chessInHand[i] == bestResultInPosEffect.Item2) {
+                    chessInHand.RemoveAt(i);
+                    break;
+                }
+            }
+        }
+        return Rival.GetChessStatusInRivalView(finalChessGridStatusTemp);
+    }
+    private static List<Tuple<Int2D, string, int>> DoTheBestInEveryCardForPosEffect(List<List<int>> chessGridPosStatus, List<Tuple<Int2D, int>> vaildChessGrids, List<string> chessInHand) {
+        List<Tuple<Int2D, string, int>> result = new List<Tuple<Int2D, string, int>>{};
         foreach(var chessName in chessInHand) {
             int chessPosPoint = 0;
-            int posY = 0;
             int posX = 0;
+            int posY = 0;
+            ChessProperty property = GlobalScope.GetChessProperty(chessName);
             foreach(var vaildChessGrid in vaildChessGrids) {
-                GlobalScope.ChessProperty property = GlobalScope.GetChessProperty(chessName);
                 if(vaildChessGrid.Item2 > property.Level) {
                     continue;
                 }
-                // List<List<int>> chessGridStatusTemp = new List<List<int>>(chessGridStatus);
-                List<List<int>> chessGridStatusTemp = chessGridStatus.Select(innerList => new List<int>(innerList)).ToList();
-                chessGridStatusTemp = ChessInputer.DoPosEffect(new Tuple<int, int>(vaildChessGrid.Item1.Item1, vaildChessGrid.Item1.Item2), property.PosEffects, chessGridStatusTemp);
-                //OtherEffect // TODO
-                if (GetAllVaildChessGrids(chessGridStatusTemp).Count >= chessPosPoint) {
-                    chessPosPoint = GetAllVaildChessGrids(chessGridStatusTemp).Count;
-                    posY = vaildChessGrid.Item1.Item1;
-                    posX = vaildChessGrid.Item1.Item2;
+                Int2D chessGridPos = new Int2D(vaildChessGrid.Item1.x, vaildChessGrid.Item1.y);
+                List<List<int>> chessGridStatusTemp = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridPosStatus);
+                int effectResult = Rival.GetAllVaildChessGrids(chessGridStatusTemp).Count;
+                if (effectResult >= chessPosPoint) {
+                    chessPosPoint = effectResult;
+                    posX = vaildChessGrid.Item1.x;
+                    posY = vaildChessGrid.Item1.y;
                 }
             }
-            Tuple<Tuple<int, int>, string, int> oneResult = new Tuple<Tuple<int, int>, string, int>(new Tuple<int, int>(posY, posX), chessName, chessPosPoint);
+            Tuple<Int2D, string, int> oneResult = new Tuple<Int2D, string, int>(new Int2D(posX, posY), chessName, chessPosPoint);
             result.Add(oneResult);
         }
-        if(result.Count == 0) {
-            return GetChessStatusInRivalView(finalChessGridStatusTemp);
-        }
-        int maxScore = 0;
-        Tuple<Tuple<int, int>, string, int> finalResult = result[0];
-        foreach(var oneResult in result) {
-            if (oneResult.Item3 > maxScore) {
-                maxScore = oneResult.Item3;
-                finalResult = oneResult;
-            }
-        }
-        // List<List<int>> finalChessGridStatusTemp = new List<List<int>>(chessGridStatus);
-        GlobalScope.ChessProperty finalProperty = GlobalScope.GetChessProperty(finalResult.Item2);
-        finalChessGridStatusTemp = ChessInputer.DoPosEffect(new Tuple<int, int>(finalResult.Item1.Item1, finalResult.Item1.Item2), finalProperty.PosEffects, finalChessGridStatusTemp);
-        for(int i = 0; i < chessInHand.Count; i++) {
-            if(chessInHand[i] == finalResult.Item2) {
-                chessInHand.RemoveAt(i);
-                break;
-            }
-        }
-        return GetChessStatusInRivalView(finalChessGridStatusTemp);
+        return result;
     }
 
-    public static List<List<int>> GetChessStatusInRivalView(List<List<int>> originChessStatus) {
-        // List<List<int>> result = new List<List<int>>(originChessStatus);
-        List<List<int>> result = originChessStatus.Select(innerList => new List<int>(innerList)).ToList();
-        foreach(var line in result) {
+    private static Tuple<Int2D, string, int> FindTheHighestScore(List<Tuple<Int2D, string, int>> ScoreList) {
+        int maxScore = 0;
+        Tuple<Int2D, string, int> result = ScoreList[0];
+        foreach(var Score in ScoreList) {
+            if (Score.Item3 > maxScore) {
+                maxScore = Score.Item3;
+                result = Score;
+            }
+        }
+        return result;
+    }
+}
+public class Rival
+{
+    public static List<List<List<int>>> GetChessStatusInRivalView(List<List<List<int>>> originChessStatus) {
+        List<List<List<int>>> result = GlobalScope.DeepCopy3DList(originChessStatus);
+        GetChessPosStatusInRivalView(result[0]);
+        GetChessCardStatusInRivalView(result[1]);
+        return result;
+    }
+    private static void GetChessPosStatusInRivalView(List<List<int>> chessPosStatus) {
+        foreach(var line in chessPosStatus) {
             for(int i = 0; i < line.Count; i++) {
                 switch (line[i]) {
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_ONE_FRIEND:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_TWO_FRIEND:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND:
-                        line[i] += (int)GlobalScope.ChessPosStatus.EMPTY;
+                    case (int)ChessPosStatus.LEVEL_ONE_FRIEND:
+                    case (int)ChessPosStatus.LEVEL_TWO_FRIEND:
+                    case (int)ChessPosStatus.LEVEL_THREE_FRIEND:
+                        line[i] += (int)ChessPosStatus.EMPTY;
                         break;
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_ONE_ENEMY:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_TWO_ENEMY:
-                    case (int)GlobalScope.ChessPosStatus.LEVEL_THREE_ENEMY:
-                        line[i] -= (int)GlobalScope.ChessPosStatus.EMPTY;
+                    case (int)ChessPosStatus.LEVEL_ONE_ENEMY:
+                    case (int)ChessPosStatus.LEVEL_TWO_ENEMY:
+                    case (int)ChessPosStatus.LEVEL_THREE_ENEMY:
+                        line[i] -= (int)ChessPosStatus.EMPTY;
                         break;
-                    case (int)GlobalScope.ChessPosStatus.OCCUPIED_FRIEND:
-                        line[i] = (int)GlobalScope.ChessPosStatus.OCCUPIED_ENEMY;
+                    case (int)ChessPosStatus.OCCUPIED_FRIEND:
+                        line[i] = (int)ChessPosStatus.OCCUPIED_ENEMY;
                         break;
-                    case (int)GlobalScope.ChessPosStatus.OCCUPIED_ENEMY:
-                        line[i] = (int)GlobalScope.ChessPosStatus.OCCUPIED_FRIEND;
+                    case (int)ChessPosStatus.OCCUPIED_ENEMY:
+                        line[i] = (int)ChessPosStatus.OCCUPIED_FRIEND;
                         break;
                     default:
                         break;
@@ -105,15 +119,28 @@ public class Rival : MonoBehaviour
                 right--;
             }
         }
-        return result;
     }
 
-    public static List<Tuple<Tuple<int, int>, int>> GetAllVaildChessGrids(List<List<int>> chessStatus) {
-        List<Tuple<Tuple<int, int>, int>> result = new List<Tuple<Tuple<int, int>, int>>{};
+    private static void GetChessCardStatusInRivalView(List<List<int>> chessCardStatus) {
+        foreach(var line in chessCardStatus) {
+            int left = 0;
+            int right = line.Count - 1;
+            while (left < right)
+            {
+                int temp = line[left];
+                line[left] = line[right];
+                line[right] = temp;
+                left++;
+                right--;
+            }
+        }
+    }
+    public static List<Tuple<Int2D, int>> GetAllVaildChessGrids(List<List<int>> chessStatus) {
+        List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>{};
         for(int i = 0; i < chessStatus.Count; i++) {
             for(int j = 0; j < chessStatus[i].Count; j++) {
-                if(chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)GlobalScope.ChessPosStatus.LEVEL_THREE_FRIEND) {
-                    result.Add(new Tuple<Tuple<int, int>, int>(new Tuple<int, int>(i, j), chessStatus[i][j]));
+                if(chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
+                    result.Add(new Tuple<Int2D, int>(new Int2D(i, j), chessStatus[i][j]));
                 }
             }
         }

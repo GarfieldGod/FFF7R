@@ -56,7 +56,13 @@ public class PlayerOperation : MonoBehaviour
                 if (currentChessObject != CHESSNULL && GlobalScope.chessPositionNameSet.Contains(hitOne.name)) {
                     if (CheckIfInputVaild(hitOne, currentChessObject)) {
                         Debug.Log("Input is vaild.");
-                        GetComponent<ChessInputer>().GetChessInput(hitOne, currentChessObject);
+                        ChessInputParmObj parmsInput = new ChessInputParmObj(
+                            hitOne,
+                            currentChessObject,
+                            GlobalScope.chessGridStatus,
+                            GameManager.playerLastingTasks
+                        );
+                        ChessInputer.GetChessInput(parmsInput);
                         GameObject newChessObj = GetComponent<ChessDispenser>().InstantiateChess(ChessDispenser.DispenseChess());
                         if (newChessObj != null) {
                         ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
@@ -85,16 +91,16 @@ public class PlayerOperation : MonoBehaviour
 
     bool CheckIfInputVaild (GameObject chessPositionObject, GameObject chessObject) {
         ChessGrid chessPos = chessPositionObject.GetComponent<ChessGrid>();
-        int chessPosLevel = chessPos.GetChessLevel();
-        if (chessPosLevel <= 0 || chessPosLevel < GlobalScope.GetChessProperty(chessObject.name).Level) {
+        int chessPosLevel = chessPos.GetChessPosLevel();
+        if (chessPosLevel <= 0 || chessPosLevel < GlobalScope.GetChessProperty(chessObject.name).Cost) {
             return false;
         }
         if(!GetComponent<GameManager>().PlayerTurn) {
             return false;
         }
-        List<Tuple<Tuple<int, int>, int>> vaildChessGrids = Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus);
+        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus[0]);
         foreach(var vaildChessGrid in vaildChessGrids) {
-            if(chessPos.chessGridPos.Item1 == vaildChessGrid.Item1.Item1 && chessPos.chessGridPos.Item2 == vaildChessGrid.Item1.Item2) {
+            if(chessPos.chessGridPos_.x == vaildChessGrid.Item1.x && chessPos.chessGridPos_.y == vaildChessGrid.Item1.y) {
                 return true;
             }
         }

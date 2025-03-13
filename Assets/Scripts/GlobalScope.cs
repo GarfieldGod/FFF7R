@@ -1,13 +1,20 @@
+// #define UNITY_ENGINE
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
-using Newtonsoft.Json;
 using System;
+using Newtonsoft.Json;
+using System.Diagnostics;
+#if UNITY_ENGINE
+using UnityEngine;
+using System.Linq;
 using Unity.VisualScripting;
-
 public class GlobalScope : MonoBehaviour
+#else 
+public class GlobalScope
+#endif
 {
-    public static List<List<int>> chessGridStatus;
+    private static readonly string chessPropertiesJsonPath = "Json/ChessProperties.json";
+    public static List<List<List<int>>> chessGridStatus;
     public static readonly string[,] chessPositionNameList = {
         { "upLine0", "upLine1", "upLine2", "upLine3", "upLine4" },
         { "midLine0", "midLine1", "midLine2", "midLine3", "midLine4" },
@@ -20,50 +27,34 @@ public class GlobalScope : MonoBehaviour
         "downLine0", "downLine1", "downLine2", "downLine3", "downLine4"
     };
     public static HashSet<string> chessNameSet = new HashSet<string>{};
-    public enum ChessPosStatus {
-        LEVEL_ONE_FRIEND = 1,
-        LEVEL_TWO_FRIEND = 2,
-        LEVEL_THREE_FRIEND = 3,
-        EMPTY = 10,
-        LEVEL_ONE_ENEMY = 11,
-        LEVEL_TWO_ENEMY = 12,
-        LEVEL_THREE_ENEMY = 13,
-        OCCUPIED_FRIEND = 14,
-        OCCUPIED_ENEMY = 15
-    }
-    public class ChessProperty
-    {
-        public string Name;
-        public int Level;
-        public int Cost;
-        public List<List<int>> PosEffects;
-        public List<List<int>> CardEffects;
-        public HashSet<string> SpecialEffects;
-    }
     private static List<ChessProperty> ChessProperties;
+    public static ChessProperty GetChessProperty(string chessCode)
+    {
+        foreach (var chess in ChessProperties) {
+            if (chess.CardCode == chessCode) {
+                return chess;
+            }
+        }
+        return null;
+    }
     public static void LoadChessProperties()
     {
-        string path = Path.Combine(Application.streamingAssetsPath, "Json/ChessProperties.json");
+#if UNITY_ENGINE
+        string path = Path.Combine(Application.streamingAssetsPath, chessPropertiesJsonPath);
+#else
+        string path = chessPropertiesJsonPath;
+#endif
         string ChessPropertiesData = System.IO.File.ReadAllText(path);
         ChessProperties = JsonConvert.DeserializeObject<List<ChessProperty>>(ChessPropertiesData);
 
         HashSet<string> ChessNames = new HashSet<string>();
         foreach (var chess in ChessProperties)
         {
-            ChessNames.Add(chess.Name);
+            ChessNames.Add(chess.CardCode);
         }
         chessNameSet = ChessNames;
     }
-
-    public static ChessProperty GetChessProperty(string chessName)
-    {
-        foreach (var chess in ChessProperties) {
-            if (chess.Name == chessName) {
-                return chess;
-            }
-        }
-        return null;
-    }
+#if UNITY_ENGINE
     public static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListLocal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
     public static void MoveToLocal(GameObject obj, Vector3 targetPosition, Quaternion rotation, float moveSpeed, bool isClearTaskList = false)
     {
@@ -114,4 +105,85 @@ public class GlobalScope : MonoBehaviour
     {
         LoadChessProperties();
     }
+    public static List<List<List<int>>> DeepCopy3DList(List<List<List<int>>> original) {
+        List<List<List<int>>> result = original
+        .Select(outerList => outerList
+            .Select(innerList => new List<int>(innerList))
+            .ToList())
+        .ToList();
+        return result;
+    }
+    public static List<List<int>> DeepCopy2DList(List<List<int>> original) {
+        List<List<int>> result = original.Select(innerList => new List<int>(innerList)).ToList();
+        return result;
+    }
+#endif
+}
+public enum CardEffectsType {
+    DOTOALL_ONCE = 0,
+    FRIEND_ONLY_ONCE = 1,
+    ENEMY_ONLY_ONCE = 2,
+    FRIEND_INCREASE_ENEMY_REDUCE_ONCE = 3,
+    DOTOALL_LASTING = 10,
+    FRIEND_ONLY_LASTING = 11,
+    ENEMY_ONLY_LASTING = 12,
+    FRIEND_INCREASE_ENEMY_REDUCE_LASTING = 13
+}
+public enum ChessPosStatus {
+    LEVEL_ONE_FRIEND = 1,
+    LEVEL_TWO_FRIEND = 2,
+    LEVEL_THREE_FRIEND = 3,
+    EMPTY = 10,
+    LEVEL_ONE_ENEMY = 11,
+    LEVEL_TWO_ENEMY = 12,
+    LEVEL_THREE_ENEMY = 13,
+    OCCUPIED_FRIEND = 14,
+    OCCUPIED_ENEMY = 15
+}
+public struct Int2D
+{
+    public int x;
+    public int y;
+
+    public Int2D(int x, int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public static bool operator ==(Int2D a, Int2D b)
+    {
+        return a.x == b.x && a.y == b.y;
+    }
+
+    public static bool operator !=(Int2D a, Int2D b)
+    {
+        return !(a == b);
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (obj is Int2D)
+        {
+            Int2D other = (Int2D)obj;
+            return this == other;
+        }
+        return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return x.GetHashCode() ^ y.GetHashCode();
+    }
+}
+
+public class ChessProperty
+{
+    public string CardCode;
+    public string Name;
+    public int Level;
+    public int Cost;
+    public List<List<int>> PosEffects;
+    public Tuple<CardEffectsType, List<List<int>>> CardEffects;
+    public HashSet<string> SpecialEffects;
 }
