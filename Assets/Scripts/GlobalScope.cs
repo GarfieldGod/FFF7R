@@ -4,6 +4,8 @@ using System.IO;
 using System;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using UnityEngine.UIElements.Experimental;
+
 #if UNITY_ENGINE
 using UnityEngine;
 using System.Linq;
@@ -104,6 +106,27 @@ public class GlobalScope
     void Awake()
     {
         LoadChessProperties();
+        chessModelPrefab_static_ = chessModelPrefab_;
+    }
+    public GameObject chessPad_;
+    public GameObject chessModelPrefab_;
+    public static GameObject chessModelPrefab_static_;
+    private static Dictionary<Int2D, GameObject> ChessGridMap_ = new Dictionary<Int2D, GameObject>();
+    public static Int2D InitGlobalScopeChessGridMap(GameObject chessGrid) {
+        Int2D chessGridPos = new Int2D();
+        for(int i = 0; i < chessPositionNameList.GetLength(0); i++) {
+            for(int j = 0; j < chessPositionNameList.GetLength(1); j++) {
+                if(chessGrid.name == chessPositionNameList[i, j]) {
+                    chessGridPos = new Int2D(i, j);
+                    ChessGridMap_.Add(chessGridPos, chessGrid);
+                    return chessGridPos;
+                }
+            }
+        }
+        return chessGridPos;
+    }
+    public static GameObject GetChessGridObjectByChessGridPos(Int2D chessGridPos) {
+        return ChessGridMap_[chessGridPos];
     }
     public static List<List<List<int>>> DeepCopy3DList(List<List<List<int>>> original) {
         List<List<List<int>>> result = original

@@ -8,6 +8,10 @@ public class Chess : MonoBehaviour
     public int cost;
     public Vector3 chessPos = new Vector3(0, 0, 0);
     public GameObject chessModel = null;
+    private GameObject nameObj;
+    private GameObject levelObj;
+    private GameObject costObj;
+    private GameObject chessModelObj;
     public void InstantiateChessProperty(ChessProperty property)
     {
         gameObject.name = property.CardCode;
@@ -15,24 +19,6 @@ public class Chess : MonoBehaviour
         chessName = property.Name;
         level = property.Level;
         cost = property.Cost;
-
-        foreach(Transform child in transform) {
-            switch (child.name) {
-                case "name":
-                    child.gameObject.GetComponent<TextMesh>().text = name;
-                    break;
-                case "level":
-                    child.gameObject.GetComponent<TextMesh>().text = "Level:" + level.ToString();
-                    break;
-                case "cost":
-                    child.gameObject.GetComponent<TextMesh>().text = "Cost:" + cost.ToString();
-                    break;
-                case "chessModel":
-                    chessModel = child.gameObject;
-                    break;
-                default:break;
-            }
-        }
     }
     public void ObjectPosToChessPos(Vector3 position, Quaternion rotation, float moveSpeed){
         transform.localPosition = Vector3.MoveTowards(transform.localPosition, position, moveSpeed * Time.deltaTime);

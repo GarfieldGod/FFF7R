@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,31 +13,39 @@ public class ChessGrid : MonoBehaviour
     public int cardLevel_ = 0;
     private GameObject[] levelModels_ = new GameObject[3];
     private TextMesh levelText_;
+    private GameObject gridPlane_;
 
     // Start is called before the first frame update
     void Awake()
     {
-        for(int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0); i++) {
-            for(int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
-                if(gameObject.name == GlobalScope.chessPositionNameList[i, j]) {
-                    chessGridPos_ = new Int2D(i, j);
-                    break;
-                }
-            }
-        }
+        chessGridPos_ = GlobalScope.InitGlobalScopeChessGridMap(gameObject);
         levelModels_[0] = transform.Find("levelOne").gameObject;
         levelModels_[1] = transform.Find("levelTwo").gameObject;
         levelModels_[2] = transform.Find("levelThree").gameObject;
         GameObject levelText = transform.Find("text_level").gameObject;
-        if(levelModels_[0] == null || levelModels_[1] == null || levelModels_[2] == null || levelText == null) {
+        gridPlane_ = transform.Find("gridPlane").gameObject;
+
+        if(levelModels_[0] == null || levelModels_[1] == null || levelModels_[2] == null || levelText == null || gridPlane_ == null) {
             Log.test("ChessGrid: Can not found child.");
         }
         levelText.SetActive(true);
         levelText_ = levelText.gameObject.GetComponent<TextMesh>();
+
+        gridPlane_.SetActive(false);
     }
     void Update()
     {
-        // UpdateGridPosStatus(posStatus_, cardLevel_, "");
+        if(posStatus_ <= ChessPosStatus.LEVEL_THREE_FRIEND && PlayerOperation.preview) {
+            // float duration = 1.0f;
+            // float startAlpha = 0.2f;
+            // float endAlpha = 0.5f;
+            // float alpha = Mathf.Lerp(startAlpha, endAlpha, (Mathf.Sin(Time.time / duration * 2 * Mathf.PI) + 1.5f) / 4);
+            // Log.test(((Mathf.Sin(Time.time / duration * 2 * Mathf.PI) + 1) / 2).ToSafeString());
+            float alpha = (Mathf.Sin(Time.time / 1.5f * 2 * Mathf.PI) + 1.5f) / 4;
+            PlayerMouseHover(alpha);
+        } else {
+            gridPlane_.SetActive(false);
+        }
     }
     public int GetChessPosLevel() {
         int result = (int)posStatus_ % 10;
@@ -103,5 +112,19 @@ public class ChessGrid : MonoBehaviour
         }
     }
     public void GetCardModelOn(string cardName) {
+    }
+    private void PlayerMouseHover(float alpha) {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == gameObject) {
+            gridPlane_.SetActive(true);
+            if(PlayerOperation.currentChessObject != PlayerOperation.CHESSNULL && PlayerOperation.CheckIfInputVaild(gameObject, PlayerOperation.currentChessObject)) {
+                gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(0.6627451f, 1, 0.6901961f, alpha);//0.5294118f
+            } else {
+                gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(1, 0.3812995f, 0.03447914f, alpha);
+            }
+        } else {
+            gridPlane_.SetActive(false);
+        }
     }
 }

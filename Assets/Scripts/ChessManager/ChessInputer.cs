@@ -45,23 +45,13 @@ public class ChessInputer : MonoBehaviour {
         ChessSelector.RemoveChess(chessObj);
     }
     public static void GetChessInput(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
-        GetCardModelOn(chessGridPos, property);
         chessGridStatus[0] = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridStatus[0]);
         chessGridStatus[1] = CardEffect.DoCardEffect(chessGridPos, property, chessGridStatus, tasksLasting);
         // DoSpecialEffect(chessGridPos, property.SpecialEffects);
         GameManager.CommitChessStatusToChessPad();
     }
     private static void GetCardModelOn(Int2D chessGridPos, ChessProperty property) {
-        // for(int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0); i++) {
-        //     for(int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
-        //         Transform chessGrid = chessPad.transform.Find(GlobalScope.chessPositionNameList[chessGridPos.x, chessGridPos.y]);
-        //         // chessGridPosStatus
-        //         if(Enum.IsDefined(typeof(ChessPosStatus), GlobalScope.chessGridStatus[0][i][j]) && chessGrid != null) {
-        //             chessGrid.GetComponent<ChessGrid>().posStatus_ = (ChessPosStatus)GlobalScope.chessGridStatus[0][i][j];
-        //         }
-        //         // Others TODO
-        //     }
-        // }
+        GameObject instantiateModel = ChessDispenser.InstantiateChessModel(GlobalScope.chessModelPrefab_static_, GlobalScope.GetChessGridObjectByChessGridPos(chessGridPos), property);
     }
 }
 #endif
