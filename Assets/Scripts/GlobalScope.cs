@@ -3,24 +3,33 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using UnityEngine.UIElements.Experimental;
+using Unity.VisualScripting;
+
 
 #if UNITY_ENGINE
 using UnityEngine;
 using System.Linq;
-using Unity.VisualScripting;
 public class GlobalScope : MonoBehaviour
 #else 
 public class GlobalScope
 #endif
 {
+    void Awake()
+    {
+        LoadGlabalScopeStaticGameObject();
+        GenerateChessGird(10.5f, 8.5f);
+        LoadChessProperties();
+    }
+    void Update() {
+        GlobalScopeMovement();
+    }
+// -----------------------------------------------------------------------------------ChessProperties
     private static readonly string chessPropertiesJsonPath = "Json/ChessProperties.json";
     public static List<List<List<int>>> chessGridStatus;
-    public static readonly string[,] chessPositionNameList = {
-        { "upLine0", "upLine1", "upLine2", "upLine3", "upLine4" },
-        { "midLine0", "midLine1", "midLine2", "midLine3", "midLine4" },
-        { "downLine0", "downLine1", "downLine2", "downLine3", "downLine4" }
+    public static readonly List<List<string>> chessGridNameList_ = new List<List<string>>{
+        new List<string>{ "upLine0", "upLine1", "upLine2", "upLine3", "upLine4" },
+        new List<string>{ "midLine0", "midLine1", "midLine2", "midLine3", "midLine4" },
+        new List<string>{ "downLine0", "downLine1", "downLine2", "downLine3", "downLine4" }
     };
     public static readonly HashSet<string> chessPositionNameSet = new HashSet<string>
     {
@@ -57,7 +66,9 @@ public class GlobalScope
         chessNameSet = ChessNames;
     }
 #if UNITY_ENGINE
-    public static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListLocal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
+// -----------------------------------------------------------------------------------GlobalScope Movement
+    private static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListLocal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
+    private static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListGlobal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
     public static void MoveToLocal(GameObject obj, Vector3 targetPosition, Quaternion rotation, float moveSpeed, bool isClearTaskList = false)
     {
         if(isClearTaskList) {
@@ -65,7 +76,6 @@ public class GlobalScope
         }
         moveListLocal.Add(new Tuple<GameObject, Vector3, Quaternion, float>(obj, targetPosition, rotation, moveSpeed));
     }
-    public static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListGlobal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
     public static void MoveToGlobal(GameObject obj, Vector3 targetPosition, Quaternion rotation, float moveSpeed, bool isClearTaskList = false)
     {
         if(isClearTaskList) {
@@ -73,12 +83,12 @@ public class GlobalScope
         }
         moveListGlobal.Add(new Tuple<GameObject, Vector3, Quaternion, float>(obj, targetPosition, rotation, moveSpeed));
     }
-    void Update() {
+    public static void GlobalScopeMovement() {
         if (moveListLocal.Count != 0) {
             for (int i = 0; i < moveListLocal.Count; i++)
             {
                 var task = moveListLocal[i];
-                if (task.Item1.transform.localPosition != task.Item2)
+                if (task.Item1 != null && task.Item1.transform.localPosition != task.Item2)
                 {
                     task.Item1.transform.localPosition = Vector3.MoveTowards(task.Item1.transform.localPosition, task.Item2, task.Item4 * Time.deltaTime);
                     task.Item1.transform.localRotation = task.Item3;
@@ -103,20 +113,42 @@ public class GlobalScope
             }
         }
     }
-    void Awake()
-    {
-        LoadChessProperties();
-        chessModelPrefab_static_ = chessModelPrefab_;
+// -----------------------------------------------------------------------------------Load GlabalScope Static GameObjects
+    void GenerateChessGird(float offsetX, float offsetY) {
+        Int2D centerPos = new Int2D((chessGridNameList_.Count)/2, (chessGridNameList_[0].Count)/2);
+        for(int i = 0; i < chessGridNameList_.Count ; i++) {
+            for(int j = 0; j < chessGridNameList_[0].Count ; j++) {
+                GameObject chessGrid = Instantiate(chessGirdPrefab_static_, chessPad_.transform);
+                chessGrid.name = chessGridNameList_[i][j];
+                int posX = i - centerPos.x;
+                int posY = centerPos.y - j;
+                chessGrid.transform.localPosition = new Vector3(posY * offsetX, 1, posX * offsetY);
+            }
+        }
     }
+    public GameObject chessSelector_;
     public GameObject chessPad_;
+    public GameObject chessPrefab_;
     public GameObject chessModelPrefab_;
+    public GameObject chessGirdPrefab_;
+    public static GameObject chessSelector_static_;
+    public static GameObject chessPad_static_;
+    public static GameObject chessPrefab_static_;
     public static GameObject chessModelPrefab_static_;
+    public static GameObject chessGirdPrefab_static_;
+    private void LoadGlabalScopeStaticGameObject() {
+        chessSelector_static_ = chessSelector_;
+        chessPad_static_ = chessPad_;
+        chessPrefab_static_ = chessPrefab_;
+        chessModelPrefab_static_ = chessModelPrefab_;
+        chessGirdPrefab_static_ = chessGirdPrefab_;
+    }
     private static Dictionary<Int2D, GameObject> ChessGridMap_ = new Dictionary<Int2D, GameObject>();
     public static Int2D InitGlobalScopeChessGridMap(GameObject chessGrid) {
         Int2D chessGridPos = new Int2D();
-        for(int i = 0; i < chessPositionNameList.GetLength(0); i++) {
-            for(int j = 0; j < chessPositionNameList.GetLength(1); j++) {
-                if(chessGrid.name == chessPositionNameList[i, j]) {
+        for(int i = 0; i < chessGridNameList_.Count; i++) {
+            for(int j = 0; j < chessGridNameList_[0].Count; j++) {
+                if(chessGrid.name == chessGridNameList_[i][j]) {
                     chessGridPos = new Int2D(i, j);
                     ChessGridMap_.Add(chessGridPos, chessGrid);
                     return chessGridPos;
@@ -125,9 +157,17 @@ public class GlobalScope
         }
         return chessGridPos;
     }
+    public static List<GameObject> GetAllChessGrid() {
+        List<GameObject> result = new List<GameObject>();
+        foreach(var pair in ChessGridMap_) {
+            result.Add(pair.Value);
+        }
+        return result;
+    }
     public static GameObject GetChessGridObjectByChessGridPos(Int2D chessGridPos) {
         return ChessGridMap_[chessGridPos];
     }
+// -----------------------------------------------------------------------------------Functions For All
     public static List<List<List<int>>> DeepCopy3DList(List<List<List<int>>> original) {
         List<List<List<int>>> result = original
         .Select(outerList => outerList
@@ -142,6 +182,7 @@ public class GlobalScope
     }
 #endif
 }
+// -----------------------------------------------------------------------------------Enums For All
 public enum CardEffectsType {
     DOTOALL_ONCE = 0,
     FRIEND_ONLY_ONCE = 1,
@@ -162,6 +203,17 @@ public enum ChessPosStatus {
     LEVEL_THREE_ENEMY = 13,
     OCCUPIED_FRIEND = 14,
     OCCUPIED_ENEMY = 15
+}
+// -----------------------------------------------------------------------------------Structs For All
+public struct SingleGameConfig {
+    public int rivalLevel;
+    public List<string> playerChessPool;
+    public List<string> rivalChessPool;
+    public SingleGameConfig(int rivalLevel, List<string> playerChessPool, List<string> rivalChessPool) {
+        this.rivalLevel = rivalLevel;
+        this.playerChessPool = playerChessPool;
+        this.rivalChessPool = rivalChessPool;
+    }
 }
 public struct Int2D
 {

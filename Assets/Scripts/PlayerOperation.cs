@@ -12,8 +12,6 @@ public class PlayerOperation : MonoBehaviour
 {
     public static GameObject currentChessObject = null;
     public static GameObject CHESSNULL;
-    public int highestLevel = 1;
-    // Start is called before the first frame update
     public static bool preview = false;
     void Start()
     {
@@ -21,60 +19,27 @@ public class PlayerOperation : MonoBehaviour
         currentChessObject = CHESSNULL;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        playerClick();
-        ScreenPosToWorldPos(Input.mousePosition);
+        PlayerClick();
+        // ScreenPosToWorldPos(Input.mousePosition);
     }
 
-    UnityEngine.Vector3 ScreenPosToWorldPos(UnityEngine.Vector3 mouseScreenPosition){
-        return Camera.main.ScreenToWorldPoint(new UnityEngine.Vector3(mouseScreenPosition.x, mouseScreenPosition.y, Camera.main.nearClipPlane));
-    }
+    // UnityEngine.Vector3 ScreenPosToWorldPos(UnityEngine.Vector3 mouseScreenPosition){
+    //     return Camera.main.ScreenToWorldPoint(new UnityEngine.Vector3(mouseScreenPosition.x, mouseScreenPosition.y, Camera.main.nearClipPlane));
+    // }
 
-    void playerClick() {
+    void PlayerClick() {
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit)) {
                 GameObject hitOne = hit.collider.gameObject;
-                //Debug.Log("Hit Object: " + hitOne.name);
-                //Select Chess
                 if (GlobalScope.chessNameSet.Contains(hitOne.name)) {
-                    if (CheckIfSelectVaild(hitOne)  && GetComponent<GameManager>().PlayerTurn) {
-                        Debug.Log("Select is vaild.");
-                        if(currentChessObject != CHESSNULL) {
-                            ChessSelector.CancelPreview();
-                            currentChessObject = CHESSNULL;
-                        }
-                        currentChessObject = hitOne;
-                        ChessSelector.DoPreview(hitOne.GetComponent<Chess>());
-                        preview = true;
-                    } else {
-                        Debug.Log("Select is Invaild.");
-                    }
+                    PlyerDoSelect(hitOne);
                 }
-                //Input Chess
                 if (currentChessObject != CHESSNULL && GlobalScope.chessPositionNameSet.Contains(hitOne.name)) {
-                    if (CheckIfInputVaild(hitOne, currentChessObject) && GetComponent<GameManager>().PlayerTurn) {
-                        Debug.Log("Input is vaild.");
-                        ChessInputParmObj parmsInput = new ChessInputParmObj(
-                            hitOne,
-                            currentChessObject,
-                            GlobalScope.chessGridStatus,
-                            GameManager.playerLastingTasks
-                        );
-                        ChessInputer.GetChessInput(parmsInput);
-                        GameObject newChessObj = GetComponent<ChessDispenser>().InstantiateChess(ChessDispenser.DispenseChess());
-                        if (newChessObj != null) {
-                        ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
-                        }
-                        currentChessObject = CHESSNULL;
-                        preview = false;
-                        GetComponent<GameManager>().GameTurns++;
-                    } else  {
-                        Debug.Log("Input is Invaild.");
-                    }
+                    PlayerDoInput(hitOne);
                 }
             }
         } else if (Input.GetMouseButtonDown(1)){
@@ -86,10 +51,43 @@ public class PlayerOperation : MonoBehaviour
         }
     }
 
-    bool CheckIfSelectVaild (GameObject chessObject) {
-        if (GlobalScope.GetChessProperty(chessObject.name).Level > highestLevel) {
-            return false;
+    void PlayerDoInput(GameObject chessGridToInput){
+        if (CheckIfInputVaild(chessGridToInput, currentChessObject) && GetComponent<GameManager>().PlayerTurn) {
+            Debug.Log("Input is vaild.");
+            ChessInputParmObj parmsInput = new ChessInputParmObj(
+                chessGridToInput,
+                currentChessObject,
+                GlobalScope.chessGridStatus,
+                GameManager.playerLastingTasks
+            );
+            GetComponent<GameManager>().DoPlayerTurn(parmsInput);
+            ChessDispenser.DispenserNewChessToChessSelector();
+            currentChessObject = CHESSNULL;
+            preview = false;
+        } else  {
+            Debug.Log("Input is Invaild.");
         }
+    }
+
+    void PlyerDoSelect(GameObject chessToSelect){
+        if (CheckIfSelectVaild(chessToSelect)  && GetComponent<GameManager>().PlayerTurn) {
+            Debug.Log("Select is vaild.");
+            if(currentChessObject != CHESSNULL) {
+                ChessSelector.CancelPreview();
+                currentChessObject = CHESSNULL;
+            }
+            currentChessObject = chessToSelect;
+            ChessSelector.DoPreview(chessToSelect.GetComponent<Chess>());
+            preview = true;
+        } else {
+            Debug.Log("Select is Invaild.");
+        }
+    }
+
+    bool CheckIfSelectVaild (GameObject chessObject) {
+        // if (GlobalScope.GetChessProperty(chessObject.name).Level > highestLevel) {
+        //     return false;
+        // }
         return true;
     }
 

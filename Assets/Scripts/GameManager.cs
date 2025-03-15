@@ -1,11 +1,12 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using Unity.VisualScripting;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
+    public Text turnCountText;
+    public Text turnInfoText;
     public enum GameStatus {
         INIT,
         REDISPENSE_CHESS,
@@ -13,48 +14,48 @@ public class GameManager : MonoBehaviour
         COMPUTE_RESULT,
         GAME_OVER
     }
-    ChessDispenser chessDispenser;
-    static GameObject chessPad;
-
-    public GameStatus gameStatus = GameStatus.INIT;
-    public int GameTurns = 0;
+    public static GameStatus gameStatus_ = GameStatus.INIT;
+    public static int GameTurns = 0;
     public bool PlayerTurn = true;
     List<string> rivalChessListGlabol;
     public static Dictionary<Int2D, List<Tuple<Int2D, int>>> playerLastingTasks = new Dictionary<Int2D, List<Tuple<Int2D, int>>>{};
-    public static Dictionary<Int2D, List<Tuple<Int2D, int>>> aiRivalLastingTasks = new Dictionary<Int2D, List<Tuple<Int2D, int>>>{};
+    public static Dictionary<Int2D, List<Tuple<Int2D, int>>> RivalLastingTasks = new Dictionary<Int2D, List<Tuple<Int2D, int>>>{};
 //----------------------------------------------------------------------------------------------------------------------------------InitGame
     void Start()
     {
-        chessDispenser = GetComponent<ChessDispenser>();
-        chessPad = GameObject.Find("chessPad");
-        //For Test
-        List<string> rivalChessList = new List<string>{
-            "Card001",
-            "Card007", "Card007",
-            "Card008", "Card008"
-        };
-        List<string> chessPool = new List<string>{
-            "Card001", "Card001", "Card001",
-            "Card007", "Card007", "Card007", "Card007",
-            "Card008", "Card008", "Card008", "Card008",
-            "Card009", "Card009", "Card009", "Card009",
-        };
-        InitGame(chessPool, rivalChessList);
+        SingleGameConfig singleGameConfig = new SingleGameConfig(
+            1,
+            new List<string>{
+                "Card001", "Card001", "Card001",
+                "Card007", "Card007", "Card007", "Card007",
+                "Card008", "Card008", "Card008", "Card008",
+                "Card009", "Card009", "Card009", "Card009",
+            },
+            new List<string>{
+                "Card001", "Card001", "Card001",
+                "Card007", "Card007", "Card007", "Card007",
+                "Card008", "Card008", "Card008", "Card008",
+                "Card009", "Card009", "Card009", "Card009",
+            }
+        );
+        StartSingleGame(singleGameConfig);
     }
-
-    void InitGame(List<string> chessPool, List<string> rivalChessList) {
-        gameStatus = GameStatus.INIT;
+    void StartSingleGame (SingleGameConfig singleGameConfig) {
+        InitGame(singleGameConfig.playerChessPool, singleGameConfig.rivalChessPool);
+    }
+    void StartMultiPlayerGame () {}
+    void InitGame(List<string> playerChessPool, List<string> rivalChessPool) {
+        gameStatus_ = GameStatus.INIT;
         InitChessPadStandard();
-        InitChessPoolAndChessSelector(chessPool, 5);
-        rivalChessListGlabol = rivalChessList;
-        gameStatus = GameStatus.REDISPENSE_CHESS;
+        InitChessPoolAndChessSelector(playerChessPool, 5);
+        rivalChessListGlabol = rivalChessPool;
+        gameStatus_ = GameStatus.REDISPENSE_CHESS;
         // TODO
-        gameStatus = GameStatus.GAMING;
+        gameStatus_ = GameStatus.GAMING;
     }
-
     void EndGame() {
         playerLastingTasks.Clear();
-        aiRivalLastingTasks.Clear();
+        RivalLastingTasks.Clear();
     }
 
     void InitChessPadStandard() {
@@ -76,58 +77,90 @@ public class GameManager : MonoBehaviour
     void InitChessPoolAndChessSelector(List<string> chessPoolConfig, int chessSelectorSize) {
         ChessDispenser.chessPool = chessPoolConfig;
         for( int i = 0 ; i < chessSelectorSize ; i++ ) {
-            ChessSelector.PushBackChess(chessDispenser.InstantiateChess(ChessDispenser.DispenseChess()).GetComponent<Chess>());
+            ChessSelector.PushBackChess(ChessDispenser.InstantiateChess(ChessDispenser.DispenseChess()).GetComponent<Chess>());
         }
     }
 //----------------------------------------------------------------------------------------------------------------------------------RunGame
     void Update() {
         // Debug.Log($"TheGameTurns: {GameTurns} , The PlayerTurn: {PlayerTurn}");
-        if (gameStatus == GameStatus.GAMING) {
-            RunGameTurns(rivalChessListGlabol);
+        GameRuning();
+        ComputeResult();
+    }
+    void GameRuning() {
+        if (gameStatus_ == GameStatus.GAMING) {
+            RunGameTurns(rivalChessListGlabol, 30);
+        }
+        if (Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus[0]).Count == 0
+            && Rival.GetAllVaildChessGrids(Rival.GetChessStatusInRivalView(GlobalScope.chessGridStatus)[0]).Count == 0) {
+            gameStatus_ = GameStatus.COMPUTE_RESULT;
         }
     }
-    float startTime;
-    void RunGameTurns(List<string> rivalChessList) {
-        if(gameStatus == GameStatus.GAMING) {
+    void ComputeResult() {
+        if (gameStatus_ == GameStatus.COMPUTE_RESULT) {
+            turnInfoText.text = "游戏结束！";
+            turnInfoText.fontSize = 60;
+        }
+    }
+    public static void CommitChessStatusToChessPad(){
+        List<GameObject> chessGrids = GlobalScope.GetAllChessGrid();
+        foreach(var chessGridObj in chessGrids) {
+            ChessGrid chessGrid = chessGridObj.GetComponent<ChessGrid>();
+            chessGrid.UpdateGridStatus(GlobalScope.chessGridStatus);
+        }
+    }
+//----------------------------------------------------------------------------------------------------------------------------------GameTurn
+    private float thisTurnStartTime;
+    private int TurnTimeCounter(int turnTime) {
+        int thisTurnTime = (int)(Time.time - thisTurnStartTime);
+        int thisTurnTimeRemaining = turnTime - thisTurnTime;
+        if(thisTurnTime > turnTime) {
+            NextTurn();
+        }
+        return thisTurnTimeRemaining;
+    }
+    private void showTurnTextInfo(string info) {
+        turnInfoText.fontSize = (int)Mathf.Lerp(200, 60, (Time.time - thisTurnStartTime) * 3);
+        turnInfoText.text = info;
+    }
+    void RunGameTurns(List<string> rivalChessList, int TimeEveryTurn) {
+        turnCountText.text = TurnTimeCounter(TimeEveryTurn).ToString();
+        if(gameStatus_ == GameStatus.GAMING) {
             if(GameTurns % 2 == 0) {
+                showTurnTextInfo("Your Turn!");
                 PlayerTurn = true;
+                if(Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus[0]).Count == 0) {
+                    NextTurn();
+                }
             } else {
-                // DoARivalTurn(rivalChessList);
+                showTurnTextInfo("Rival Turn!");
                 if (PlayerTurn) {
                     PlayerTurn = false;
-                    startTime = Time.time;
                 }
-                float elapsedTime = Time.time - startTime;
-                // Debug.Log(elapsedTime);
-                if (elapsedTime > 1.5f) {
+                int delayTime = 3;
+                if(rivalChessList.Count == 0) {
+                    delayTime = 1;
+                }
+                if (Time.time - thisTurnStartTime > delayTime) {
                     DoAiRivalTurn(rivalChessList);
                 }
             }
         }
     }
-
-    void DoAiRivalTurn(List<string> chessInHand) {
-        if(chessInHand.Count != 0) {
-            GlobalScope.chessGridStatus = AiRival.DoAiRivalInput(GlobalScope.chessGridStatus, chessInHand, aiRivalLastingTasks);
-            CommitChessStatusToChessPad();
-        }
+    public void NextTurn() {
+        thisTurnStartTime = Time.time;
+        turnInfoText.fontSize = 60;
         GameTurns++;
     }
-
-    public static void CommitChessStatusToChessPad(){
-        for(int i = 0; i < GlobalScope.chessPositionNameList.GetLength(0); i++) {
-            for(int j = 0; j < GlobalScope.chessPositionNameList.GetLength(1); j++) {
-                Transform chessGridObj = chessPad.transform.Find(GlobalScope.chessPositionNameList[i, j]);
-                // chessGridPosStatus
-                ChessGrid chessGrid = chessGridObj.GetComponent<ChessGrid>();
-                if(Enum.IsDefined(typeof(ChessPosStatus), GlobalScope.chessGridStatus[0][i][j]) && chessGrid != null) {
-                    ChessPosStatus posStatus = (ChessPosStatus)GlobalScope.chessGridStatus[0][i][j];
-                    int cardLevelStatus = GlobalScope.chessGridStatus[1][i][j];
-                    chessGrid.UpdateGridPosStatus(posStatus);
-                    chessGrid.UpdateGridCardLevel(cardLevelStatus, posStatus);
-                }
-                // Others TODO
-            }
+    public void DoAiRivalTurn(List<string> chessInHand) {
+        if(chessInHand.Count != 0) {
+            GlobalScope.chessGridStatus = AiRival.DoAiRivalInput(GlobalScope.chessGridStatus, chessInHand, RivalLastingTasks);
+            CommitChessStatusToChessPad();
         }
+        NextTurn();
+    }
+    public void DoPlayerTurn(ChessInputParmObj parmsInput){
+        ChessInputer.GetChessInput(parmsInput);
+        CommitChessStatusToChessPad();
+        NextTurn();
     }
 }

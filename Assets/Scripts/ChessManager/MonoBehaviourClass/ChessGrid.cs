@@ -12,40 +12,24 @@ public class ChessGrid : MonoBehaviour
     public Int2D chessGridPos_;
     public int cardLevel_ = 0;
     private GameObject[] levelModels_ = new GameObject[3];
-    private TextMesh levelText_;
+    public TextMesh levelText_;
     private GameObject gridPlane_;
 
-    // Start is called before the first frame update
-    void Awake()
+    void Start()
     {
         chessGridPos_ = GlobalScope.InitGlobalScopeChessGridMap(gameObject);
         levelModels_[0] = transform.Find("levelOne").gameObject;
         levelModels_[1] = transform.Find("levelTwo").gameObject;
         levelModels_[2] = transform.Find("levelThree").gameObject;
-        GameObject levelText = transform.Find("text_level").gameObject;
         gridPlane_ = transform.Find("gridPlane").gameObject;
+        GameObject levelText = transform.Find("text_level").gameObject;
 
-        if(levelModels_[0] == null || levelModels_[1] == null || levelModels_[2] == null || levelText == null || gridPlane_ == null) {
+        if(levelModels_[0] == null || levelModels_[1] == null || levelModels_[2] == null || gridPlane_ == null) {
             Log.test("ChessGrid: Can not found child.");
         }
         levelText.SetActive(true);
         levelText_ = levelText.gameObject.GetComponent<TextMesh>();
-
         gridPlane_.SetActive(false);
-    }
-    void Update()
-    {
-        if(posStatus_ <= ChessPosStatus.LEVEL_THREE_FRIEND && PlayerOperation.preview) {
-            // float duration = 1.0f;
-            // float startAlpha = 0.2f;
-            // float endAlpha = 0.5f;
-            // float alpha = Mathf.Lerp(startAlpha, endAlpha, (Mathf.Sin(Time.time / duration * 2 * Mathf.PI) + 1.5f) / 4);
-            // Log.test(((Mathf.Sin(Time.time / duration * 2 * Mathf.PI) + 1) / 2).ToSafeString());
-            float alpha = (Mathf.Sin(Time.time / 1.5f * 2 * Mathf.PI) + 1.5f) / 4;
-            PlayerMouseHover(alpha);
-        } else {
-            gridPlane_.SetActive(false);
-        }
     }
     public int GetChessPosLevel() {
         int result = (int)posStatus_ % 10;
@@ -54,10 +38,11 @@ public class ChessGrid : MonoBehaviour
         }
         return result;
     }
-    public void UpdateGridPosStatus(ChessPosStatus posStatus, int cardLevel, string cardName) {
-        UpdateGridPosStatus(posStatus);
-        UpdateGridCardLevel(cardLevel, posStatus);
-        GetCardModelOn(cardName);
+    public void UpdateGridStatus(List<List<List<int>>> chessGirdStatus) {
+        ChessPosStatus myChessStatus = (ChessPosStatus)chessGirdStatus[0][chessGridPos_.x][chessGridPos_.y];
+        int MyCardLevel = chessGirdStatus[1][chessGridPos_.x][chessGridPos_.y];
+        UpdateGridPosStatus(myChessStatus);
+        UpdateGridCardLevel(MyCardLevel, myChessStatus);
     }
     public void UpdateGridPosStatus(ChessPosStatus posStatus) {
         posStatus_ = posStatus;
@@ -100,31 +85,45 @@ public class ChessGrid : MonoBehaviour
         }
     }
     public void UpdateGridCardLevel(int cardLevel, ChessPosStatus posStatus) {
-        if(cardLevel > 0 && posStatus >= ChessPosStatus.OCCUPIED_FRIEND) {
-            levelText_.GetComponent<TextMesh>().text = cardLevel.ToString();
-            if(posStatus == ChessPosStatus.OCCUPIED_FRIEND) {
-                levelText_.GetComponent<TextMesh>().color = Color.black;
+        if (levelText_ != null) {
+            if(cardLevel > 0 && posStatus >= ChessPosStatus.OCCUPIED_FRIEND) {
+                levelText_.GetComponent<TextMesh>().text = cardLevel.ToString();
+                if(posStatus == ChessPosStatus.OCCUPIED_FRIEND) {
+                    levelText_.GetComponent<TextMesh>().color = Color.green;
+                } else {
+                    levelText_.GetComponent<TextMesh>().color = Color.red;
+                }
             } else {
-                levelText_.GetComponent<TextMesh>().color = Color.red;
+                levelText_.GetComponent<TextMesh>().text = "";
             }
-        } else {
-            levelText_.GetComponent<TextMesh>().text = "";
         }
     }
-    public void GetCardModelOn(string cardName) {
-    }
-    private void PlayerMouseHover(float alpha) {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == gameObject) {
-            gridPlane_.SetActive(true);
-            if(PlayerOperation.currentChessObject != PlayerOperation.CHESSNULL && PlayerOperation.CheckIfInputVaild(gameObject, PlayerOperation.currentChessObject)) {
-                gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(0.6627451f, 1, 0.6901961f, alpha);//0.5294118f
+    private void PlayerMouseHover() {
+        if(posStatus_ <= ChessPosStatus.LEVEL_THREE_FRIEND && PlayerOperation.preview) {
+            // float duration = 1.0f;
+            // float startAlpha = 0.2f;
+            // float endAlpha = 0.5f;
+            // float alpha = Mathf.Lerp(startAlpha, endAlpha, (Mathf.Sin(Time.time / duration * 2 * Mathf.PI) + 1.5f) / 4);
+            // Log.test(((Mathf.Sin(Time.time / duration * 2 * Mathf.PI) + 1) / 2).ToSafeString());
+            float alpha = (Mathf.Sin(Time.time / 1.5f * 2 * Mathf.PI) + 1.5f) / 4;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == gameObject) {
+                gridPlane_.SetActive(true);
+                if(PlayerOperation.currentChessObject != PlayerOperation.CHESSNULL && PlayerOperation.CheckIfInputVaild(gameObject, PlayerOperation.currentChessObject)) {
+                    gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(0.6627451f, 1, 0.6901961f, alpha);//0.5294118f
+                } else {
+                    gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(1, 0.3812995f, 0.03447914f, alpha);
+                }
             } else {
-                gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(1, 0.3812995f, 0.03447914f, alpha);
+                gridPlane_.SetActive(false);
             }
         } else {
             gridPlane_.SetActive(false);
         }
+    }
+    void Update()
+    {
+        PlayerMouseHover();
     }
 }

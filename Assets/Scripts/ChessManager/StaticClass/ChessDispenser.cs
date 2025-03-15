@@ -1,14 +1,16 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ChessDispenser : MonoBehaviour
 {
-    public GameObject chessSelectorPos_;
-    public GameObject chessPrefab_;
-    public GameObject chessModelPrefab_;
     public static List<string> chessPool = new List<string>{};
+    public static void DispenserNewChessToChessSelector() {
+        GameObject newChessObj = InstantiateChess(DispenseChess());
+        if (newChessObj != null) {
+            ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
+        }
+    }
+
     public static string DispenseChess() {
         if (chessPool.Count == 0) {
             return null;
@@ -20,17 +22,17 @@ public class ChessDispenser : MonoBehaviour
         return chess;
     }
 
-    public void ReDispense(List<int> index) {
+    public static void ReDispense(List<int> index) {
         List<Chess> popChessList = new List<Chess>{};
         foreach(int i in index) {
-            if(i < 0 || i >= ChessSelector.chessList.Count) {
+            if(i < 0 || i >= ChessSelector.chessList_.Count) {
                 Debug.Log("ReDispense: Invaild chessIndex.");
                 continue;
             }
-            popChessList.Add(ChessSelector.chessList[i]);
+            popChessList.Add(ChessSelector.chessList_[i]);
         }
         foreach(Chess chess in popChessList) {
-            ChessSelector.chessList.Remove(chess);
+            ChessSelector.chessList_.Remove(chess);
         }
         foreach(Chess chess in popChessList) {
             ChessSelector.PushBackChess(InstantiateChess(DispenseChess()).GetComponent<Chess>());
@@ -40,14 +42,14 @@ public class ChessDispenser : MonoBehaviour
         }
     }
 
-    public GameObject InstantiateChess(string chessName)
+    public static GameObject InstantiateChess(string chessName)
     {
         if (chessName == null) {
             return null;
         }
         ChessProperty instantiateData = GlobalScope.GetChessProperty(chessName);
-        GameObject instantiateBody = Instantiate(chessPrefab_, chessSelectorPos_.transform);
-        GameObject instantiateModel = InstantiateChessModel(chessModelPrefab_, instantiateBody, instantiateData);
+        GameObject instantiateBody = Instantiate(GlobalScope.chessPrefab_static_, GlobalScope.chessSelector_static_.transform);
+        GameObject instantiateModel = InstantiateChessModel(GlobalScope.chessModelPrefab_static_, instantiateBody, instantiateData, false);
         if (instantiateData != null) {
             Chess chess = instantiateBody.GetComponent<Chess>();
             chess.InstantiateChessProperty(instantiateData);
@@ -56,27 +58,33 @@ public class ChessDispenser : MonoBehaviour
         }
         return null;
     }
-    public static GameObject InstantiateChessModel(GameObject chessModelPrefab, GameObject father, ChessProperty instantiateData)
+    public static GameObject InstantiateChessModel(GameObject chessModelPrefab, GameObject father, ChessProperty instantiateData, bool ifChessGridModel)
     {
         if (father == null) {
             return null;
         }
-        GameObject instantiateModel = Instantiate(chessModelPrefab, father.transform);
+        GameObject instantiateModel = Instantiate(chessModelPrefab);
+        instantiateModel.transform.SetParent(father.transform);
         instantiateModel.transform.localPosition = Vector3.zero;
         instantiateModel.transform.localRotation = Quaternion.Euler(-90, -90, 0);
         if (instantiateData != null) {
             foreach(Transform child in instantiateModel.transform) {
                 switch (child.name) {
                     case "name":
+                        // if (!ifChessGridModel)
                         child.gameObject.GetComponent<TextMesh>().text = instantiateData.Name;
                         break;
                     case "level":
-                        child.gameObject.GetComponent<TextMesh>().text = instantiateData.Level.ToString();
+                        if (!ifChessGridModel) {
+                            child.gameObject.GetComponent<TextMesh>().text = instantiateData.Level.ToString();
+                        }
                         break;
                     case "cost":
                         string costNum = "";
-                        for(int i = 0; i<instantiateData.Cost ;i++) {
-                            costNum+="●";
+                        if (!ifChessGridModel) {
+                            for(int i = 0; i<instantiateData.Cost ;i++) {
+                                costNum+="●";
+                            }
                         }
                         child.gameObject.GetComponent<TextMesh>().text = costNum;
                         break;
@@ -88,10 +96,9 @@ public class ChessDispenser : MonoBehaviour
         return null;
     }
 
-
-    public int GetChessNumInChessSelector() {
+    public static int GetChessNumInChessSelector() {
         int result = 0;
-        foreach(Transform child in chessSelectorPos_.transform) {
+        foreach(Transform child in GlobalScope.chessSelector_static_.transform) {
             result++;
         }
         return result;

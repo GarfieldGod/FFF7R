@@ -8,10 +8,6 @@ public class Chess : MonoBehaviour
     public int cost;
     public Vector3 chessPos = new Vector3(0, 0, 0);
     public GameObject chessModel = null;
-    private GameObject nameObj;
-    private GameObject levelObj;
-    private GameObject costObj;
-    private GameObject chessModelObj;
     public void InstantiateChessProperty(ChessProperty property)
     {
         gameObject.name = property.CardCode;
@@ -20,15 +16,15 @@ public class Chess : MonoBehaviour
         level = property.Level;
         cost = property.Cost;
     }
-    public void ObjectPosToChessPos(Vector3 position, Quaternion rotation, float moveSpeed){
+    private void ObjectPosToChessPos(Vector3 position, Quaternion rotation, float moveSpeed){
         transform.localPosition = Vector3.MoveTowards(transform.localPosition, position, moveSpeed * Time.deltaTime);
         transform.localRotation = rotation;
     }
-    void MouseHover() {
+    private void MouseHover() {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100f) && hit.collider.gameObject == gameObject) {
-            chessModel.transform.localPosition = Vector3.MoveTowards(chessModel.transform.localPosition, new Vector3(1, 0, 0), 30f * Time.deltaTime);
+            chessModel.transform.localPosition = Vector3.MoveTowards(chessModel.transform.localPosition, new Vector3(1, 1, 0), 30f * Time.deltaTime);
         } else {
             chessModel.transform.localPosition = Vector3.MoveTowards(chessModel.transform.localPosition, new Vector3(0, 0, 0), 30f * Time.deltaTime);
         }

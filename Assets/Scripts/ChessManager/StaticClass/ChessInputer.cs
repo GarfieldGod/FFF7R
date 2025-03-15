@@ -11,11 +11,13 @@ public struct ChessInputParmObj {
     public GameObject chessObj;
     public List<List<List<int>>> chessGridStatus;
     public Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting;
-    public ChessInputParmObj(GameObject chessGrid, GameObject chessObj, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+    public bool rivalInput;
+    public ChessInputParmObj(GameObject chessGrid, GameObject chessObj, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting, bool rivalInput = false) {
         this.chessGrid = chessGrid;
         this.chessObj = chessObj;
         this.chessGridStatus = chessGridStatus;
         this.tasksLasting = tasksLasting;
+        this.rivalInput = rivalInput;
     }
 }
 public struct ChessInputParm {
@@ -23,35 +25,45 @@ public struct ChessInputParm {
     public ChessProperty property;
     public List<List<List<int>>> chessGridStatus;
     public Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting;
-    public ChessInputParm(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+    public bool rivalInput;
+    public ChessInputParm(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting, bool rivalInput = false) {
         this.chessGridPos = chessGridPos;
         this.property = property;
         this.chessGridStatus = chessGridStatus;
         this.tasksLasting = tasksLasting;
+        this.rivalInput = rivalInput;
     }
 }
 public class ChessInputer : MonoBehaviour {
-    public GameObject chessPad;
     public static void GetChessInput(ChessInputParmObj parms) {
-        GetChessInput(parms.chessGrid, parms.chessObj, parms.chessGridStatus, parms.tasksLasting);
+        GetChessInput(parms.chessGrid, parms.chessObj, parms.chessGridStatus, parms.tasksLasting, parms.rivalInput);
     }
     public static void GetChessInput(ChessInputParm parms) {
-        GetChessInput(parms.chessGridPos, parms.property, parms.chessGridStatus, parms.tasksLasting);
+        GetChessInput(parms.chessGridPos, parms.property, parms.chessGridStatus, parms.tasksLasting, parms.rivalInput);
     }
-    public static void GetChessInput(GameObject chessGrid, GameObject chessObj, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+    public static void GetChessInput(GameObject chessGrid, GameObject chessObj, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting, bool rivalInput) {
         Int2D chessGridPos = chessGrid.GetComponent<ChessGrid>().chessGridPos_;
         ChessProperty property = GlobalScope.GetChessProperty(chessObj.name);
-        GetChessInput(chessGridPos, property, chessGridStatus, tasksLasting);
+        GetChessInput(chessGridPos, property, chessGridStatus, tasksLasting, rivalInput);
         ChessSelector.RemoveChess(chessObj);
     }
-    public static void GetChessInput(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+    public static void GetChessInput(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting, bool rivalInput) {
         chessGridStatus[0] = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridStatus[0]);
         chessGridStatus[1] = CardEffect.DoCardEffect(chessGridPos, property, chessGridStatus, tasksLasting);
-        // DoSpecialEffect(chessGridPos, property.SpecialEffects);
-        GameManager.CommitChessStatusToChessPad();
+        GetCardModelOn(chessGridPos, property, rivalInput);
     }
-    private static void GetCardModelOn(Int2D chessGridPos, ChessProperty property) {
-        GameObject instantiateModel = ChessDispenser.InstantiateChessModel(GlobalScope.chessModelPrefab_static_, GlobalScope.GetChessGridObjectByChessGridPos(chessGridPos), property);
+    private static void GetCardModelOn(Int2D chessGridPos, ChessProperty property, bool rivalInput) { // TODO somebug in rival view
+        Int2D finalPos = chessGridPos;
+        if(rivalInput) {
+            finalPos = Rival.GetChessGridPosInRivalView(finalPos);
+        }
+        GameObject chessGridObj = GlobalScope.GetChessGridObjectByChessGridPos(finalPos);
+        GameObject instantiateModel = ChessDispenser.InstantiateChessModel(GlobalScope.chessModelPrefab_static_, chessGridObj, property, true);
+        instantiateModel.transform.localPosition = new Vector3(0, -0.8f, 0);
+        instantiateModel.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+        instantiateModel.transform.localScale = new Vector3(80, 80, 1);
+        // TextMesh level = instantiateModel.transform.Find("level").GetComponent<TextMesh>();
+        // chessGridObj.GetComponent<ChessGrid>().levelText_ = level;
     }
 }
 #endif

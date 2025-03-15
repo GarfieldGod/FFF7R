@@ -13,7 +13,7 @@ public class AiRival {
         if(vaildChessGrids.Count == 0) {
             return Rival.GetChessStatusInRivalView(finalChessGridStatusTemp);
         }
-        List<Tuple<Int2D, string, int>> resultInPosEffect = DoTheBestInEveryCardForPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
+        List<Tuple<Int2D, string, int>> resultInPosEffect = TryTheBestInEveryCardForPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
         // List<Tuple<Int2D, string, int>> resultInCardEffect = DoTheBestByEveryCardInPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
         // List<Tuple<Int2D, string, int>> resultInSpecialEffect = DoTheBestByEveryCardInPosEffect(chessGridStatus[0], vaildChessGrids, chessInHand);
         if(resultInPosEffect.Count != 0) {
@@ -26,7 +26,8 @@ public class AiRival {
                 chessGridPos,
                 property,
                 finalChessGridStatusTemp,
-                tasksLasting
+                tasksLasting,
+                true
             );
             ChessInputer.GetChessInput(parmInput);
             for(int i = 0; i < chessInHand.Count; i++) {
@@ -38,7 +39,7 @@ public class AiRival {
         }
         return Rival.GetChessStatusInRivalView(finalChessGridStatusTemp);
     }
-    private static List<Tuple<Int2D, string, int>> DoTheBestInEveryCardForPosEffect(List<List<int>> chessGridPosStatus, List<Tuple<Int2D, int>> vaildChessGrids, List<string> chessInHand) {
+    private static List<Tuple<Int2D, string, int>> TryTheBestInEveryCardForPosEffect(List<List<int>> chessGridPosStatus, List<Tuple<Int2D, int>> vaildChessGrids, List<string> chessInHand) {
         List<Tuple<Int2D, string, int>> result = new List<Tuple<Int2D, string, int>>{};
         foreach(var chessName in chessInHand) {
             int chessPosPoint = 0;
@@ -46,7 +47,7 @@ public class AiRival {
             int posY = 0;
             ChessProperty property = GlobalScope.GetChessProperty(chessName);
             foreach(var vaildChessGrid in vaildChessGrids) {
-                if(vaildChessGrid.Item2 > property.Level) {
+                if(vaildChessGrid.Item2 < property.Cost) {
                     continue;
                 }
                 Int2D chessGridPos = new Int2D(vaildChessGrid.Item1.x, vaildChessGrid.Item1.y);
@@ -78,6 +79,11 @@ public class AiRival {
 }
 public class Rival
 {
+    public static Int2D GetChessGridPosInRivalView(Int2D pos) {
+        int chessPadLength = GlobalScope.chessGridNameList_[0].Count - 1;
+        Log.test("Origin: " + pos.y +" RivalView: " + (chessPadLength - pos.y).ToString());
+        return new Int2D(pos.x, chessPadLength - pos.y);
+    }
     public static List<List<List<int>>> GetChessStatusInRivalView(List<List<List<int>>> originChessStatus) {
         List<List<List<int>>> result = GlobalScope.DeepCopy3DList(originChessStatus);
         GetChessPosStatusInRivalView(result[0]);
