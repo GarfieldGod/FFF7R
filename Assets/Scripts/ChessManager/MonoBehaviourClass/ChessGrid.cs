@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class ChessGrid : MonoBehaviour
 {
@@ -41,11 +42,21 @@ public class ChessGrid : MonoBehaviour
     public void UpdateGridStatus(List<List<List<int>>> chessGirdStatus) {
         ChessPosStatus myChessStatus = (ChessPosStatus)chessGirdStatus[0][chessGridPos_.x][chessGridPos_.y];
         int MyCardLevel = chessGirdStatus[1][chessGridPos_.x][chessGridPos_.y];
+        posStatus_ = myChessStatus;
         UpdateGridPosStatus(myChessStatus);
         UpdateGridCardLevel(MyCardLevel, myChessStatus);
     }
+    public void PreviewGridStatus(List<List<List<int>>> chessGirdStatus, bool self) {
+        ChessPosStatus myChessStatus = (ChessPosStatus)chessGirdStatus[0][chessGridPos_.x][chessGridPos_.y];
+        int MyCardLevel = chessGirdStatus[1][chessGridPos_.x][chessGridPos_.y];
+        if(self) {
+            UpdateGridPosStatus(ChessPosStatus.EMPTY);
+        } else {
+            UpdateGridPosStatus(myChessStatus);
+        }
+        UpdateGridCardLevel(MyCardLevel, myChessStatus);
+    }
     public void UpdateGridPosStatus(ChessPosStatus posStatus) {
-        posStatus_ = posStatus;
         switch (posStatus) {
             case ChessPosStatus.LEVEL_ONE_FRIEND:
             case ChessPosStatus.LEVEL_ONE_ENEMY:
@@ -98,8 +109,8 @@ public class ChessGrid : MonoBehaviour
             }
         }
     }
-    private void PlayerMouseHover() {
-        if(posStatus_ <= ChessPosStatus.LEVEL_THREE_FRIEND && PlayerOperation.preview) {
+    public void PlayerMouseHover() {
+        if(posStatus_ <= ChessPosStatus.OCCUPIED_FRIEND && PlayerOperation.preview) {
             // float duration = 1.0f;
             // float startAlpha = 0.2f;
             // float endAlpha = 0.5f;
@@ -112,8 +123,12 @@ public class ChessGrid : MonoBehaviour
                 gridPlane_.SetActive(true);
                 if(PlayerOperation.currentChessObject != PlayerOperation.CHESSNULL && PlayerOperation.CheckIfInputVaild(gameObject, PlayerOperation.currentChessObject)) {
                     gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(0.6627451f, 1, 0.6901961f, alpha);//0.5294118f
+                    if(ChessSelector.previewChess_.Key != null) {
+                        ChessSelector.DoPreviewToChessGridPos(gameObject);
+                    }
                 } else {
                     gridPlane_.GetComponent<MeshRenderer>().material.color = new Color(1, 0.3812995f, 0.03447914f, alpha);
+                    ChessSelector.CancelPreviewToChessGridPos();
                 }
             } else {
                 gridPlane_.SetActive(false);

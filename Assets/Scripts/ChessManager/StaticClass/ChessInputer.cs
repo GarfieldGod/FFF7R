@@ -59,11 +59,25 @@ public class ChessInputer : MonoBehaviour {
         }
         GameObject chessGridObj = GlobalScope.GetChessGridObjectByChessGridPos(finalPos);
         GameObject instantiateModel = ChessDispenser.InstantiateChessModel(GlobalScope.chessModelPrefab_static_, chessGridObj, property, true);
-        instantiateModel.transform.localPosition = new Vector3(0, -0.8f, 0);
+        instantiateModel.transform.localPosition = new Vector3(0.5f, -0.8f, 0);
         instantiateModel.transform.localRotation = Quaternion.Euler(-90, 0, 0);
-        instantiateModel.transform.localScale = new Vector3(80, 80, 1);
+        instantiateModel.transform.localScale = new Vector3(90, 80, 150);
         // TextMesh level = instantiateModel.transform.Find("level").GetComponent<TextMesh>();
         // chessGridObj.GetComponent<ChessGrid>().levelText_ = level;
+    }
+    public static List<List<List<int>>> GetPreviewChessGridStatus(ChessInputParmObj parms) {
+        Int2D chessGridPos = parms.chessGrid.GetComponent<ChessGrid>().chessGridPos_;
+        ChessProperty property = GlobalScope.GetChessProperty(parms.chessObj.name);
+        return GetPreviewChessGridStatus(chessGridPos, property, parms.chessGridStatus, parms.tasksLasting);
+    }
+    public static List<List<List<int>>> GetPreviewChessGridStatus(ChessInputParm parms) {
+        return GetPreviewChessGridStatus(parms.chessGridPos, parms.property, parms.chessGridStatus, parms.tasksLasting);
+    }
+    public static List<List<List<int>>> GetPreviewChessGridStatus(Int2D chessGridPos, ChessProperty property, List<List<List<int>>> chessGridStatus, Dictionary<Int2D, List<Tuple<Int2D, int>>> tasksLasting) {
+        List<List<List<int>>> chessGridStatusTemp = GlobalScope.DeepCopy3DList(GlobalScope.chessGridStatus);
+        chessGridStatusTemp[0] = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridStatusTemp[0]);
+        chessGridStatusTemp[1] = CardEffect.DoCardEffect(chessGridPos, property, chessGridStatusTemp, tasksLasting);
+        return chessGridStatusTemp;
     }
 }
 #endif
@@ -187,7 +201,7 @@ class EffectsParser {
                     if (posX != 0 || posY != 0) {
                         var posWithValue = new Tuple<Int2D, int>(new Int2D(posX, posY), effects[i][j]);
                         result.Add(posWithValue);
-                        Log.test($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
+                        // Log.test($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
                     }
                 }
             }

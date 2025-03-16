@@ -22,6 +22,7 @@ public class PlayerOperation : MonoBehaviour
     void Update()
     {
         PlayerClick();
+        PlayerPreView();
         // ScreenPosToWorldPos(Input.mousePosition);
     }
 
@@ -47,6 +48,32 @@ public class PlayerOperation : MonoBehaviour
                 ChessSelector.CancelPreview();
                 currentChessObject = CHESSNULL;
                 preview = false;
+            }
+        }
+    }
+
+    void PlayerPreView() {
+        if (preview == true) {
+            RaycastHit hit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out hit) && GlobalScope.chessPositionNameSet.Contains(hit.collider.gameObject.name)) {
+                GameObject hitOne = hit.collider.gameObject;
+                if (GetComponent<GameManager>().PlayerTurn && CheckIfInputVaild(hitOne, currentChessObject)) {
+                    ChessInputParmObj parmsInput = new ChessInputParmObj(
+                        hitOne,
+                        currentChessObject,
+                        GlobalScope.chessGridStatus,
+                        GameManager.playerLastingTasks
+                    );
+                    Int2D chessGridPos = hitOne.GetComponent<ChessGrid>().chessGridPos_;
+                    List<List<List<int>>> chessGridStatusTemp = ChessInputer.GetPreviewChessGridStatus(parmsInput);
+                    GameManager.PreviewStatusToChessPad(chessGridStatusTemp, chessGridPos);
+                } else {
+                    GameManager.CommitChessStatusToChessPad();
+                }
+            } else {
+                GameManager.CommitChessStatusToChessPad();
+                ChessSelector.CancelPreviewToChessGridPos();
             }
         }
     }
@@ -77,7 +104,7 @@ public class PlayerOperation : MonoBehaviour
                 currentChessObject = CHESSNULL;
             }
             currentChessObject = chessToSelect;
-            ChessSelector.DoPreview(chessToSelect.GetComponent<Chess>());
+            ChessSelector.DoPreviewToPreViewPos(chessToSelect.GetComponent<Chess>());
             preview = true;
         } else {
             Debug.Log("Select is Invaild.");

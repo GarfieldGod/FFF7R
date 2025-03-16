@@ -79,9 +79,18 @@ public class AiRival {
 }
 public class Rival
 {
+    public static int GetScoreInOneLine(List<List<List<int>>> originChessStatus, int Line) {
+        int score = 0;
+        for(int j = 0; j< originChessStatus[0].Count; j++) {
+            if(originChessStatus[0][Line][j] == (int)ChessPosStatus.OCCUPIED_FRIEND) {
+                score += originChessStatus[1][Line][j];
+            }
+        }
+        return score;
+    }
     public static Int2D GetChessGridPosInRivalView(Int2D pos) {
         int chessPadLength = GlobalScope.chessGridNameList_[0].Count - 1;
-        Log.test("Origin: " + pos.y +" RivalView: " + (chessPadLength - pos.y).ToString());
+        // Log.test("Origin: " + pos.y +" RivalView: " + (chessPadLength - pos.y).ToString());
         return new Int2D(pos.x, chessPadLength - pos.y);
     }
     public static List<List<List<int>>> GetChessStatusInRivalView(List<List<List<int>>> originChessStatus) {

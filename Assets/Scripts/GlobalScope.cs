@@ -21,7 +21,6 @@ public class GlobalScope
         LoadChessProperties();
     }
     void Update() {
-        GlobalScopeMovement();
     }
 // -----------------------------------------------------------------------------------ChessProperties
     private static readonly string chessPropertiesJsonPath = "Json/ChessProperties.json";
@@ -38,10 +37,10 @@ public class GlobalScope
         "downLine0", "downLine1", "downLine2", "downLine3", "downLine4"
     };
     public static HashSet<string> chessNameSet = new HashSet<string>{};
-    private static List<ChessProperty> ChessProperties;
+    private static List<ChessProperty> ChessProperties_;
     public static ChessProperty GetChessProperty(string chessCode)
     {
-        foreach (var chess in ChessProperties) {
+        foreach (var chess in ChessProperties_) {
             if (chess.CardCode == chessCode) {
                 return chess;
             }
@@ -56,74 +55,37 @@ public class GlobalScope
         string path = chessPropertiesJsonPath;
 #endif
         string ChessPropertiesData = System.IO.File.ReadAllText(path);
-        ChessProperties = JsonConvert.DeserializeObject<List<ChessProperty>>(ChessPropertiesData);
+        ChessProperties_ = JsonConvert.DeserializeObject<List<ChessProperty>>(ChessPropertiesData);
 
         HashSet<string> ChessNames = new HashSet<string>();
-        foreach (var chess in ChessProperties)
+        foreach (var chess in ChessProperties_)
         {
             ChessNames.Add(chess.CardCode);
         }
         chessNameSet = ChessNames;
     }
 #if UNITY_ENGINE
-// -----------------------------------------------------------------------------------GlobalScope Movement
-    private static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListLocal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
-    private static List<Tuple<GameObject, Vector3, Quaternion, float>> moveListGlobal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
-    public static void MoveToLocal(GameObject obj, Vector3 targetPosition, Quaternion rotation, float moveSpeed, bool isClearTaskList = false)
-    {
-        if(isClearTaskList) {
-            moveListLocal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
-        }
-        moveListLocal.Add(new Tuple<GameObject, Vector3, Quaternion, float>(obj, targetPosition, rotation, moveSpeed));
-    }
-    public static void MoveToGlobal(GameObject obj, Vector3 targetPosition, Quaternion rotation, float moveSpeed, bool isClearTaskList = false)
-    {
-        if(isClearTaskList) {
-            moveListGlobal = new List<Tuple<GameObject, Vector3, Quaternion, float>>{};
-        }
-        moveListGlobal.Add(new Tuple<GameObject, Vector3, Quaternion, float>(obj, targetPosition, rotation, moveSpeed));
-    }
-    public static void GlobalScopeMovement() {
-        if (moveListLocal.Count != 0) {
-            for (int i = 0; i < moveListLocal.Count; i++)
-            {
-                var task = moveListLocal[i];
-                if (task.Item1 != null && task.Item1.transform.localPosition != task.Item2)
-                {
-                    task.Item1.transform.localPosition = Vector3.MoveTowards(task.Item1.transform.localPosition, task.Item2, task.Item4 * Time.deltaTime);
-                    task.Item1.transform.localRotation = task.Item3;
-                } else {
-                    moveListLocal.RemoveAt(i);
-                    i--;
-                }
-            }
-        }
-        if (moveListGlobal.Count != 0) {
-            for (int i = 0; i < moveListGlobal.Count; i++)
-            {
-                var task = moveListGlobal[i];
-                if (task.Item1.transform.position != task.Item2)
-                {
-                    task.Item1.transform.position = Vector3.MoveTowards(task.Item1.transform.position, task.Item2, task.Item4 * Time.deltaTime);
-                    task.Item1.transform.rotation = task.Item3;
-                } else {
-                    moveListGlobal.RemoveAt(i);
-                    i--;
-                }
-            }
-        }
-    }
 // -----------------------------------------------------------------------------------Load GlabalScope Static GameObjects
+    public static List<Tuple<GameObject, GameObject>> GirdScoreCounters_ = new List<Tuple<GameObject, GameObject>>();
     void GenerateChessGird(float offsetX, float offsetY) {
         Int2D centerPos = new Int2D((chessGridNameList_.Count)/2, (chessGridNameList_[0].Count)/2);
         for(int i = 0; i < chessGridNameList_.Count ; i++) {
-            for(int j = 0; j < chessGridNameList_[0].Count ; j++) {
+            int j = 0;
+            for(; j < chessGridNameList_[0].Count ; j++) {
                 GameObject chessGrid = Instantiate(chessGirdPrefab_static_, chessPad_.transform);
                 chessGrid.name = chessGridNameList_[i][j];
                 int posX = i - centerPos.x;
                 int posY = centerPos.y - j;
                 chessGrid.transform.localPosition = new Vector3(posY * offsetX, 1, posX * offsetY);
             }
+            GameObject scoreCounterPlayer = Instantiate(chessGirdScoreCounterPrefab_static_, chessPad_.transform);
+            GameObject scoreCounterRival = Instantiate(chessGirdScoreCounterPrefab_static_, chessPad_.transform);
+            scoreCounterPlayer.transform.localPosition = new Vector3((chessGridNameList_[0].Count/2 + 1) * offsetX, 1, (i - centerPos.x) * offsetY);
+            scoreCounterRival.transform.localPosition = new Vector3(-(chessGridNameList_[0].Count/2 + 1) * offsetX, 1, (i - centerPos.x) * offsetY);
+            scoreCounterPlayer.name = "scoreCounterPlayer" + i.ToString();
+            scoreCounterRival.name = "scoreCounterRival" + i.ToString();
+            GirdScoreCounters_.Add(new Tuple<GameObject, GameObject>(scoreCounterPlayer, scoreCounterRival));
+            Log.test("scoreCounterPlayer" + i.ToString() + " : " + "scoreCounterRival" + i.ToString());
         }
     }
     public GameObject chessSelector_;
@@ -131,17 +93,20 @@ public class GlobalScope
     public GameObject chessPrefab_;
     public GameObject chessModelPrefab_;
     public GameObject chessGirdPrefab_;
+    public GameObject chessGirdScoreCounterPrefab_;
     public static GameObject chessSelector_static_;
     public static GameObject chessPad_static_;
     public static GameObject chessPrefab_static_;
     public static GameObject chessModelPrefab_static_;
     public static GameObject chessGirdPrefab_static_;
+    public static GameObject chessGirdScoreCounterPrefab_static_;
     private void LoadGlabalScopeStaticGameObject() {
         chessSelector_static_ = chessSelector_;
         chessPad_static_ = chessPad_;
         chessPrefab_static_ = chessPrefab_;
         chessModelPrefab_static_ = chessModelPrefab_;
         chessGirdPrefab_static_ = chessGirdPrefab_;
+        chessGirdScoreCounterPrefab_static_ = chessGirdScoreCounterPrefab_;
     }
     private static Dictionary<Int2D, GameObject> ChessGridMap_ = new Dictionary<Int2D, GameObject>();
     public static Int2D InitGlobalScopeChessGridMap(GameObject chessGrid) {
