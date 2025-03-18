@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using JetBrains.Annotations;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
+
 
 public class ChessGrid : MonoBehaviour
 {
+    public static Dictionary<Int2D, Tuple<CardEffectsScope, CardEffectsType, List<List<int>>>> tasksLasting_;
     public ChessPosStatus posStatus_ = ChessPosStatus.EMPTY;
     public Int2D chessGridPos_;
     public int cardLevel_ = 0;

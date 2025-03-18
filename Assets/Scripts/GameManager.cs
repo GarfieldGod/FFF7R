@@ -70,6 +70,11 @@ public class GameManager : MonoBehaviour
                 new List<int> { 0, 0, 0, 0, 0 },
                 new List<int> { 0, 0, 0, 0, 0 },
                 new List<int> { 0, 0, 0, 0, 0 },
+            },
+            new List<List<int>>{
+                new List<int> { 0, 0, 0, 0, 0 },
+                new List<int> { 0, 0, 0, 0, 0 },
+                new List<int> { 0, 0, 0, 0, 0 },
             }
         };
         CommitChessStatusToChessPad();

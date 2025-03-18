@@ -148,15 +148,18 @@ public class GlobalScope
 #endif
 }
 // -----------------------------------------------------------------------------------Enums For All
+public enum CardEffectsScope {
+    DOTOALL = 0,
+    FRIEND_ONLY = 1,
+    ENEMY_ONLY = 2,
+    FRIEND_INCREASE_ENEMY_REDUCE_ONCE,
+}
 public enum CardEffectsType {
-    DOTOALL_ONCE = 0,
-    FRIEND_ONLY_ONCE = 1,
-    ENEMY_ONLY_ONCE = 2,
-    FRIEND_INCREASE_ENEMY_REDUCE_ONCE = 3,
-    DOTOALL_LASTING = 10,
-    FRIEND_ONLY_LASTING = 11,
-    ENEMY_ONLY_LASTING = 12,
-    FRIEND_INCREASE_ENEMY_REDUCE_LASTING = 13
+    ON_PLAYED,
+    ON_POSITION,
+    ON_SELF_DEAD,
+    ON_ENEMY_DEAD,
+    ON_ENHANCED
 }
 public enum ChessPosStatus {
     LEVEL_ONE_FRIEND = 1,
@@ -224,6 +227,6 @@ public class ChessProperty
     public int Level;
     public int Cost;
     public List<List<int>> PosEffects;
-    public Tuple<CardEffectsType, List<List<int>>> CardEffects;
+    public Tuple<CardEffectsScope, CardEffectsType, List<List<int>>> CardEffects;
     public HashSet<string> SpecialEffects;
 }
