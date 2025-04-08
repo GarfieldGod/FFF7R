@@ -4,6 +4,8 @@ using System.IO;
 using System;
 using Newtonsoft.Json;
 using Unity.VisualScripting;
+using Unity.VisualScripting.FullSerializer;
+
 
 
 #if UNITY_ENGINE
@@ -24,7 +26,11 @@ public class GlobalScope
     }
 // -----------------------------------------------------------------------------------ChessProperties
     private static readonly string chessPropertiesJsonPath = "Json/ChessProperties.json";
-    public static List<List<List<int>>> chessGridStatus;
+    public static readonly List<List<int>> EmptyStandard2DList = new List<List<int>> {
+        new List<int> { 0, 0, 0, 0, 0 },
+        new List<int> { 0, 0, 0, 0, 0 },
+        new List<int> { 0, 0, 0, 0, 0 },
+    };
     public static readonly List<List<string>> chessGridNameList_ = new List<List<string>>{
         new List<string>{ "upLine0", "upLine1", "upLine2", "upLine3", "upLine4" },
         new List<string>{ "midLine0", "midLine1", "midLine2", "midLine3", "midLine4" },
@@ -89,24 +95,32 @@ public class GlobalScope
         }
     }
     public GameObject chessSelector_;
+    public GameObject chessSelector_rival_;
     public GameObject chessPad_;
     public GameObject chessPrefab_;
     public GameObject chessModelPrefab_;
     public GameObject chessGirdPrefab_;
     public GameObject chessGirdScoreCounterPrefab_;
+    public GameObject previewPos_;
     public static GameObject chessSelector_static_;
+    public static GameObject chessSelector_rival_static_;
     public static GameObject chessPad_static_;
     public static GameObject chessPrefab_static_;
     public static GameObject chessModelPrefab_static_;
     public static GameObject chessGirdPrefab_static_;
     public static GameObject chessGirdScoreCounterPrefab_static_;
+    public static GameObject previewPos_static_;
+    public static GameObject system_static_;
     private void LoadGlabalScopeStaticGameObject() {
         chessSelector_static_ = chessSelector_;
+        chessSelector_rival_static_ = chessSelector_rival_;
         chessPad_static_ = chessPad_;
         chessPrefab_static_ = chessPrefab_;
         chessModelPrefab_static_ = chessModelPrefab_;
         chessGirdPrefab_static_ = chessGirdPrefab_;
         chessGirdScoreCounterPrefab_static_ = chessGirdScoreCounterPrefab_;
+        previewPos_static_ = previewPos_;
+        system_static_ = gameObject;
     }
     private static Dictionary<Int2D, GameObject> ChessGridMap_ = new Dictionary<Int2D, GameObject>();
     public static Int2D InitGlobalScopeChessGridMap(GameObject chessGrid) {
@@ -143,6 +157,21 @@ public class GlobalScope
     }
     public static List<List<int>> DeepCopy2DList(List<List<int>> original) {
         List<List<int>> result = original.Select(innerList => new List<int>(innerList)).ToList();
+        return result;
+    }
+    public static List<List<int>> Compose2DList(List<List<int>> ListA, List<List<int>> ListB) {
+        if(ListA.Count == 0 || ListB.Count == 0 || ListA.Count != ListB.Count) {
+            return null;
+        }
+        if (ListA[0].Count == 0 || ListB[0].Count == 0 || ListA[0].Count != ListB[0].Count) {
+            return null;
+        }
+        List<List<int>> result = DeepCopy2DList(ListA);
+        for(int i = 0; i < result.Count; i++) {
+            for(int j = 0; j < result[0].Count; j++) {
+                result[i][j] += ListB[i][j];
+            }
+        }
         return result;
     }
 #endif
@@ -227,6 +256,29 @@ public class ChessProperty
     public int Level;
     public int Cost;
     public List<List<int>> PosEffects;
+    public List<List<int>> CardEffect;
+    public EffectConfig CardEffectConfig;
     public Tuple<CardEffectsScope, CardEffectsType, List<List<int>>> CardEffects;
-    public HashSet<string> SpecialEffects;
+    public string Description;
+    public void TurnToOnPositionEffectNegativeTask() {
+        if(CardEffects.Item2 != CardEffectsType.ON_POSITION) return;
+        List<List<int>> result = GlobalScope.DeepCopy2DList(CardEffects.Item3);
+        foreach(var Line in result) {
+            for(int j = 0; j < Line.Count ; j++) {
+                Line[j] = -Line[j];
+            }
+        }
+        CardEffects = new Tuple<CardEffectsScope, CardEffectsType, List<List<int>>>(CardEffects.Item1, CardEffectsType.ON_SELF_DEAD, result);
+    }
+    public ChessProperty() {}
+    public ChessProperty(ChessProperty chessProperty){
+        CardCode = chessProperty.CardCode;
+        Name = chessProperty.Name;
+        Level = chessProperty.Level;
+        Cost = chessProperty.Cost;
+        PosEffects = GlobalScope.DeepCopy2DList(chessProperty.PosEffects);
+        CardEffects = new Tuple<CardEffectsScope, CardEffectsType, List<List<int>>>(
+            chessProperty.CardEffects.Item1,chessProperty.CardEffects.Item2,GlobalScope.DeepCopy2DList(chessProperty.CardEffects.Item3));
+        Description = chessProperty.Description;
+    }
 }

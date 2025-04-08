@@ -3,6 +3,7 @@ using UnityEngine;
 using System;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using Mirror.Examples.BilliardsPredicted;
 
 public class GameManager : MonoBehaviour
 {
@@ -18,19 +19,18 @@ public class GameManager : MonoBehaviour
     public static GameStatus gameStatus_ = GameStatus.INIT;
     public static int GameTurns = 0;
     public bool PlayerTurn = true;
-    List<string> rivalChessListGlabol;
-    public static Dictionary<Int2D, List<Tuple<Int2D, int>>> playerLastingTasks = new Dictionary<Int2D, List<Tuple<Int2D, int>>>{};
-    public static Dictionary<Int2D, List<Tuple<Int2D, int>>> RivalLastingTasks = new Dictionary<Int2D, List<Tuple<Int2D, int>>>{};
 //----------------------------------------------------------------------------------------------------------------------------------INIT
+    private ChessInputer playerInputer_;
+    private ChessInputer rivalInputer_;
     void Start()
     {
         SingleGameConfig singleGameConfig = new SingleGameConfig(
             1,
             new List<string>{
-                "Card001", "Card001", "Card001",
-                "Card007", "Card007", "Card007", "Card007",
-                "Card008", "Card008", "Card008", "Card008",
-                "Card009", "Card009", "Card009", "Card009",
+                "CardTest0", "CardTest0", "CardTest0", "CardTest0",
+                "CardTest1", "CardTest1", "CardTest1", "CardTest1",
+                "Card006", "Card006", "Card006", "Card006",
+                "Card009", "Card009", "Card009",
             },
             new List<string>{
                 "Card001", "Card001", "Card001",
@@ -48,43 +48,29 @@ public class GameManager : MonoBehaviour
     void InitGame(List<string> playerChessPool, List<string> rivalChessPool) {
         gameStatus_ = GameStatus.INIT;
         InitChessPadStandard();
-        InitChessPoolAndChessSelector(playerChessPool, 5);
-        rivalChessListGlabol = rivalChessPool;
+        playerInputer_ = new ChessInputer(playerChessPool, 5, ChessPad.chessPadInfo_, InputerType.PLAYER);
+        rivalInputer_ = new ChessInputer(rivalChessPool, 5, ChessPad.chessPadInfo_, InputerType.RIVAL);
+
         gameStatus_ = GameStatus.REDISPENSE_CHESS;
         // TODO
         gameStatus_ = GameStatus.GAMING;
     }
     void EndGame() {
-        playerLastingTasks.Clear();
-        RivalLastingTasks.Clear();
     }
 
     void InitChessPadStandard() {
-        GlobalScope.chessGridStatus = new List<List<List<int>>> {
+        ChessPad.chessPadInfo_ = new ChessPadInfo(
+        new List<List<List<int>>> {
             new List<List<int>>{
                 new List<int> { 1, 10, 10, 10, 11 },
                 new List<int> { 1, 10, 10, 10, 11 },
                 new List<int> { 1, 10, 10, 10, 11 },
             },
-            new List<List<int>>{
-                new List<int> { 0, 0, 0, 0, 0 },
-                new List<int> { 0, 0, 0, 0, 0 },
-                new List<int> { 0, 0, 0, 0, 0 },
-            },
-            new List<List<int>>{
-                new List<int> { 0, 0, 0, 0, 0 },
-                new List<int> { 0, 0, 0, 0, 0 },
-                new List<int> { 0, 0, 0, 0, 0 },
-            }
-        };
-        CommitChessStatusToChessPad();
-    }
-
-    void InitChessPoolAndChessSelector(List<string> chessPoolConfig, int chessSelectorSize) {
-        ChessDispenser.chessPool = chessPoolConfig;
-        for( int i = 0 ; i < chessSelectorSize ; i++ ) {
-            ChessSelector.PushBackChess(ChessDispenser.InstantiateChess(ChessDispenser.DispenseChess()).GetComponent<Chess>());
+            GlobalScope.DeepCopy2DList(GlobalScope.EmptyStandard2DList),
+            GlobalScope.DeepCopy2DList(GlobalScope.EmptyStandard2DList)
         }
+        );
+        ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
     }
 //----------------------------------------------------------------------------------------------------------------------------------REDISPENSE_CHESS
 // TODO
@@ -96,10 +82,12 @@ public class GameManager : MonoBehaviour
     }
     void GameRuning() {
         if (gameStatus_ == GameStatus.GAMING) {
-            RunGameTurns(rivalChessListGlabol, 30);
+            RunGameTurns(30);
+            playerInputer_.GetChessSelector().PreviewChessToPreviewPos();
+            rivalInputer_.GetChessSelector().PreviewChessToPreviewPos();
         }
-        if (Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus[0]).Count == 0
-            && Rival.GetAllVaildChessGrids(Rival.GetChessStatusInRivalView(GlobalScope.chessGridStatus)[0]).Count == 0) {
+        if (Rival.GetAllVaildChessGrids(ChessPad.chessPadInfo_.chessPadStatus[0]).Count == 0
+            && Rival.GetAllVaildChessGrids(Rival.GetChessPadStatusInRivalView(ChessPad.chessPadInfo_.chessPadStatus)[0]).Count == 0) {
             gameStatus_ = GameStatus.COMPUTE_RESULT;
         }
     }
@@ -107,42 +95,6 @@ public class GameManager : MonoBehaviour
         if (gameStatus_ == GameStatus.COMPUTE_RESULT) {
             turnInfoText.text = "游戏结束！";
             turnInfoText.fontSize = 60;
-        }
-    }
-    public static void CommitChessStatusToChessPad(){
-        List<GameObject> chessGrids = GlobalScope.GetAllChessGrid();
-        foreach(var chessGridObj in chessGrids) {
-            ChessGrid chessGrid = chessGridObj.GetComponent<ChessGrid>();
-            chessGrid.UpdateGridStatus(GlobalScope.chessGridStatus);
-        }
-        UpdateScore(GlobalScope.chessGridStatus);
-    }
-    public static void PreviewStatusToChessPad(List<List<List<int>>> chessGridStatus, Int2D selfPos){
-        List<GameObject> chessGrids = GlobalScope.GetAllChessGrid();
-        foreach(var chessGridObj in chessGrids) {
-            ChessGrid chessGrid = chessGridObj.GetComponent<ChessGrid>();
-            chessGrid.PreviewGridStatus(chessGridStatus, chessGrid.chessGridPos_ == selfPos);
-        }
-        UpdateScore(chessGridStatus);
-    }
-    public static void UpdateScore(List<List<List<int>>> chessGridStatus) {
-        for(int i = 0; i < GlobalScope.chessGridNameList_.Count; i++) {
-            int playerScore = Rival.GetScoreInOneLine(chessGridStatus, i);
-            int rivalScore = Rival.GetScoreInOneLine(Rival.GetChessStatusInRivalView(chessGridStatus), i);
-            TextMesh playerScoreText = GlobalScope.GirdScoreCounters_[i].Item1.transform.Find("score").GetComponent<TextMesh>();
-            TextMesh rivalScoreText = GlobalScope.GirdScoreCounters_[i].Item2.transform.Find("score").GetComponent<TextMesh>();
-            playerScoreText.text = playerScore.ToString();
-            rivalScoreText.text = rivalScore.ToString();
-            if(playerScore > rivalScore) {
-                playerScoreText.color = Color.yellow;
-                rivalScoreText.color = Color.gray;
-            } else if (playerScore < rivalScore){
-                playerScoreText.color = Color.gray;
-                rivalScoreText.color = Color.yellow;
-            } else {
-                playerScoreText.color = Color.gray;
-                rivalScoreText.color = Color.gray;
-            }
         }
     }
 //----------------------------------------------------------------------------------------------------------------------------------GAMING : Turns
@@ -159,13 +111,13 @@ public class GameManager : MonoBehaviour
         turnInfoText.fontSize = (int)Mathf.Lerp(200, 60, (Time.time - thisTurnStartTime) * 3);
         turnInfoText.text = info;
     }
-    void RunGameTurns(List<string> rivalChessList, int TimeEveryTurn) {
+    void RunGameTurns(int TimeEveryTurn) {
         turnCountText.text = TurnTimeCounter(TimeEveryTurn).ToString();
         if(gameStatus_ == GameStatus.GAMING) {
             if(GameTurns % 2 == 0) {
                 showTurnTextInfo("Your Turn!");
                 PlayerTurn = true;
-                if(Rival.GetAllVaildChessGrids(GlobalScope.chessGridStatus[0]).Count == 0) {
+                if(Rival.GetAllVaildChessGrids(ChessPad.chessPadInfo_.chessPadStatus[0]).Count == 0) {
                     NextTurn();
                 }
             } else {
@@ -174,11 +126,11 @@ public class GameManager : MonoBehaviour
                     PlayerTurn = false;
                 }
                 int delayTime = 3;
-                if(rivalChessList.Count == 0) {
+                if(!rivalInputer_.IfCanDoInput()) {
                     delayTime = 1;
                 }
                 if (Time.time - thisTurnStartTime > delayTime) {
-                    DoAiRivalTurn(rivalChessList);
+                    DoAiRivalTurn();
                 }
             }
         }
@@ -188,16 +140,24 @@ public class GameManager : MonoBehaviour
         turnInfoText.fontSize = 60;
         GameTurns++;
     }
-    public void DoAiRivalTurn(List<string> chessInHand) {
-        if(chessInHand.Count != 0) {
-            GlobalScope.chessGridStatus = AiRival.DoAiRivalInput(GlobalScope.chessGridStatus, chessInHand, RivalLastingTasks);
-            CommitChessStatusToChessPad();
+    public void DoAiRivalTurn() {
+        ChessInputParms chessInputParms = AiRival.GetTheBestInput(ChessPad.chessPadInfo_, rivalInputer_.GetChessInChessInHand());
+        if(rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
+            Log.test("chessInputParms.Empty(): False");
+            ChessInputParm chessInputParm = new ChessInputParm(
+                chessInputParms,
+                ChessPad.chessPadInfo_
+            );
+            rivalInputer_.GetChessInput(chessInputParm.chessInputParms.pos, chessInputParm.chessInputParms.cardCode, chessInputParm.chessPadInfo);
+            ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
         }
         NextTurn();
     }
     public void DoPlayerTurn(ChessInputParmObj parmsInput){
-        ChessInputer.GetChessInput(parmsInput);
-        CommitChessStatusToChessPad();
+        if(playerInputer_.IfCanDoInput()) {
+            playerInputer_.GetChessInput(parmsInput.chessGrid, parmsInput.chessObj, parmsInput.chessPadInfo);
+            ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
+        }
         NextTurn();
     }
 //----------------------------------------------------------------------------------------------------------------------------------COMPUTE_RESULT
@@ -206,7 +166,7 @@ public class GameManager : MonoBehaviour
         int rivalScoreFinal = 0;
         for(int i = 0; i < GlobalScope.chessGridNameList_.Count; i++) {
             int playerScore = Rival.GetScoreInOneLine(chessGridStatus, i);
-            int rivalScore = Rival.GetScoreInOneLine(Rival.GetChessStatusInRivalView(chessGridStatus), i);
+            int rivalScore = Rival.GetScoreInOneLine(Rival.GetChessPadStatusInRivalView(chessGridStatus), i);
             playerScoreFinal += playerScore;
             rivalScoreFinal += rivalScore;
         }
@@ -214,4 +174,16 @@ public class GameManager : MonoBehaviour
     }
 //----------------------------------------------------------------------------------------------------------------------------------GAME_OVER
 // TODO
+    public void DoPreviewToPreViewPos(Chess chess){
+        playerInputer_.GetChessSelector().DoPreviewToPreViewPos(chess);
+    }
+    public void CancelPreview(){
+        playerInputer_.GetChessSelector().CancelPreview();
+    }
+    public void DoPreviewToChessGridPos(GameObject chessGridObj){
+        playerInputer_.GetChessSelector().DoPreviewToChessGridPos(chessGridObj);
+    }
+    public void CancelPreviewToChessGridPos(){
+        playerInputer_.GetChessSelector().CancelPreviewToChessGridPos();
+    }
 }

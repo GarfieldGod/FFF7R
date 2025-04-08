@@ -3,52 +3,60 @@ using UnityEngine;
 
 public class ChessDispenser : MonoBehaviour
 {
-    public static List<string> chessPool = new List<string>{};
-    public static void DispenserNewChessToChessSelector() {
-        GameObject newChessObj = InstantiateChess(DispenseChess());
-        if (newChessObj != null) {
-            ChessSelector.PushBackChess(newChessObj.GetComponent<Chess>());
-        }
+    public ChessDispenser(ChessSelector chessSelector, List<string> chessPool, GameObject chessSelectorObj){
+        chessPool_ = chessPool;
+        chessSelector_ = chessSelector;
+        chessSelectorObj_ = chessSelectorObj;
     }
+    private List<string> chessPool_;
+    private ChessSelector chessSelector_;
+    private GameObject chessSelectorObj_;
 
-    public static string DispenseChess() {
-        if (chessPool.Count == 0) {
+    public string DispenseChess() {
+        if (chessPool_.Count == 0) {
             return null;
         }
         System.Random random = new System.Random();
-        int randomIndex = random.Next(chessPool.Count);
-        string chess = chessPool[randomIndex];
-        chessPool.RemoveAt(randomIndex);
+        int randomIndex = random.Next(chessPool_.Count);
+        string chess = chessPool_[randomIndex];
+        chessPool_.RemoveAt(randomIndex);
         return chess;
     }
 
-    public static void ReDispense(List<int> index) {
+    public void ReDispense(List<int> index) {
         List<Chess> popChessList = new List<Chess>{};
         foreach(int i in index) {
-            if(i < 0 || i >= ChessSelector.chessList_.Count) {
+            if(i < 0 || i >= chessSelector_.chessList_.Count) {
                 Debug.Log("ReDispense: Invaild chessIndex.");
                 continue;
             }
-            popChessList.Add(ChessSelector.chessList_[i]);
+            popChessList.Add(chessSelector_.chessList_[i]);
         }
         foreach(Chess chess in popChessList) {
-            ChessSelector.chessList_.Remove(chess);
+            chessSelector_.chessList_.Remove(chess);
         }
         foreach(Chess chess in popChessList) {
-            ChessSelector.PushBackChess(InstantiateChess(DispenseChess()).GetComponent<Chess>());
+            chessSelector_.PushBackChess(InstantiateChess(DispenseChess()).GetComponent<Chess>());
         }
         foreach(Chess chess in popChessList) {
-            chessPool.Add(chess.cardCode);
+            chessPool_.Add(chess.cardCode);
         }
     }
 
-    public static GameObject InstantiateChess(string chessName)
+    public void DispenserNewChessToChessSelector() {
+        GameObject newChessObj = InstantiateChess(DispenseChess());
+        if (newChessObj != null) {
+            chessSelector_.PushBackChess(newChessObj.GetComponent<Chess>());
+        }
+    }
+
+    public GameObject InstantiateChess(string chessName)
     {
         if (chessName == null) {
             return null;
         }
         ChessProperty instantiateData = GlobalScope.GetChessProperty(chessName);
-        GameObject instantiateBody = Instantiate(GlobalScope.chessPrefab_static_, GlobalScope.chessSelector_static_.transform);
+        GameObject instantiateBody = Instantiate(GlobalScope.chessPrefab_static_, chessSelectorObj_.transform);
         GameObject instantiateModel = InstantiateChessModel(GlobalScope.chessModelPrefab_static_, instantiateBody, instantiateData, false);
         if (instantiateData != null) {
             Chess chess = instantiateBody.GetComponent<Chess>();
@@ -58,7 +66,7 @@ public class ChessDispenser : MonoBehaviour
         }
         return null;
     }
-    public static GameObject InstantiateChessModel(GameObject chessModelPrefab, GameObject father, ChessProperty instantiateData, bool ifChessGridModel)
+    public GameObject InstantiateChessModel(GameObject chessModelPrefab, GameObject father, ChessProperty instantiateData, bool ifChessGridModel)
     {
         if (father == null) {
             return null;
@@ -96,11 +104,7 @@ public class ChessDispenser : MonoBehaviour
         return null;
     }
 
-    public static int GetChessNumInChessSelector() {
-        int result = 0;
-        foreach(Transform child in GlobalScope.chessSelector_static_.transform) {
-            result++;
-        }
-        return result;
+    public List<string> GetChessInChessPool() {
+        return chessPool_;
     }
 }
