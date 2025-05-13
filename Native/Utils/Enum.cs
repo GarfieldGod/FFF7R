@@ -1,0 +1,11 @@
+public enum ChessPosStatus {
+    LEVEL_ONE_FRIEND = 1,
+    LEVEL_TWO_FRIEND = 2,
+    LEVEL_THREE_FRIEND = 3,
+    EMPTY = 10,
+    LEVEL_ONE_ENEMY = 11,
+    LEVEL_TWO_ENEMY = 12,
+    LEVEL_THREE_ENEMY = 13,
+    OCCUPIED_FRIEND = 14,
+    OCCUPIED_ENEMY = 15
+}

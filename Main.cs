@@ -19,18 +19,22 @@ class Program
 
     static void Main()
     {
-        Int2D chessPos = new Int2D(2, 0);
-        var result = ChessInputer.DoPosEffect(chessPos, posEffects, chessPad);
-        foreach(var line in result) {
-            foreach(var i in line) {
-                Console.Write("\t" + i.ToString());
+        Property.LoadChessProperties();
+        SingleGameConfig singleGameConfig = new SingleGameConfig(
+            1,
+            new List<string>{
+                "CardTest0", "CardTest0", "CardTest0", "CardTest0",
+                "CardTest1", "CardTest1", "CardTest1", "CardTest1",
+                "Card006", "Card006", "Card006", "Card006",
+                "Card009", "Card009", "Card009",
+            },
+            new List<string>{
+                "Card001", "Card001", "Card001",
+                "Card007", "Card007", "Card007", "Card007",
+                "Card008", "Card008", "Card008", "Card008",
+                "Card009", "Card009", "Card009", "Card009",
             }
-            Console.Write("\n");
-        }
-        // GameManager.StartAGame();
-        // if(ChessSelector.DoPreview(chess3)) {
-        //     ChessSelector.CancelPreview();
-        //     ChessSelector.OutChess(chess3);
-        // }
+        );
+        Game testGame = new Game(singleGameConfig);
     }
 }
