@@ -21,10 +21,10 @@ public struct SingleGameConfig {
     }
 }
 
-public struct Gamer {
-    private Dispenser dispenser;
-    private Selector selector;
-    private Inputer inputer;
+public readonly struct Gamer {
+    private readonly Dispenser dispenser;
+    private readonly Selector selector;
+    private readonly Inputer inputer;
     public Gamer(Dispenser dispenser, Selector selector, Inputer inputer) {
         this.dispenser = dispenser;
         this.selector = selector;
@@ -39,6 +39,9 @@ public struct Gamer {
     public void GetCardFromCardPool() {
         selector.PushBack(dispenser.Dispense());
     }
+    public Selector GetSelector() {
+        return selector;
+    }
 }
 
 public class Game
@@ -47,39 +50,33 @@ public class Game
     public string turnInfoText_;
     public GameStatus gameStatus_ = GameStatus.INIT;
     public int GameTurns = 0;
-    public bool PlayerTurn = true;
+    public bool playerTurn_ = true;
 //----------------------------------------------------------------------------------------------------------------------------------INIT
-    private ChessPad chessPad_;
-    private Gamer player_;
-    private Gamer rival_;
+    protected  ChessPad chessPad_;
+    protected  Gamer player_;
+    protected  Gamer rival_;
 
     public Game(SingleGameConfig singleGameConfig){
         StartSingleGame(singleGameConfig);
     }
 
-    void Start() {
-        // StartSingleGame(singleGameConfig);
-    }
-
-    void StartSingleGame (SingleGameConfig singleGameConfig) {
-        InitGame(singleGameConfig.playerChessPool, singleGameConfig.rivalChessPool);
+    public void StartSingleGame (SingleGameConfig singleGameConfig) {
+        InitGame(singleGameConfig.playerChessPool, singleGameConfig.rivalChessPool, InitChessPadStandard());
     }
 
     void StartMultiPlayerGame () {}
 
     Gamer InitGamer(InputerType inputerType, List<string> chessPool, List<Chess> chesses = null) {
         Dispenser dispenser = new Dispenser(chessPool);
-        if(chesses == null) {
-            chesses = new List<Chess>{};
-        }
+        chesses ??= new List<Chess>{};
         Selector selector = new Selector(chesses);
         Inputer inputer = new Inputer(dispenser, selector, chessPad_, inputerType);
         return new Gamer(dispenser, selector, inputer);
     }
 
-    void InitGame(List<string> playerChessPool, List<string> rivalChessPool) {
+    void InitGame(List<string> playerChessPool, List<string> rivalChessPool, ChessPad chessPad) {
         gameStatus_ = GameStatus.INIT;
-        chessPad_ = InitChessPadStandard();
+        chessPad_ = chessPad;
         player_ = InitGamer(InputerType.PLAYER, playerChessPool);
         rival_ = InitGamer(InputerType.AI, rivalChessPool);
 
@@ -95,7 +92,7 @@ public class Game
     void EndGame() {
     }
 
-    ChessPad InitChessPadStandard() {
+    private static ChessPad InitChessPadStandard() {
         return new ChessPad(
             new List<List<int>>{
                 new List<int> { 1, 10, 10, 10, 11 },
@@ -140,68 +137,86 @@ public class Game
         }
     }
 //----------------------------------------------------------------------------------------------------------------------------------GAMING : Turns
-    // private float thisTurnStartTime;
-    // private int TurnTimeCounter(int turnTime) {
-    //     int thisTurnTime = (int)(Time.time - thisTurnStartTime);
-    //     int thisTurnTimeRemaining = turnTime - thisTurnTime;
-    //     if(thisTurnTime > turnTime) {
-    //         NextTurn();
-    //     }
-    //     return thisTurnTimeRemaining;
-    // }
-    // private void showTurnTextInfo(string info) {
-    //     turnInfoText.fontSize = (int)Mathf.Lerp(200, 60, (Time.time - thisTurnStartTime) * 3);
-    //     turnInfoText.text = info;
-    // }
-    // void RunGameTurns(int TimeEveryTurn) {
-    //     turnCountText.text = TurnTimeCounter(TimeEveryTurn).ToString();
-    //     if(gameStatus_ == GameStatus.GAMING) {
-    //         if(GameTurns % 2 == 0) {
-    //             showTurnTextInfo("Your Turn!");
-    //             PlayerTurn = true;
-    //             if(Rival.GetAllVaildChessGrids(ChessPad.chessPadInfo_.chessPadStatus[0]).Count == 0) {
-    //                 NextTurn();
-    //             }
-    //         } else {
-    //             showTurnTextInfo("Rival Turn!");
-    //             if (PlayerTurn) {
-    //                 PlayerTurn = false;
-    //             }
-    //             int delayTime = 3;
-    //             if(!rivalInputer_.IfCanDoInput()) {
-    //                 delayTime = 1;
-    //             }
-    //             if (Time.time - thisTurnStartTime > delayTime) {
-    //                 DoAiRivalTurn();
-    //             }
-    //         }
-    //     }
-    // }
-    // public void NextTurn() {
-    //     thisTurnStartTime = Time.time;
-    //     turnInfoText.fontSize = 60;
-    //     GameTurns++;
-    // }
-    // public void DoAiRivalTurn() {
-    //     ChessInputParms chessInputParms = AiRival.GetTheBestInput(ChessPad.chessPadInfo_, rivalInputer_.GetChessInChessInHand());
-    //     if(rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
-    //         Log.test("chessInputParms.Empty(): False");
-    //         ChessInputParm chessInputParm = new ChessInputParm(
-    //             chessInputParms,
-    //             ChessPad.chessPadInfo_
-    //         );
-    //         rivalInputer_.GetChessInput(chessInputParm.chessInputParms.pos, chessInputParm.chessInputParms.cardCode, chessInputParm.chessPadInfo);
-    //         ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
-    //     }
-    //     NextTurn();
-    // }
-    // public void DoPlayerTurn(ChessInputParmObj parmsInput){
-    //     if(playerInputer_.IfCanDoInput()) {
-    //         playerInputer_.GetChessInput(parmsInput.chessGrid, parmsInput.chessObj, parmsInput.chessPadInfo);
-    //         ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
-    //     }
-    //     NextTurn();
-    // }
+    private float thisTurnStartTime;
+    public virtual int TurnTimeCounter(int turnTime) {
+        // int thisTurnTime = (int)(Time.time - thisTurnStartTime);
+        // int thisTurnTimeRemaining = turnTime - thisTurnTime;
+        // if(thisTurnTime > turnTime) {
+        //     NextTurn();
+        // }
+        // return thisTurnTimeRemaining;
+        return 0;
+    }
+    public virtual void ShowTurnTextInfo(string info) {
+        // turnInfoText.fontSize = (int)Mathf.Lerp(200, 60, (Time.time - thisTurnStartTime) * 3);
+        // turnInfoText.text = info;
+    }
+    public virtual void ShowTurnsTimeLeft(int TimeEveryTurn) {
+        // turnCountText.text = TurnTimeCounter(TimeEveryTurn).ToString();
+    }
+    public virtual void NextTurn() {
+
+        // thisTurnStartTime = Time.time;
+        // turnInfoText.fontSize = 60;
+        // GameTurns++;
+    }
+    public virtual void AiTurn() {
+        // int delayTime = 3;
+        // if(!rivalInputer_.IfCanDoInput()) {
+        //     delayTime = 1;
+        // }
+        // if (Time.time - thisTurnStartTime > delayTime) {
+        //     ChessInputParms chessInputParms = AiRival.GetTheBestInput(ChessPad.chessPadInfo_, rivalInputer_.GetChessInChessInHand());
+        //     if(rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
+        //         Log.TestLine("chessInputParms.Empty(): False");
+        //         ChessInputParm chessInputParm = new ChessInputParm(
+        //             chessInputParms,
+        //             ChessPad.chessPadInfo_
+        //         );
+        //         rivalInputer_.GetChessInput(chessInputParm.chessInputParms.pos, chessInputParm.chessInputParms.cardCode, chessInputParm.chessPadInfo);
+        //         ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
+        //     }
+        //     NextTurn();
+        // }
+    }
+    public virtual void RivalTurn() {
+        NextTurn();
+    }
+    public virtual void PlayerTurn() {
+        // if(playerInputer_.IfCanDoInput()) {
+        //     playerInputer_.GetChessInput(parmsInput.chessGrid, parmsInput.chessObj, parmsInput.chessPadInfo);
+        //     ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
+        // }
+        NextTurn();
+    }
+    public virtual void RunGameTurns(int TimeEveryTurn) {
+        ShowTurnsTimeLeft(TimeEveryTurn);
+        if(gameStatus_ == GameStatus.GAMING) {
+            if(GameTurns % 2 == 0) {
+                ShowTurnTextInfo("Your Turn!");
+                playerTurn_ = true;
+
+                if(Rival.GetAllVaildChessGrids(
+                    chessPad_.GetChessGridStatus()
+                    ).Count == 0) {
+                    ShowTurnTextInfo("No Input Can Do!");
+                    NextTurn();
+                }
+                PlayerTurn();
+            } else {
+                ShowTurnTextInfo("Rival Turn!");
+                playerTurn_ = false;
+
+                if(Rival.GetAllVaildChessGrids(
+                    Rival.GetChessPadStatusInRivalView(chessPad_.GetChessGridStatus())
+                    ).Count == 0) {
+                    ShowTurnTextInfo("No Input Can Do!");
+                    NextTurn();
+                }
+                RivalTurn();
+            }
+        }
+    }
 //----------------------------------------------------------------------------------------------------------------------------------COMPUTE_RESULT
     public static int GetScoreInOneLine(List<List<List<int>>> originChessStatus, int Line) {
         int score = 0;
@@ -225,29 +240,10 @@ public class Game
     // }
 //----------------------------------------------------------------------------------------------------------------------------------GAME_OVER
 // TODO
-    public static void repeatTurns() {
+    public static void RepeatTurns() {
         string input = "";
         while(input != "end") {
 
         }
     }
-
-    // public static void ShowChessInChessSelector() {
-    //     Console.WriteLine("Cards:");
-    //     foreach (var chess in ChessSelector.chessList) {
-    //         Console.Write(" ");
-    //         Console.Write(chess.level);
-    //     }
-    //     Console.Write("\n");
-    // }
-
-    // public static void ShowChessGrid() {
-    //     Console.WriteLine("The ChessGrid:");
-    //     foreach(List<int> gridLine in chessGridStatus) {
-    //         foreach(int grid in gridLine) {
-    //             Console.Write(grid.ToString() + " ");
-    //         }
-    //         Console.Write("\n");
-    //     }
-    // }
 }

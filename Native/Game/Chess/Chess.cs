@@ -41,6 +41,10 @@ public class ChessPad {
         return chessGridStatus_;
     }
 
+    public List<List<Chess>> GetChessStatus() {
+        return chessStatus_;
+    }
+
     public void AddInput(Input input, ChessPad chessPad) {
     }
     public void RestoreInput() {

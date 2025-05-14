@@ -16,7 +16,7 @@ static class EffectsParser {
                     } else {
                         result.Add(posWithValue);
                     }
-                    // Log.test($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
+                    // Log.TestLine($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
                 }
             }
         }
@@ -33,7 +33,7 @@ static class EffectsParser {
             int posX = posPos.x + effect.Item1.x;
             int posY = posPos.y + effect.Item1.y;
             if (posX <  chessPadSize.x && posX >= 0 && posY <  chessPadSize.y && posY >= 0) {
-                // Log.test($"ParseEffectsInPosition: vertical: {posY} horizontal: {posX} value: {effect.Item2}");
+                // Log.TestLine($"ParseEffectsInPosition: vertical: {posY} horizontal: {posX} value: {effect.Item2}");
                 var affectedPos = new Int2D(posX, posY);
                 var next = new Tuple<Int2D, int>(affectedPos, effect.Item2);
                 // var next = new Tuple<string, int>(GlobalScope.chessPositionNameList[posY, posX], effect.Item2); //use chessGrid name in the past

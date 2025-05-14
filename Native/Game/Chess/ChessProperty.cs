@@ -26,7 +26,7 @@ public class ChessProperty {
 public static class Property {
     private static readonly string chessPropertiesJsonPath = "Json/ChessProperties.json";
     private static List<ChessProperty> ChessProperties_ = new List<ChessProperty>{};
-    public static HashSet<string> chessNameSet_ = new HashSet<string>{};
+    private static HashSet<string> chessNameSet_ = new HashSet<string>{};
     public static ChessProperty GetChessProperty(string chessName)
     {
         foreach (var chess in ChessProperties_) {

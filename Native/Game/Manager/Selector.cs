@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 
 public class Selector
 {
@@ -10,6 +11,10 @@ public class Selector
     public Selector(List<Chess> chessList, float ChessSelectorLength = 50) {
         chessList_ = chessList;
         ChessSelectorLength_ = ChessSelectorLength;
+    }
+
+    public List<Chess> GetChesses() {
+        return chessList_;
     }
 
     public bool PushBack(Chess chess) {
@@ -37,9 +42,13 @@ public class Selector
         return result;
     }
 
-    public void RemoveByIndex(int index) {
+    public bool RemoveByIndex(int index) {
+        if (index < 0 || index >= chessList_.Count) {
+            return false;
+        }
         chessList_.RemoveAt(index);
         ResetAllChessPos();
+        return true;
     }
 
     public bool Remove(List<int> indexs) {
@@ -63,21 +72,38 @@ public class Selector
         return result;
     }
 
-    public bool Preview(Chess chessOne) {
-        previewChess_ = new KeyValuePair<Chess, int>(chessOne, chessList_.IndexOf(chessOne));
-        bool result = chessList_.Remove(chessOne);
+    public void Commit() {
+        previewChess_ = new KeyValuePair<Chess, int>(null, 0);
+        ResetAllChessPos();
+    }
+
+    public bool Preview(int index) {
+        CancelPreview();
+        previewChess_ = new KeyValuePair<Chess, int>(chessList_[index], index);
+        bool result = chessList_.Remove(chessList_[index]);
         ResetAllChessPos();
         return result;
     }
 
+    public bool Preview(Chess chessOne) {
+        CancelPreview();
+        int index = chessList_.IndexOf(chessOne);
+        previewChess_ = new KeyValuePair<Chess, int>(chessOne, index);
+        return RemoveByIndex(index);
+    }
+
     public void CancelPreview() {
         if (previewChess_.Key == null) {
-            Log.test("CancelPreview Nothing to do.");
+            Log.TestLine("CancelPreview Nothing to do.");
             return;
         }
         chessList_.Insert(previewChess_.Value, previewChess_.Key);
         previewChess_ = new KeyValuePair<Chess, int>(null, -1);
         ResetAllChessPos();
+    }
+
+    public Chess GetChess(int index){
+        return chessList_[index];
     }
 
     public List<Chess> GetAllChess(){

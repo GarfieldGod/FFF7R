@@ -63,7 +63,7 @@ public class AiRival {
 public class Rival
 {
     public static Int2D GetChessGridPosInRivalView(Int2D pos, int chessPadLength = 4) {
-        // Log.test("Origin: " + pos.y +" RivalView: " + (chessPadLength - pos.y).ToString());
+        // Log.TestLine("Origin: " + pos.y +" RivalView: " + (chessPadLength - pos.y).ToString());
         return new Int2D(pos.x, chessPadLength - pos.y);
     }
 
