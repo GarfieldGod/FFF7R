@@ -3,20 +3,7 @@ using System.Collections.Generic;
 
 public class TestGame : Game {
     public TestGame(SingleGameConfig singleGameConfig) : base(singleGameConfig) {}
-    public void ShowCardInHand() {
-        Log.TestLine("Cards:", TextColor.BLUE, true);
-        int index = 0;
-        foreach (var chess in player_.GetSelector().GetChesses()) {
-            string name = FixLength(chess.chessName_, 10);
-            Log.TestLine(
-                index.ToString() + 
-                "\t[" + name + "]" + 
-                "\tCost: " + chess.cost_.ToString() + 
-                "\tLevel: " + chess.level_.ToString()
-            );
-            index++;
-        }
-    }
+
     static string FixLength(string input, int maxLength)
     {
         if (input.Length > maxLength)
@@ -25,6 +12,22 @@ public class TestGame : Game {
         }
         return input.PadRight(maxLength, ' ');
     }
+
+    public void ShowCardInHand() {
+        Log.TestLine("Cards:", TextColor.BLUE, true);
+        int index = 0;
+        foreach (var chess in player_.GetChessInHand()) {
+            string name = FixLength(chess.GetChessProperty().Name, 10);
+            Log.TestLine(
+                index.ToString() + 
+                "\t[" + name + "]" + 
+                "\tCost: " + chess.GetChessProperty().Cost.ToString() + 
+                "\tLevel: " + chess.GetChessProperty().Level.ToString()
+            );
+            index++;
+        }
+    }
+
     public void ShowChessGrid() {
         Log.TestLine("The ChessGrid:", TextColor.BLUE, true);
         int index = 0;
@@ -44,18 +47,44 @@ public class TestGame : Game {
                 }
 
                 string output = (posStatus % 10).ToString();
-                if(chess != null) {
-                    output = chess.chessName_;
+                if (chess != null) {
+                    output = chess.GetChessProperty().Name;
                 }
-                Log.Test(output, textColor, ifHightLight);
-                Log.Test("(" + index.ToString("D2") + ")   ", TextColor.BLACK, false);
+                Log.Test("(" + index.ToString("D2") + ")", TextColor.BLACK, false);
+                Log.Test(FixLength(output, 15), textColor, ifHightLight);
                 index++;
             }
             Log.Test("\n");
         }
     }
+
+    Dictionary<int, Int2D> chessGridIndexMap_ = [];
+
+    public override ChessPad InitChessPadStandard() {
+        ChessPad chessPad = new ChessPad(
+            new List<List<int>>{
+                new List<int> { 1, 10, 10, 10, 11 },
+                new List<int> { 1, 10, 10, 10, 11 },
+                new List<int> { 1, 10, 10, 10, 11 },
+            },
+            new List<List<Chess>>{
+                new List<Chess> { null, null, null, null, null },
+                new List<Chess> { null, null, null, null, null },
+                new List<Chess> { null, null, null, null, null },
+            }
+        );
+        int index = 0;
+        for(int x = 0;x < chessPad.GetChessGridStatus().Count ; x++) {
+            for(int y = 0;y < chessPad.GetChessGridStatus()[0].Count ; y++) {
+                chessGridIndexMap_.Add(index, new Int2D(x,y));
+                index++;
+            }
+        }
+        return chessPad;
+    }
+
     public void ShowInfo(string info, TextColor textColor = TextColor.NONE) {
-        Log.Clear();
+        // Log.Clear();
         ShowChessGrid();
         ShowCardInHand();
         Log.Test("Info:\n", TextColor.BLUE, true);
@@ -65,6 +94,29 @@ public class TestGame : Game {
         while(gameStatus_ == GameStatus.GAMING) {
             base.RunGameTurns(TimeEveryTurn);
         }
+    }
+    public virtual void AiTurn() {
+        // int delayTime = 3;
+        // if (!rivalInputer_.IfCanDoInput()) {
+        //     delayTime = 1;
+        // }
+        // if (Time.time - thisTurnStartTime > delayTime) {
+        //     ChessInputParms chessInputParms = AiRival.GetTheBestInput(ChessPad.chessPadInfo_, rivalInputer_.GetChessInChessInHand());
+        //     if (rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
+        //         Log.TestLine("chessInputParms.Empty(): False");
+        //         ChessInputParm chessInputParm = new ChessInputParm(
+        //             chessInputParms,
+        //             ChessPad.chessPadInfo_
+        //         );
+        //         rivalInputer_.GetChessInput(chessInputParm.chessInputParms.pos, chessInputParm.chessInputParms.cardCode, chessInputParm.chessPadInfo);
+        //         ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
+        //     }
+        //     NextTurn();
+        // }
+    }
+    public override void RivalTurn() {
+
+        base.RivalTurn();
     }
     public override void PlayerTurn()
     {
@@ -76,34 +128,34 @@ public class TestGame : Game {
         ShowInfo(info, textColor);
 
         string select = Console.ReadLine();
-        if (int.TryParse(select, out int index) && index >= 0 && index < player_.GetSelector().GetAllChessNum()) {
-            Chess selectedChess = player_.GetSelector().GetChess(index);
-            player_.GetSelector().Preview(index);
+        if (int.TryParse(select, out int index) && index >= 0 && index < player_.GetChessInHand().Count &&
+            (player_.Select(index) is { } selectedChess)) {
+
             ShowInfo(
-                "Selected Card:" + selectedChess.chessName_ +
+                "Selected Card:" + selectedChess.GetChessProperty().Name +
                 "\nSelect Grid To ADD:",
                 TextColor.YELLOW
             );
-
             string input = Console.ReadLine();
-            if (int.TryParse(input, out int grid) && grid >= 0 && grid < 15) {
+            if (int.TryParse(input, out int grid) && grid >= 0 && grid < 15 && 
+                player_.AddInput(new Input(chessGridIndexMap_[grid], selectedChess))) {
+
                 ShowInfo(
-                    "Selected Card: " + selectedChess.chessName_ +
+                    "Selected Card: " + selectedChess.GetChessProperty().Name +
                     "\nSelected Grid: " + input +
                     "\nEnter 1 To Commit, 0 To Cancel:",
                     TextColor.YELLOW
                 );
                 string commit = Console.ReadLine();
                 if (int.TryParse(commit, out int result) && result == 1) {
-                    
-                    player_.GetSelector().Commit();
+                    player_.CommitInput();
                 } else {
-                    player_.GetSelector().CancelPreview();
+                    player_.RestoreInput();
                     PlayerTurnWithInfo("Cancel Commit, Select Card:", TextColor.YELLOW);
                     return;
                 }
             } else {
-                player_.GetSelector().CancelPreview();
+                player_.RestoreSelect();
                 PlayerTurnWithInfo("Invaild Input! ReSelect Card!", TextColor.RED);
                 return;
             }
@@ -136,8 +188,6 @@ class Program
             }
         );
         TestGame testGame = new TestGame(singleGameConfig);
-        testGame.ShowChessGrid();
-        testGame.ShowCardInHand();
         testGame.RunGameTurns(30);
     }
 }

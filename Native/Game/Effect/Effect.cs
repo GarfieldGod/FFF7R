@@ -9,14 +9,14 @@ static class EffectsParser {
                     int posX = i - midPos.x;
                     int posY = j - midPos.y;
                     var posWithValue = new Tuple<Int2D, int>(new Int2D(posX, posY), effects[i][j]);
-                    if(ignoreSelf) {
+                    if (ignoreSelf) {
                         if (posX != 0 || posY != 0) {
                             result.Add(posWithValue);
                         }
                     } else {
                         result.Add(posWithValue);
                     }
-                    // Log.TestLine($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
+                    Log.TestLine($"ParseEffectsInRelative: y: {posY} x: {posX} value: {effects[i][j]}");
                 }
             }
         }

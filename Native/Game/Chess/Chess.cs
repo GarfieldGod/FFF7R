@@ -1,21 +1,30 @@
+using System.Net.WebSockets;
+
 public class Chess
 {
-    public ChessProperty property_;
-    public string cardCode_;
-    public string chessName_;
-    public int level_;
-    public int cost_;
-    public Float3D chessPos = new Float3D(0, 0, 0);
+    private ChessProperty property_;
+    private string cardCode_;
+    private string chessName_;
+    private int level_;
+    private int cost_;
+    private Float3D chessPos_ = new Float3D(0, 0, 0);
     public Chess(ChessProperty property)
     {
-        property_ = property;
+        property_ = new ChessProperty(property);
         cardCode_ = property.CardCode;
         chessName_ = property.Name;
         level_ = property.Level;
         cost_ = property.Cost;
     }
+    public Chess Clone()
+    {
+        return new Chess(this.property_);
+    }
     public ChessProperty GetChessProperty() {
         return property_;
+    }
+    public void SetPos(Float3D chessPos) {
+        chessPos_ = chessPos;
     }
 }
 
@@ -31,6 +40,7 @@ public struct ChessPadInfo {
 public class ChessPad {
     private List<List<int>> chessGridStatus_ = new List<List<int>>{};
     private List<List<Chess>> chessStatus_ = new List<List<Chess>>{};
+    public ChessPad() {}
 
     public ChessPad(List<List<int>> chessGridStatus, List<List<Chess>> chessStatus) {
         chessGridStatus_ = chessGridStatus;
@@ -45,11 +55,9 @@ public class ChessPad {
         return chessStatus_;
     }
 
-    public void AddInput(Input input, ChessPad chessPad) {
-    }
-    public void RestoreInput() {
-
-    }
-    public void CommitInput() {
+    public void Copy(ChessPad chessPad) {
+        if (chessPad == null) return;
+        chessGridStatus_ = chessPad.GetChessGridStatus();
+        chessStatus_ = chessPad.GetChessStatus();
     }
 }

@@ -39,8 +39,38 @@ public readonly struct Gamer {
     public void GetCardFromCardPool() {
         selector.PushBack(dispenser.Dispense());
     }
-    public Selector GetSelector() {
-        return selector;
+    public bool CanInput() {
+        return inputer.CanInput();
+    }
+    public List<Chess> GetChessInHand() {
+        return selector.GetAllChess();
+    }
+    public ChessPad GetChessPad() {
+        return inputer.GetChessPad();
+    }
+    public Chess Select(int index) {
+        Chess selectedChess = selector.GetChess(index);
+        if (selectedChess != null) {
+            selector.Preview(index);
+            return selectedChess;
+        } else {
+            return null;
+        }
+    }
+    public void RestoreSelect() {
+        selector.CancelPreview();
+    }
+    public bool AddInput(Input input) {
+        return inputer.AddInput(input);
+    }
+    public void RestoreInput() {
+        RestoreSelect();
+        inputer.RestoreInput();
+    }
+    public void CommitInput() {
+        inputer.CommitInput();
+        selector.Commit();
+        GetCardFromCardPool();
     }
 }
 
@@ -52,7 +82,7 @@ public class Game
     public int GameTurns = 0;
     public bool playerTurn_ = true;
 //----------------------------------------------------------------------------------------------------------------------------------INIT
-    protected  ChessPad chessPad_;
+    protected readonly ChessPad chessPad_ = new ChessPad();
     protected  Gamer player_;
     protected  Gamer rival_;
 
@@ -76,7 +106,7 @@ public class Game
 
     void InitGame(List<string> playerChessPool, List<string> rivalChessPool, ChessPad chessPad) {
         gameStatus_ = GameStatus.INIT;
-        chessPad_ = chessPad;
+        chessPad_.Copy(chessPad);
         player_ = InitGamer(InputerType.PLAYER, playerChessPool);
         rival_ = InitGamer(InputerType.AI, rivalChessPool);
 
@@ -92,7 +122,7 @@ public class Game
     void EndGame() {
     }
 
-    private static ChessPad InitChessPadStandard() {
+    public virtual ChessPad InitChessPadStandard() {
         return new ChessPad(
             new List<List<int>>{
                 new List<int> { 1, 10, 10, 10, 11 },
@@ -119,8 +149,8 @@ public class Game
             
             // RunGameTurns(30);
         }
-        if (Rival.GetAllVaildChessGrids(chessPad_.GetChessGridStatus()).Count == 0
-            && Rival.GetAllVaildChessGrids(Rival.GetChessPosStatusInRivalView(chessPad_.GetChessGridStatus())).Count == 0) {
+        if (Rival.GetAllFriendEmptyGrids(chessPad_.GetChessGridStatus()).Count == 0
+            && Rival.GetAllFriendEmptyGrids(Rival.GetChessPosStatusInRivalView(chessPad_.GetChessGridStatus())).Count == 0) {
             gameStatus_ = GameStatus.GAME_END;
         }
     }
@@ -141,7 +171,7 @@ public class Game
     public virtual int TurnTimeCounter(int turnTime) {
         // int thisTurnTime = (int)(Time.time - thisTurnStartTime);
         // int thisTurnTimeRemaining = turnTime - thisTurnTime;
-        // if(thisTurnTime > turnTime) {
+        // if (thisTurnTime > turnTime) {
         //     NextTurn();
         // }
         // return thisTurnTimeRemaining;
@@ -162,12 +192,12 @@ public class Game
     }
     public virtual void AiTurn() {
         // int delayTime = 3;
-        // if(!rivalInputer_.IfCanDoInput()) {
+        // if (!rivalInputer_.IfCanDoInput()) {
         //     delayTime = 1;
         // }
         // if (Time.time - thisTurnStartTime > delayTime) {
         //     ChessInputParms chessInputParms = AiRival.GetTheBestInput(ChessPad.chessPadInfo_, rivalInputer_.GetChessInChessInHand());
-        //     if(rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
+        //     if (rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
         //         Log.TestLine("chessInputParms.Empty(): False");
         //         ChessInputParm chessInputParm = new ChessInputParm(
         //             chessInputParms,
@@ -183,7 +213,7 @@ public class Game
         NextTurn();
     }
     public virtual void PlayerTurn() {
-        // if(playerInputer_.IfCanDoInput()) {
+        // if (playerInputer_.IfCanDoInput()) {
         //     playerInputer_.GetChessInput(parmsInput.chessGrid, parmsInput.chessObj, parmsInput.chessPadInfo);
         //     ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
         // }
@@ -191,14 +221,12 @@ public class Game
     }
     public virtual void RunGameTurns(int TimeEveryTurn) {
         ShowTurnsTimeLeft(TimeEveryTurn);
-        if(gameStatus_ == GameStatus.GAMING) {
-            if(GameTurns % 2 == 0) {
+        if (gameStatus_ == GameStatus.GAMING) {
+            if (GameTurns % 2 == 0) {
                 ShowTurnTextInfo("Your Turn!");
                 playerTurn_ = true;
 
-                if(Rival.GetAllVaildChessGrids(
-                    chessPad_.GetChessGridStatus()
-                    ).Count == 0) {
+                if (!player_.CanInput()) {
                     ShowTurnTextInfo("No Input Can Do!");
                     NextTurn();
                 }
@@ -207,9 +235,7 @@ public class Game
                 ShowTurnTextInfo("Rival Turn!");
                 playerTurn_ = false;
 
-                if(Rival.GetAllVaildChessGrids(
-                    Rival.GetChessPadStatusInRivalView(chessPad_.GetChessGridStatus())
-                    ).Count == 0) {
+                if (!rival_.CanInput()) {
                     ShowTurnTextInfo("No Input Can Do!");
                     NextTurn();
                 }
@@ -221,7 +247,7 @@ public class Game
     public static int GetScoreInOneLine(List<List<List<int>>> originChessStatus, int Line) {
         int score = 0;
         for(int j = 0; j< originChessStatus[0].Count; j++) {
-            if(originChessStatus[0][Line][j] == (int)ChessPosStatus.OCCUPIED_FRIEND) {
+            if (originChessStatus[0][Line][j] == (int)ChessPosStatus.OCCUPIED_FRIEND) {
                 score += originChessStatus[1][Line][j] + originChessStatus[2][Line][j];
             }
         }
@@ -232,7 +258,7 @@ public class Game
     //     int rivalScoreFinal = 0;
     //     for(int i = 0; i < GlobalScope.chessGridNameList_.Count; i++) {
     //         int playerScore = Rival.GetScoreInOneLine(chessGridStatus, i);
-    //         int rivalScore = Rival.GetScoreInOneLine(Rival.GetChessPadStatusInRivalView(chessGridStatus), i);
+    //         int rivalScore = Rival.GetScoreInOneLine(Rival.GetGridLevelInRivalView(chessGridStatus), i);
     //         playerScoreFinal += playerScore;
     //         rivalScoreFinal += rivalScore;
     //     }

@@ -1,18 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 public class AiRival {
     public static Input GetTheBestInput(ChessPad chessPad, List<Chess> chessInHand) {
         Input result = new Input();
-        List<List<int>> RivalViewChessStatus = Rival.GetChessPadStatusInRivalView(chessPad.GetChessGridStatus());
-        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllVaildChessGrids(RivalViewChessStatus);
-        if(vaildChessGrids.Count == 0) {
+        List<List<int>> RivalViewChessStatus = Rival.GetGridLevelInRivalView(chessPad.GetChessGridStatus());
+        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(RivalViewChessStatus);
+        if (vaildChessGrids.Count == 0) {
             return result;
         }
         List<Tuple<Int2D, Chess, int>> resultInPosEffect = TryTheBestInEveryCardForPosEffect(RivalViewChessStatus, vaildChessGrids, chessInHand);
         // List<Tuple<Int2D, string, int>> resultInCardEffect = DoTheBestByEveryCardInPosEffect(RivalViewChessStatus[0], vaildChessGrids, chessInHand);
         // List<Tuple<Int2D, string, int>> resultInSpecialEffect = DoTheBestByEveryCardInPosEffect(RivalViewChessStatus[0], vaildChessGrids, chessInHand);
-        if(resultInPosEffect.Count != 0) {
+        if (resultInPosEffect.Count != 0) {
             Tuple<Int2D, Chess, int> bestResultInPosEffect = FindTheHighestScore(resultInPosEffect);
             // Tuple<Int2D, string, int> bestResultInCardEffect = FindTheHighestScore(resultInCardEffect);
             // Tuple<Int2D, string, int> bestResultInSpecialEffect = FindTheHighestScore(resultInSpecialEffect);
@@ -30,12 +31,12 @@ public class AiRival {
             int posY = 0;
             ChessProperty property = chess.GetChessProperty();
             foreach(var vaildChessGrid in vaildChessGrids) {
-                if(vaildChessGrid.Item2 < property.Cost) {
+                if (vaildChessGrid.Item2 < property.Cost) {
                     continue;
                 }
                 Int2D chessGridPos = new Int2D(vaildChessGrid.Item1.x, vaildChessGrid.Item1.y);
                 List<List<int>> chessGridStatusTemp = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridPosStatus);
-                int effectResult = Rival.GetAllVaildChessGrids(chessGridStatusTemp).Count;
+                int effectResult = Rival.GetAllFriendEmptyGrids(chessGridStatusTemp).Count;
                 if (effectResult >= chessPosPoint) {
                     chessPosPoint = effectResult;
                     posX = vaildChessGrid.Item1.x;
@@ -67,13 +68,14 @@ public class Rival
         return new Int2D(pos.x, chessPadLength - pos.y);
     }
 
-    public static List<List<int>> GetChessPadStatusInRivalView(List<List<int>> originChessStatus) {
+    public static List<List<int>> GetGridLevelInRivalView(List<List<int>> originChessStatus) {
         return GetChessPosStatusInRivalView(originChessStatus);
     }
-    public static void TurnChessPadStatusToRivalView(List<List<List<int>>> originChessStatus) {
-        GetChessPosStatusInRivalView(originChessStatus[0]);
-        GetChessCardStatusInRivalView(originChessStatus[1]);
-        GetChessCardStatusInRivalView(originChessStatus[2]);
+    public static ChessPad GetChessPadInRivalView(ChessPad originalChessPad) {
+        return new ChessPad(
+            GetChessPosStatusInRivalView(originalChessPad.GetChessGridStatus()),
+            GetChessStatusInRivalView(originalChessPad.GetChessStatus())
+        );
     }
 
     public static List<List<int>> GetChessPosStatusInRivalView(List<List<int>> chessPosStatus) {
@@ -129,11 +131,57 @@ public class Rival
             }
         }
     }
-    public static List<Tuple<Int2D, int>> GetAllVaildChessGrids(List<List<int>> chessStatus) {
+
+    public static List<List<Chess>> GetChessStatusInRivalView(List<List<Chess>> chessCardStatus) {
+        List<List<Chess>> result = new List<List<Chess>>();
+        foreach (var line in chessCardStatus) {
+            List<Chess> reversedLine = new List<Chess>(line);
+            reversedLine.Reverse();
+            result.Add(reversedLine);
+        }
+        return result;
+    }
+
+    public static List<Tuple<Int2D, int>> GetAllVaildChessGrids(List<Chess> chessInHand, List<List<int>> chessStatus) {
+        List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>{};
+        if(chessInHand.Count == 0) {
+            return result;
+        }
+
+        List<Tuple<Int2D, int>> friendEmpty = GetAllFriendEmptyGrids(chessStatus);
+        List<Tuple<Int2D, int>> friendOccupied = GetAllFriendOccupiedGrids(chessStatus);
+        bool hasCoverInput = false;
+        int lowestCardLevel = int.MaxValue;
+        foreach(Chess chess in chessInHand) {
+            if(chess.GetChessProperty().CardEffectConfig.condition == EffectCondition.CoverInput) {
+                hasCoverInput = true; 
+            } else {
+                lowestCardLevel = Math.Min(chess.GetChessProperty().Level, lowestCardLevel);
+            }
+        }
+        if(hasCoverInput) {
+            result.AddRange(friendOccupied);
+        }
+        result.AddRange(friendEmpty.Where(grid => grid.Item2 >= lowestCardLevel));
+        return result;
+    }
+    public static List<Tuple<Int2D, int>> GetAllFriendEmptyGrids(List<List<int>> chessStatus) {
         List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>{};
         for(int i = 0; i < chessStatus.Count; i++) {
             for(int j = 0; j < chessStatus[i].Count; j++) {
-                if(chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
+                if (chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
+                    result.Add(new Tuple<Int2D, int>(new Int2D(i, j), chessStatus[i][j]));
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<Tuple<Int2D, int>> GetAllFriendOccupiedGrids(List<List<int>> chessStatus) {
+        List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>{};
+        for(int i = 0; i < chessStatus.Count; i++) {
+            for(int j = 0; j < chessStatus[i].Count; j++) {
+                if (chessStatus[i][j] == (int)ChessPosStatus.OCCUPIED_FRIEND) {
                     result.Add(new Tuple<Int2D, int>(new Int2D(i, j), chessStatus[i][j]));
                 }
             }

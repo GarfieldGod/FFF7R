@@ -47,8 +47,8 @@ public class Log {
         };
 
         string highLight = "";
-        if(result != "") {
-            if(ifHightLight)
+        if (result != "") {
+            if (ifHightLight)
                 highLight = ";1m";
             else
                 highLight = "m";
@@ -78,7 +78,7 @@ public static class Utils {
         return result;
     }
     public static List<List<int>> Compose2DList(List<List<int>> ListA, List<List<int>> ListB) {
-        if(ListA.Count == 0 || ListB.Count == 0 || ListA.Count != ListB.Count) {
+        if (ListA.Count == 0 || ListB.Count == 0 || ListA.Count != ListB.Count) {
             return null;
         }
         if (ListA[0].Count == 0 || ListB[0].Count == 0 || ListA[0].Count != ListB[0].Count) {

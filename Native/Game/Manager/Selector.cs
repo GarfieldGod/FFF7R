@@ -18,7 +18,7 @@ public class Selector
     }
 
     public bool PushBack(Chess chess) {
-        if(chess == null) {
+        if (chess == null) {
             return false;
         }
         chessList_.Add(chess);
@@ -29,12 +29,12 @@ public class Selector
     public bool Remove(string chessCode) {
         Chess chessOne = null;
         foreach(var chess in chessList_) {
-            if(chess.cardCode_ == chessCode) {
+            if (chess.GetChessProperty().CardCode == chessCode) {
                 chessOne = chess;
                 break;
             }
         }
-        if(chessOne == null) {
+        if (chessOne == null) {
             return false;
         }
         bool result = chessList_.Remove(chessOne);
@@ -103,7 +103,11 @@ public class Selector
     }
 
     public Chess GetChess(int index){
-        return chessList_[index];
+        if (index >= 0 && index < chessList_.Count) {
+            return chessList_[index];
+        } else {
+            return null;
+        }
     }
 
     public List<Chess> GetAllChess(){
@@ -117,7 +121,7 @@ public class Selector
     public List<string> GetAllChessCode() {
         List<string> result = new List<string>();
         foreach(var chess in chessList_) {
-            result.Add(chess.cardCode_);
+            result.Add(chess.GetChessProperty().CardCode);
         }
         return result;
     }
@@ -125,7 +129,7 @@ public class Selector
     private void ResetAllChessPos() {
         float chessGap = ChessSelectorLength_ / (chessList_.Count + 1);
         for (int i = 0; i < chessList_.Count; i++) {
-            chessList_[i].chessPos = new Float3D(0, - i * 0.1f, - i * chessGap);
+            chessList_[i].SetPos(new Float3D(0, - i * 0.1f, - i * chessGap));
         }
     }
 }
