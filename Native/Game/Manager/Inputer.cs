@@ -82,7 +82,10 @@ public class Inputer {
         originChessPad_ = new ChessPad();
     }
     public void CommitInput() {
-        chessPad_.GetChessStatus()[input_.pos.x][input_.pos.y] = input_.chess;
+        List<List<Chess>> chesses = GetChessPad().GetChessStatus();
+        chesses[input_.pos.x][input_.pos.y] = input_.chess;
+        ChessPad chessPad = new ChessPad(GetChessPad().GetChessGridStatus(), chesses);
+        chessPad_.Copy(GetChessPadByType(chessPad));
         originChessPad_ = new ChessPad();
     }
 

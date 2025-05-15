@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public class AiRival {
     public static Input GetTheBestInput(ChessPad chessPad, List<Chess> chessInHand) {
         Input result = new Input();
-        List<List<int>> RivalViewChessStatus = Rival.GetGridLevelInRivalView(chessPad.GetChessGridStatus());
+        List<List<int>> RivalViewChessStatus = Utils.DeepCopy2DList(chessPad.GetChessGridStatus());
         List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(RivalViewChessStatus);
         if (vaildChessGrids.Count == 0) {
             return result;
@@ -135,7 +135,8 @@ public class Rival
     public static List<List<Chess>> GetChessStatusInRivalView(List<List<Chess>> chessCardStatus) {
         List<List<Chess>> result = new List<List<Chess>>();
         foreach (var line in chessCardStatus) {
-            List<Chess> reversedLine = new List<Chess>(line);
+            List<Chess> reversedLine = new List<Chess>{};
+            reversedLine.AddRange(line);
             reversedLine.Reverse();
             result.Add(reversedLine);
         }

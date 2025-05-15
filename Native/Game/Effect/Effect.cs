@@ -69,6 +69,7 @@ public enum EffectCondition {
     Dead_Enemy,
     EveryTime_Buffed,
     EveryTime_Debuffed,
+    FriendPlayed,
     EnemyPlayed,
     //special
     CoverInput,

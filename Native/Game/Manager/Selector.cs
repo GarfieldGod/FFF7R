@@ -102,6 +102,10 @@ public class Selector
         ResetAllChessPos();
     }
 
+    public int GetIndex(Chess chess) { 
+        return chessList_.IndexOf(chess);
+    }
+
     public Chess GetChess(int index){
         if (index >= 0 && index < chessList_.Count) {
             return chessList_[index];

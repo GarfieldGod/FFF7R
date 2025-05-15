@@ -2,6 +2,7 @@ using System.Net.WebSockets;
 
 public class Chess
 {
+    public static readonly List<List<int>> chessLevelMap_ = [];
     private ChessProperty property_;
     private string cardCode_;
     private string chessName_;
@@ -16,15 +17,69 @@ public class Chess
         level_ = property.Level;
         cost_ = property.Cost;
     }
-    public Chess Clone()
-    {
-        return new Chess(this.property_);
-    }
+    // public Chess Clone()
+    // {
+    //     return new Chess(this.property_);
+    // }
     public ChessProperty GetChessProperty() {
         return property_;
     }
     public void SetPos(Float3D chessPos) {
         chessPos_ = chessPos;
+    }
+
+    private bool neverBuffed = true;
+    public void Buff(int num) {
+        if (neverBuffed && property_.CardEffectConfig.condition == EffectCondition.Frist_Buffed) {
+
+        }
+        neverBuffed = false;
+    }
+    // PLAYED ONCE
+    // DEAD ONCE
+    // EVENT ONPLAYED
+    // BUFFED ONCE
+    // BUFFED
+    // WIN ONCE
+    public void Buff(EffectCondition effectCondition) {
+        switch (effectCondition) { 
+            case EffectCondition.Played: break;
+            case EffectCondition.Stay: break;
+            case EffectCondition.Frist_Buffed: break;
+            case EffectCondition.Frist_Debuffed: break;
+            case EffectCondition.LevelFristReach7: break; // BUFFED ONCE S
+            case EffectCondition.Num_All: break;
+            case EffectCondition.Num_Friend: break;
+            case EffectCondition.Num_Enemy: break;
+            case EffectCondition.Dead_All: break;
+            case EffectCondition.Dead_Friend: break;
+            case EffectCondition.Dead_Enemy: break;
+            case EffectCondition.Dead_Self: break;
+            case EffectCondition.EveryTime_Buffed: break;
+            case EffectCondition.EveryTime_Debuffed: break;
+            case EffectCondition.FriendPlayed: break;
+            case EffectCondition.EnemyPlayed: break;
+            case EffectCondition.CoverInput: break;
+            case EffectCondition.LineWin: break;
+        }
+    }
+    public Int2D GetPosOnChessPad() {
+
+        return new Int2D();
+    }
+    //-------------------------------------------------------------------Event
+    public delegate void EffcetHandler(Chess sender, EventArgs e);
+    public event EffcetHandler Effcet;
+    public void DoEffcet()
+    {
+        Log.TestLine("DoDeadEffcet");
+        OnEffcet(EventArgs.Empty);
+    }
+    protected virtual void OnEffcet(EventArgs e) {
+        Effcet?.Invoke(this, e);
+    }
+    public void OnRecvEffcet(Chess sender, EventArgs e) {
+        if(sender == this) return;
     }
 }
 
@@ -39,9 +94,9 @@ public struct ChessPadInfo {
 
 public class ChessPad {
     private List<List<int>> chessGridStatus_ = new List<List<int>>{};
+    private List<List<int>> chessLevelStatus_ = new List<List<int>>{};
     private List<List<Chess>> chessStatus_ = new List<List<Chess>>{};
     public ChessPad() {}
-
     public ChessPad(List<List<int>> chessGridStatus, List<List<Chess>> chessStatus) {
         chessGridStatus_ = chessGridStatus;
         chessStatus_ = chessStatus;

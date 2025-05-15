@@ -48,14 +48,19 @@ public readonly struct Gamer {
     public ChessPad GetChessPad() {
         return inputer.GetChessPad();
     }
+    public int Select(Chess chess) {
+        int index = selector.GetIndex(chess);
+        if (index != -1) {
+            selector.Preview(index);
+        }
+        return index;
+    }
     public Chess Select(int index) {
         Chess selectedChess = selector.GetChess(index);
         if (selectedChess != null) {
             selector.Preview(index);
-            return selectedChess;
-        } else {
-            return null;
         }
+        return selectedChess;
     }
     public void RestoreSelect() {
         selector.CancelPreview();
@@ -188,7 +193,7 @@ public class Game
 
         // thisTurnStartTime = Time.time;
         // turnInfoText.fontSize = 60;
-        // GameTurns++;
+        GameTurns++;
     }
     public virtual void AiTurn() {
         // int delayTime = 3;

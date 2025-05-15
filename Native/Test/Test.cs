@@ -28,6 +28,32 @@ public class TestGame : Game {
         }
     }
 
+    public static void ShowChessGrid(ChessPad chessPad) {
+        for(int x = 0;x < chessPad.GetChessGridStatus().Count ; x++) {
+            for(int y = 0;y < chessPad.GetChessGridStatus()[0].Count ; y++) {
+                Chess chess = chessPad.GetChessStatus()[x][y];
+                int posStatus = chessPad.GetChessGridStatus()[x][y];
+                TextColor textColor;
+                bool ifHightLight = true;
+                if ((posStatus > 10 && posStatus < 14) || posStatus == 15) {
+                    textColor = TextColor.RED;
+                } else if (posStatus < 10 || posStatus == 14) {
+                    textColor = TextColor.GREEN;
+                } else {
+                    textColor = TextColor.NONE;
+                    ifHightLight = false;
+                }
+
+                string output = (posStatus % 10).ToString();
+                if (chess != null) {
+                    output = chess.GetChessProperty().Name;
+                }
+                Log.Test(FixLength(output, 15), textColor, ifHightLight);
+            }
+            Log.Test("\n");
+        }
+    }
+
     public void ShowChessGrid() {
         Log.TestLine("The ChessGrid:", TextColor.BLUE, true);
         int index = 0;
@@ -37,9 +63,9 @@ public class TestGame : Game {
                 int posStatus = chessPad_.GetChessGridStatus()[x][y];
                 TextColor textColor;
                 bool ifHightLight = true;
-                if (posStatus > 10) {
+                if ((posStatus > 10 && posStatus < 14) || posStatus == 15) {
                     textColor = TextColor.RED;
-                } else if (posStatus < 10) {
+                } else if (posStatus < 10 || posStatus == 14) {
                     textColor = TextColor.GREEN;
                 } else {
                     textColor = TextColor.NONE;
@@ -53,6 +79,33 @@ public class TestGame : Game {
                 Log.Test("(" + index.ToString("D2") + ")", TextColor.BLACK, false);
                 Log.Test(FixLength(output, 15), textColor, ifHightLight);
                 index++;
+            }
+            Log.Test("\n");
+        }
+    }
+
+    public void ShowChess() {
+        Log.TestLine("The Chess:", TextColor.BLUE, true);
+        for(int x = 0;x < chessPad_.GetChessGridStatus().Count ; x++) {
+            for(int y = 0;y < chessPad_.GetChessGridStatus()[0].Count ; y++) {
+                Chess chess = chessPad_.GetChessStatus()[x][y];
+                int posStatus = chessPad_.GetChessGridStatus()[x][y];
+                TextColor textColor;
+                bool ifHightLight = true;
+                if ((posStatus > 10 && posStatus < 14) || posStatus == 15) {
+                    textColor = TextColor.RED;
+                } else if (posStatus < 10 || posStatus == 14) {
+                    textColor = TextColor.GREEN;
+                } else {
+                    textColor = TextColor.NONE;
+                    ifHightLight = false;
+                }
+
+                string output = "null";
+                if (chess != null) {
+                    output = chess.GetChessProperty().Name;
+                }
+                Log.Test(FixLength(output, 15), textColor, ifHightLight);
             }
             Log.Test("\n");
         }
@@ -85,7 +138,9 @@ public class TestGame : Game {
 
     public void ShowInfo(string info, TextColor textColor = TextColor.NONE) {
         // Log.Clear();
+        Log.TestLine("Turns: " + GameTurns, TextColor.BLUE, true);
         ShowChessGrid();
+        ShowChess();
         ShowCardInHand();
         Log.Test("Info:\n", TextColor.BLUE, true);
         Log.TestLine(info, textColor, true);
@@ -95,27 +150,34 @@ public class TestGame : Game {
             base.RunGameTurns(TimeEveryTurn);
         }
     }
-    public virtual void AiTurn() {
-        // int delayTime = 3;
-        // if (!rivalInputer_.IfCanDoInput()) {
-        //     delayTime = 1;
-        // }
-        // if (Time.time - thisTurnStartTime > delayTime) {
-        //     ChessInputParms chessInputParms = AiRival.GetTheBestInput(ChessPad.chessPadInfo_, rivalInputer_.GetChessInChessInHand());
-        //     if (rivalInputer_.IfCanDoInput() && !chessInputParms.Empty()) {
-        //         Log.TestLine("chessInputParms.Empty(): False");
-        //         ChessInputParm chessInputParm = new ChessInputParm(
-        //             chessInputParms,
-        //             ChessPad.chessPadInfo_
-        //         );
-        //         rivalInputer_.GetChessInput(chessInputParm.chessInputParms.pos, chessInputParm.chessInputParms.cardCode, chessInputParm.chessPadInfo);
-        //         ChessPad.CommitChessPadInfoToChessPad(ChessPad.chessPadInfo_);
-        //     }
-        //     NextTurn();
-        // }
+    public override void AiTurn() {
+        ShowInfo(turnInfoText_, TextColor.RED);
+        int delayTime = 1;
+        Thread.Sleep(1000 * delayTime);
+        ShowChessGrid(rival_.GetChessPad());
+        Input input = AiRival.GetTheBestInput(rival_.GetChessPad(), rival_.GetChessInHand());
+        if (rival_.CanInput() && !input.Empty())
+        {
+            Log.TestLine("Rival Do Input:" + " X: " + input.pos.x.ToString() + " Y: " + input.pos.y.ToString());
+            if (rival_.Select(input.chess) != -1) {
+                Log.TestLine("Rival Select Success.", TextColor.RED);
+                Console.ReadLine();
+                if (rival_.AddInput(input)) {
+                    ShowInfo("Rival AddInput Success", TextColor.RED);
+                    Console.ReadLine();
+                    rival_.CommitInput();
+                } else {
+                    rival_.RestoreSelect();
+                    ShowInfo("Rival AddInput Failed", TextColor.RED);
+                }
+            } else {
+                Log.TestLine("Rival Select Failed.", TextColor.RED);
+            }
+        }
+        ShowInfo("Rival Finished", TextColor.RED);
     }
     public override void RivalTurn() {
-
+        AiTurn();
         base.RivalTurn();
     }
     public override void PlayerTurn()
