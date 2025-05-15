@@ -41,33 +41,11 @@ public class Chess
     // BUFFED ONCE
     // BUFFED
     // WIN ONCE
-    public void Buff(EffectCondition effectCondition) {
-        switch (effectCondition) { 
-            case EffectCondition.Played: break;
-            case EffectCondition.Stay: break;
-            case EffectCondition.Frist_Buffed: break;
-            case EffectCondition.Frist_Debuffed: break;
-            case EffectCondition.LevelFristReach7: break; // BUFFED ONCE S
-            case EffectCondition.Num_All: break;
-            case EffectCondition.Num_Friend: break;
-            case EffectCondition.Num_Enemy: break;
-            case EffectCondition.Dead_All: break;
-            case EffectCondition.Dead_Friend: break;
-            case EffectCondition.Dead_Enemy: break;
-            case EffectCondition.Dead_Self: break;
-            case EffectCondition.EveryTime_Buffed: break;
-            case EffectCondition.EveryTime_Debuffed: break;
-            case EffectCondition.FriendPlayed: break;
-            case EffectCondition.EnemyPlayed: break;
-            case EffectCondition.CoverInput: break;
-            case EffectCondition.LineWin: break;
-        }
-    }
-    public Int2D GetPosOnChessPad() {
-
-        return new Int2D();
-    }
     //-------------------------------------------------------------------Event
+    public void AddDeadEffect(Input input)
+    {
+        
+    }
     public delegate void EffcetHandler(Chess sender, EventArgs e);
     public event EffcetHandler Effcet;
     public void DoEffcet()
@@ -83,12 +61,14 @@ public class Chess
     }
 }
 
-public struct ChessPadInfo {
-    public List<List<List<int>>> chessPadStatus;
-    public Dictionary<Int2D, ChessProperty> delayEffectsList;
-    public ChessPadInfo(List<List<List<int>>> chessPadStatus, Dictionary<Int2D, ChessProperty> delayEffectsList = null){
-        this.chessPadStatus = chessPadStatus;
-        this.delayEffectsList = delayEffectsList;
+public struct Buff
+{
+    string id = "";
+    int value = 0;
+    Buff(int value, string id)
+    {
+        this.id = id;
+        this.value = value;
     }
 }
 
@@ -96,9 +76,14 @@ public class ChessPad {
     private List<List<int>> chessGridStatus_ = new List<List<int>>{};
     private List<List<int>> chessLevelStatus_ = new List<List<int>>{};
     private List<List<Chess>> chessStatus_ = new List<List<Chess>>{};
+    private readonly List<List<List<Buff>>> buffMap_ = new List<List<List<Buff>>>{};
     public ChessPad() {}
-    public ChessPad(List<List<int>> chessGridStatus, List<List<Chess>> chessStatus) {
+    public ChessPad(
+        List<List<int>> chessGridStatus,
+        List<List<int>> chessLevelStatus,
+        List<List<Chess>> chessStatus) {
         chessGridStatus_ = chessGridStatus;
+        chessLevelStatus_ = chessLevelStatus;
         chessStatus_ = chessStatus;
     }
 
@@ -109,10 +94,16 @@ public class ChessPad {
     public List<List<Chess>> GetChessStatus() {
         return chessStatus_;
     }
+    
+    public List<List<int>> GetChessLevelStatus() {
+        return chessLevelStatus_;
+    }
 
-    public void Copy(ChessPad chessPad) {
+    public void Copy(ChessPad chessPad)
+    {
         if (chessPad == null) return;
         chessGridStatus_ = chessPad.GetChessGridStatus();
+        chessLevelStatus_ = chessPad.GetChessLevelStatus();
         chessStatus_ = chessPad.GetChessStatus();
     }
 }

@@ -118,31 +118,22 @@ static class PosEffect {
 }
 
 static class CardEffect {
-    public static List<List<int>> DoCardEffect(Input parms, ChessPadInfo chessPadInfo) {
-        ChessProperty property = Property.GetChessProperty(parms.chess.GetChessProperty().CardCode);
-        return DoCardEffect(parms.pos, property, chessPadInfo);
+    public static List<List<int>> DoCardEffect(Input parms, ChessPad chessPad) {
+        ChessProperty property = parms.chess.GetChessProperty();
+        return DoCardEffect(parms.pos, property, chessPad);
     }
-    public static List<List<int>> DoCardEffect(Int2D chessGridPos, ChessProperty property, ChessPadInfo chessPadInfo) {
-        List<List<int>> chessGridPosEffectStatus = chessPadInfo.chessPadStatus[0];
-        List<List<int>> chessGridStatusTemp = Utils.DeepCopy2DList(chessPadInfo.chessPadStatus[2]);
+    public static List<List<int>> DoCardEffect(Int2D pos, ChessProperty property, ChessPad chessPad) {
+        List<List<int>> GridMap = chessPad.GetChessGridStatus();
+        List<List<int>> LevelMap = Utils.DeepCopy2DList(chessPad.GetChessLevelStatus());
         Tuple<CardEffectsScope, CardEffectsType, List<List<int>>> cardEffects = property.CardEffects;
         if (cardEffects == null || cardEffects.Item3 == null || cardEffects.Item3.Count == 0) {
-            return chessGridStatusTemp;
+            return LevelMap;
         }
-        Int2D chessPadSize = new Int2D(chessGridStatusTemp.Count, chessGridStatusTemp[0].Count);
-        var effectTask = EffectsParser.ParseEffectsInPosition(chessPadSize, chessGridPos,  EffectsParser.ParseEffectsInRelative(cardEffects.Item3, false));
-        if (cardEffects.Item2 == CardEffectsType.ON_PLAYED) {
-            var taskToRun = GetVaildCardEffectTasks(cardEffects.Item1, effectTask, chessGridPosEffectStatus);
-            ExecutCardEffect(taskToRun, chessGridStatusTemp);
-        } else if (cardEffects.Item2 == CardEffectsType.ON_POSITION) {
-            ExecutCardEffect(effectTask, chessGridStatusTemp);
-            ChessProperty propertyTemp = new ChessProperty(property);
-            chessPadInfo.delayEffectsList.Add(chessGridPos, propertyTemp);
-        }
-         else {
-            chessPadInfo.delayEffectsList.Add(chessGridPos, property);
-        }
-        return chessGridStatusTemp;
+        Int2D chessPadSize = new Int2D(GridMap.Count, GridMap[0].Count);
+        var effectTask = EffectsParser.ParseEffectsInPosition(chessPadSize, pos,  EffectsParser.ParseEffectsInRelative(cardEffects.Item3, false));
+        var taskToRun = GetVaildCardEffectTasks(cardEffects.Item1, effectTask, GridMap);
+        ExecutCardEffect(taskToRun, LevelMap);
+        return LevelMap;
     }
     public static List<List<int>> ParseCardEffect(Int2D chessGridPos, ChessProperty property, List<List<int>> effectsMap, List<List<int>> posMap) {
         List<List<int>> chessGridStatusTemp = Utils.DeepCopy2DList(effectsMap);
