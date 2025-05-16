@@ -92,6 +92,62 @@ public static class Utils {
         }
         return result;
     }
+    public static List<List<List<Buff>>> DeepCopy(this List<List<List<Buff>>> original)
+    {
+        if (original == null) {
+            return null;
+        }
+        var deepCopiedList = new List<List<List<Buff>>>();
+        foreach (var secondLevelList in original) {
+            var secondLevelCopiedList = new List<List<Buff>>();
+            foreach (var thirdLevelList in secondLevelList) {
+                var thirdLevelCopiedList = new List<Buff>();
+                foreach (var buff in thirdLevelList) {
+                    var copiedBuff = new Buff(buff.id, buff.value, buff.scope, buff.inputerType);
+                    thirdLevelCopiedList.Add(copiedBuff);
+                }
+                secondLevelCopiedList.Add(thirdLevelCopiedList);
+            }
+            deepCopiedList.Add(secondLevelCopiedList);
+        }
+        return deepCopiedList;
+    }
+    public static List<List<Chess>> DeepCopy(this List<List<Chess>> original)
+    {
+        if (original == null) {
+            return null;
+        }
+        var deepCopiedList = new List<List<Chess>>();
+        foreach (var secondLevelList in original) {
+            var secondLevelCopiedList = new List<Chess>();
+            foreach (var chess in secondLevelList) {
+                if (chess == null) {
+                    secondLevelCopiedList.Add(null);
+                    continue;
+                }
+                var copiedChess = chess.Clone();
+                secondLevelCopiedList.Add(copiedChess);
+            }
+            deepCopiedList.Add(secondLevelCopiedList);
+        }
+        return deepCopiedList;
+    }
+    public static bool Compare(List<List<int>> list1, List<List<int>> list2) {
+        for (int x = 0; x < list1.Count; x++) {
+            for (int y = 0; y < list1[0].Count; y++) {
+                if(list1[x][y] != list2[x][y]) return false;
+            }
+        }
+        return true;
+    }
+    public static string FixLength(string input, int maxLength)
+    {
+        if (input.Length > maxLength)
+        {
+            return input.Substring(0, maxLength);
+        }
+        return input.PadRight(maxLength, ' ');
+    }
 }
 
 public struct Int2D

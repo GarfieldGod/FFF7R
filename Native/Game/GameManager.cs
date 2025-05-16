@@ -128,18 +128,9 @@ public class Game
     }
 
     public virtual ChessPad InitChessPadStandard() {
-        return new ChessPad(
-            new List<List<int>>{
-                new List<int> { 1, 10, 10, 10, 11 },
-                new List<int> { 1, 10, 10, 10, 11 },
-                new List<int> { 1, 10, 10, 10, 11 },
-            },
-            new List<List<Chess>>{
-                new List<Chess> { null, null, null, null, null },
-                new List<Chess> { null, null, null, null, null },
-                new List<Chess> { null, null, null, null, null },
-            }
-        );
+        ChessPad chessPad = new ChessPad();
+        chessPad.InitStandard();
+        return chessPad;
     }
 //----------------------------------------------------------------------------------------------------------------------------------REDISPENSE_CHESS
 // TODO

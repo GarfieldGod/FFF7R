@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata;
 
 public class AiRival {
     public static Input GetTheBestInput(ChessPad chessPad, List<Chess> chessInHand) {
@@ -74,8 +75,35 @@ public class Rival
     public static ChessPad GetChessPadInRivalView(ChessPad originalChessPad) {
         return new ChessPad(
             GetChessPosStatusInRivalView(originalChessPad.GetChessGridStatus()),
-            GetChessStatusInRivalView(originalChessPad.GetChessStatus())
+            GetChessStatusInRivalView(originalChessPad.GetChessStatus()),
+            GetChessLevelStatusInRivalView(originalChessPad.GetChessLevelStatus()),
+            GetStayBuffMapInRivalView(originalChessPad.GetStayBuffMap())
         );
+    }
+
+    public static List<List<List<Buff>>> GetStayBuffMapInRivalView(List<List<List<Buff>>> src) {
+        List<List<List<Buff>>> srcTemp = Utils.DeepCopy(src);
+        List<List<List<Buff>>> result = new List<List<List<Buff>>>();
+        foreach (var line in srcTemp) {
+            List<List<Buff>> reversedLine = new List<List<Buff>>{};
+            reversedLine.AddRange(line);
+            reversedLine.Reverse();
+            result.Add(reversedLine);
+        }
+        for (int x = 0; x < result.Count; x++) {
+            var line = result[x];
+            for (int y = 0; y < line.Count; y++) {
+                var buffs = line[y];
+                for (int z = 0; z < buffs.Count; z++)
+                {
+                    var buff = buffs[z];
+                    if (buff.inputerType == InputerType.PLAYER) buff.inputerType = InputerType.RIVAL;
+                    else if (buff.inputerType == InputerType.RIVAL) buff.inputerType = InputerType.RIVAL;
+                    buffs[z] = buff;
+                }
+            }
+        }
+        return result;
     }
 
     public static List<List<int>> GetChessPosStatusInRivalView(List<List<int>> chessPosStatus) {
@@ -117,8 +145,9 @@ public class Rival
         return result;
     }
 
-    public static void GetChessCardStatusInRivalView(List<List<int>> chessCardStatus) {
-        foreach(var line in chessCardStatus) {
+    public static List<List<int>> GetChessLevelStatusInRivalView(List<List<int>> src) {
+        List<List<int>> srcTemp = Utils.DeepCopy2DList(src);
+        foreach(var line in srcTemp) {
             int left = 0;
             int right = line.Count - 1;
             while (left < right)
@@ -130,6 +159,7 @@ public class Rival
                 right--;
             }
         }
+        return srcTemp;
     }
 
     public static List<List<Chess>> GetChessStatusInRivalView(List<List<Chess>> chessCardStatus) {

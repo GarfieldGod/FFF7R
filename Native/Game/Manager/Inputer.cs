@@ -13,6 +13,10 @@ public struct Input {
         this.pos = pos;
         this.chess = chess;
     }
+    public Input(Int2D pos, ChessProperty chess) {
+        this.pos = pos;
+        this.chess = new Chess(chess);
+    }
     public bool Empty() {
         if (chess == null) {
             return true;
@@ -77,12 +81,14 @@ public class Inputer
     {
         if (!CheckInput(input)) return false;
         input_ = input;
-        Int2D Pos = input.pos;
+        Int2D pos = input.pos;
         ChessProperty property = input.chess.GetChessProperty();
 
-        List<List<int>> newGridStatus = PosEffect.DoPosEffect(Pos, property.PosEffects, GetChessPad().GetChessGridStatus());
-        List<List<int>> newLevelStatus = DoEffcet(input);
-        ChessPad tempChessPad = new ChessPad(newGridStatus, GetChessPad().GetChessStatus());
+        ChessPad tempChessPad = GetChessPad().DeepCopy();
+        List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, property.PosEffects, tempChessPad.GetChessGridStatus());
+        DoEffcet(input, tempChessPad);
+        tempChessPad.SetChessGridStatus(tempGridStatus);
+
         originChessPad_.Copy(chessPad_);
         chessPad_.Copy(GetChessPadByType(tempChessPad));
         return true;
@@ -94,10 +100,12 @@ public class Inputer
     }
     public void CommitInput()
     {
-        List<List<Chess>> chesses = GetChessPad().GetChessStatus();
+        ChessPad tempChessPad = GetChessPad().DeepCopy();
+        List<List<Chess>> chesses = tempChessPad.GetChessStatus();
         chesses[input_.pos.x][input_.pos.y] = input_.chess;
-        ChessPad chessPad = new ChessPad(GetChessPad().GetChessGridStatus(), chesses);
-        chessPad_.Copy(GetChessPadByType(chessPad));
+        tempChessPad.SetChessStatus(chesses);
+
+        chessPad_.Copy(GetChessPadByType(tempChessPad));
         originChessPad_ = new ChessPad();
     }
 
@@ -121,15 +129,24 @@ public class Inputer
         return Rival.GetAllFriendOccupiedGrids(GetChessPad().GetChessGridStatus());
     }
 
-    public List<List<int>> DoEffcet(Input input)
+    public void DoEffcet(Input input, ChessPad chessPad)
     {
         switch (input.chess.GetChessProperty().CardEffectConfig.condition)
         {
             case EffectCondition.Played:
-                return CardEffect.DoCardEffect(input, GetChessPad());
+                chessPad.SetChessLevelStatus(CardEffect.DoCardEffect(input, chessPad));
+                break;
             case EffectCondition.Stay:
-                input.chess.AddDeadEffect(input);
-                return CardEffect.DoCardEffect(input, GetChessPad());
+                List<Tuple<Int2D, int>> effectTasks = CardEffect.ParseCardEffect(input, GetChessPad());
+                foreach (var task in effectTasks) {
+                    string id = input.chess.GetChessProperty().Name + "_X_" + input.pos.x.ToString() + "_Y_" + input.pos.y.ToString();
+                    int value = task.Item2;
+                    EffectScope scope = input.chess.GetChessProperty().CardEffectConfig.scope;
+                    InputerType inputerType = inputerType_;
+                    Buff buff = new Buff(id, value, scope, inputerType);
+                    chessPad.AddStayBuff(input.pos, buff);
+                }
+                break;
             case EffectCondition.Frist_Buffed: break;
             case EffectCondition.Frist_Debuffed: break;
             case EffectCondition.LevelFristReach7: break; // BUFFED ONCE S
@@ -147,6 +164,5 @@ public class Inputer
             case EffectCondition.CoverInput: break;
             case EffectCondition.LineWin: break;
         }
-        return GetChessPad().GetChessLevelStatus();
     }
 }
