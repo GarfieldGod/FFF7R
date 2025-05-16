@@ -27,10 +27,10 @@ public static class Property {
     private static readonly string chessPropertiesJsonPath = "Json/ChessProperties.json";
     private static List<ChessProperty> ChessProperties_ = new List<ChessProperty>{};
     private static HashSet<string> chessNameSet_ = new HashSet<string>{};
-    public static ChessProperty GetChessProperty(string chessName)
+    public static ChessProperty GetChessProperty(string cardCode)
     {
         foreach (var chess in ChessProperties_) {
-            if (chess.CardCode == chessName) {
+            if (chess.CardCode == cardCode) {
                 return new ChessProperty(chess);
             }
         }

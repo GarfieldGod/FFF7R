@@ -100,10 +100,10 @@ public struct Buff
 }
 
 public class ChessPad {
-    private List<List<int>> chessGridStatus_ = new List<List<int>>{};
-    private List<List<Chess>> chessStatus_ = new List<List<Chess>>{};
-    private List<List<int>> chessLevelStatus_ = new List<List<int>>{};
-    private List<List<List<Buff>>> stayBuffMap_ = new List<List<List<Buff>>>{};
+    protected List<List<int>> chessGridStatus_ = new List<List<int>>{};
+    protected List<List<Chess>> chessStatus_ = new List<List<Chess>>{};
+    protected List<List<int>> chessLevelStatus_ = new List<List<int>>{};
+    protected List<List<List<Buff>>> stayBuffMap_ = new List<List<List<Buff>>>{};
     public ChessPad() {}
     public ChessPad(
         List<List<int>> chessGridStatus, List<List<Chess>> chessStatus,

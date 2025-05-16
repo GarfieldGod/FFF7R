@@ -42,7 +42,12 @@ public readonly struct Gamer {
     public bool CanInput() {
         return inputer.CanInput();
     }
-    public List<Chess> GetChessInHand() {
+    public void SetChessInHand(List<Chess> chesses)
+    {
+        selector.SetChesses(chesses);
+    }
+    public List<Chess> GetChessInHand()
+    {
         return selector.GetAllChess();
     }
     public ChessPad GetChessPad() {
@@ -113,7 +118,7 @@ public class Game
         gameStatus_ = GameStatus.INIT;
         chessPad_.Copy(chessPad);
         player_ = InitGamer(InputerType.PLAYER, playerChessPool);
-        rival_ = InitGamer(InputerType.AI, rivalChessPool);
+        rival_ = InitGamer(InputerType.RIVAL, rivalChessPool);
 
         gameStatus_ = GameStatus.DISPENSE_CHESS;
         player_.InitDespense(5);
@@ -173,7 +178,9 @@ public class Game
         // return thisTurnTimeRemaining;
         return 0;
     }
-    public virtual void ShowTurnTextInfo(string info) {
+    public virtual void ShowTurnTextInfo(string info)
+    {
+        Log.TestLine(info, TextColor.BLACK);
         // turnInfoText.fontSize = (int)Mathf.Lerp(200, 60, (Time.time - thisTurnStartTime) * 3);
         // turnInfoText.text = info;
     }

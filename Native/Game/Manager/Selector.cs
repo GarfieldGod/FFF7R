@@ -16,9 +16,15 @@ public class Selector
     public List<Chess> GetChesses() {
         return chessList_;
     }
+    
+    public void SetChesses(List<Chess> chesses) {
+        chessList_ = chesses;
+    }
 
-    public bool PushBack(Chess chess) {
-        if (chess == null) {
+    public bool PushBack(Chess chess)
+    {
+        if (chess == null)
+        {
             return false;
         }
         chessList_.Add(chess);

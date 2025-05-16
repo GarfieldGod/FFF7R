@@ -17,8 +17,14 @@ public struct Input {
         this.pos = pos;
         this.chess = new Chess(chess);
     }
-    public bool Empty() {
-        if (chess == null) {
+    public Input(Int2D pos, string cardCode) {
+        this.pos = pos;
+        this.chess = new Chess(Property.GetChessProperty(cardCode));
+    }
+    public bool Empty()
+    {
+        if (chess == null)
+        {
             return true;
         }
         return false;
@@ -47,9 +53,11 @@ public class Inputer
         int chessPosLevel = GetChessPad().GetChessGridStatus()[input.pos.x][input.pos.y] % 10;
         if (chessPosLevel < input.chess.GetChessProperty().Cost)
         {
+            // Log.TestLine("chessPosLevel: " + chessPosLevel + "\nCost: " + input.chess.GetChessProperty().Cost);
             return false;
         }
         List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(GetChessPad().GetChessGridStatus());
+        // Log.TestLine("vaildChessGrids: " + vaildChessGrids.Count);
         foreach (var vaildChessGrid in vaildChessGrids)
         {
             if (input.pos.x == vaildChessGrid.Item1.x && input.pos.y == vaildChessGrid.Item1.y)

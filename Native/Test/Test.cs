@@ -6,6 +6,13 @@ class Program
 {
     static void Main()
     {
+        Test.TestCase1 testCase1 = new Test.TestCase1();
+        testCase1.Run();
+        // StartConsoleGame();
+    }
+
+    static void StartConsoleGame()
+    {
         Property.LoadChessProperties();
         SingleGameConfig singleGameConfig = new SingleGameConfig(
             1,
@@ -22,8 +29,8 @@ class Program
                 "Card009", "Card009", "Card009", "Card009",
             }
         );
-        TestGame testGame = new TestGame(singleGameConfig);
-        testGame.RunGameTurns(30);
+        ConsoleGame consoleGame = new ConsoleGame(singleGameConfig);
+        consoleGame.RunGameTurns(30);
     }
 }
 #endif
