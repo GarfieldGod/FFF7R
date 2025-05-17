@@ -121,6 +121,11 @@ public class ConsoleGame : Game {
                 new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },
                 new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },
                 new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} }
+            },
+            new List<List<int>>{
+                new List<int> { 1, 10, 10, 10, 11 },
+                new List<int> { 1, 10, 10, 10, 11 },
+                new List<int> { 1, 10, 10, 10, 11 }
             }
         );
         int index = 0;

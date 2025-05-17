@@ -87,6 +87,48 @@ namespace Test
                 new List<int> { 0,  0,  0 ,  0 ,  0 }
                 }
             );
+            // Step 5
+            AddStep(InputerType.RIVAL,
+                10, "CardTest1",
+                new List<List<int>>{
+                new List<int> { FF,  FF,  FF,  E1,  EE },
+                new List<int> { F2,  F1,  F1,  E1,  EE },
+                new List<int> { F1,  O ,  O ,  E1,  EE }
+                },
+                new List<List<int>>{
+                new List<int> { 2,  3,  2 ,  0 ,  1 },
+                new List<int> { 0,  0,  0 ,  0 ,  3 },
+                new List<int> { 0,  0,  0 ,  0 ,  2 }
+                }
+            );
+            // Step 6
+            AddStep(InputerType.RIVAL,
+                11, "CardTest0",
+                new List<List<int>>{
+                new List<int> { FF,  FF,  FF,  E1,  EE },
+                new List<int> { F2,  F1,  F1,  E2,  EE },
+                new List<int> { F1,  O ,  E1,  EE,  EE }
+                },
+                new List<List<int>>{
+                new List<int> { 2,  3,  2 ,  0 ,  1 },
+                new List<int> { 0,  0,  0 ,  0 ,  3 },
+                new List<int> { 0,  0,  0 ,  2 ,  1 }
+                }
+            );
+            // Step 6
+            AddStep(InputerType.RIVAL,
+                1, "CardTest0",
+                new List<List<int>>{
+                new List<int> { FF,  FF,  FF,  EE,  E1 },
+                new List<int> { F2,  F1,  F1,  E3,  EE },
+                new List<int> { F1,  O ,  E1,  EE,  EE }
+                },
+                new List<List<int>>{
+                new List<int> { 2,  3,  1 ,  2 ,  0 },
+                new List<int> { 0,  0,  0 ,  0 ,  3 },
+                new List<int> { 0,  0,  0 ,  2 ,  1 }
+                }
+            );
         }
     }
 }

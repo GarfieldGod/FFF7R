@@ -2,8 +2,7 @@ using System.Collections.Generic;
 
 public enum InputerType {
     PLAYER,
-    RIVAL,
-    AI
+    RIVAL
 }
 
 public struct Input {
@@ -89,13 +88,11 @@ public class Inputer
     {
         if (!CheckInput(input)) return false;
         input_ = input;
-        Int2D pos = input.pos;
-        ChessProperty property = input.chess.GetChessProperty();
 
         ChessPad tempChessPad = GetChessPad().DeepCopy();
-        List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, property.PosEffects, tempChessPad.GetChessGridStatus());
-        DoEffcet(input, tempChessPad);
-        tempChessPad.SetChessGridStatus(tempGridStatus);
+        DoPosEffect(input, tempChessPad);
+        DoCardEffcet(input, tempChessPad);
+        RemoveDead(tempChessPad);
 
         originChessPad_.Copy(chessPad_);
         chessPad_.Copy(GetChessPadByType(tempChessPad));
@@ -136,12 +133,19 @@ public class Inputer
     {
         return Rival.GetAllFriendOccupiedGrids(GetChessPad().GetChessGridStatus());
     }
+    public void DoPosEffect(Input input, ChessPad chessPad)
+    { 
+        Int2D pos = input.pos;
+        ChessProperty property = input.chess.GetChessProperty();
 
-    public void DoEffcet(Input input, ChessPad chessPad)
+        List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, property.PosEffects, chessPad.GetChessGridStatus());
+        chessPad.SetChessGridStatus(tempGridStatus);
+    }
+    public void DoCardEffcet(Input input, ChessPad chessPad)
     {
         string id = input.chess.GetChessProperty().Name + "_X_" + input.pos.x.ToString() + "_Y_" + input.pos.y.ToString();
         int level = input.chess.GetChessProperty().Level;
-        EffectScope scope = input.chess.GetChessProperty().CardEffectConfig.scope;
+        EffectScope scope = input.chess.GetChessProperty().CardEffects.Item1;
         InputerType inputerType = inputerType_;
 
         // Do Self
@@ -181,5 +185,23 @@ public class Inputer
             case EffectCondition.CoverInput: break;
             case EffectCondition.LineWin: break;
         }
+    }
+
+    void RemoveDead(ChessPad tempChessPad)
+    {
+        var gridLevelMap = tempChessPad.GetChessGridStatus();
+        List<Int2D> result = new List<Int2D>();
+        for (int i = 0; i < gridLevelMap.Count; i++)
+        {
+            for (int j = 0; j < gridLevelMap[0].Count; j++)
+            {
+                ChessPosStatus chessPosStatus = (ChessPosStatus)gridLevelMap[i][j];
+                if (chessPosStatus == ChessPosStatus.OCCUPIED_FRIEND && tempChessPad.GetCardLevelResult(inputerType_)[i][j] <= 0)
+                {
+                    result.Add(new Int2D(i, j));
+                }
+            }
+        }
+        tempChessPad.RestPos(result);
     }
 }

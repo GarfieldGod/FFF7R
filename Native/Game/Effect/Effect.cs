@@ -91,16 +91,16 @@ public enum EffectValueType {
     LineRivalScore
 }
 
-public enum CardEffectsScope {
-    DOTOALL = 0,
-    FRIEND_ONLY = 1,
-    ENEMY_ONLY = 2,
-    FRIEND_INCREASE_ENEMY_REDUCE_ONCE,
-}
-public enum CardEffectsType {
-    ON_PLAYED,
-    ON_POSITION,
-    ON_SELF_DEAD,
-    ON_ENEMY_DEAD,
-    ON_ENHANCED
-}
+// public enum CardEffectsScope {
+//     DOTOALL = 0,
+//     FRIEND_ONLY = 1,
+//     ENEMY_ONLY = 2,
+//     FRIEND_INCREASE_ENEMY_REDUCE_ONCE,
+// }
+// public enum CardEffectsType {
+//     ON_PLAYED,
+//     ON_POSITION,
+//     ON_SELF_DEAD,
+//     ON_ENEMY_DEAD,
+//     ON_ENHANCED
+// }

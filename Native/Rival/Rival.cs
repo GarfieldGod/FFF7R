@@ -77,7 +77,8 @@ public class Rival
             GetChessPosStatusInRivalView(originalChessPad.GetChessGridStatus()),
             GetChessStatusInRivalView(originalChessPad.GetChessStatus()),
             GetChessLevelStatusInRivalView(originalChessPad.GetChessLevelStatus()),
-            GetStayBuffMapInRivalView(originalChessPad.GetStayBuffMap())
+            GetStayBuffMapInRivalView(originalChessPad.GetStayBuffMap()),
+            GetChessPosStatusInRivalView(originalChessPad.GetGridBackUp())
         );
     }
 

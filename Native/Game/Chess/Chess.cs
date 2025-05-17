@@ -83,36 +83,86 @@ public struct Buff
         this.scope = scope;
         this.inputerType = inputerType;
     }
-    public static int ComputeAll(List<Buff> list) {
+    // public static int Compute(List<Buff> list)
+    // {
+    //     return Compute(list, InputerType.PLAYER) + Compute(list, InputerType.RIVAL);
+    // }
+    public static int Compute(List<Buff> list, InputerType inputerType)
+    {
         int result = 0;
-        foreach(var buff in list) {
-            result += buff.value;
+        foreach (var buff in list)
+        {
+            // Log.TestLine(inputerType + " buff.scope: " + buff.scope + " buff.inputerType: " + buff.inputerType);
+            if (inputerType == InputerType.PLAYER)
+            {
+                if (buff.scope == EffectScope.DOTOALL)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.ENEMY_ONLY && buff.inputerType == InputerType.RIVAL)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.FRIEND_ONLY && buff.inputerType == InputerType.PLAYER)
+                {
+                    result += buff.value;
+                }
+            }
+            else
+            {
+                if (buff.scope == EffectScope.DOTOALL)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.ENEMY_ONLY && buff.inputerType == InputerType.PLAYER)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.FRIEND_ONLY && buff.inputerType == InputerType.RIVAL)
+                {
+                    result += buff.value;
+                }
+            }
         }
         return result;
     }
-    public static int Compute(List<Buff> list, InputerType inputerType) {
-        int result = 0;
-        foreach(var buff in list) {
-            // Log.TestLine("Found Buff: " + buff.id);
-            if (buff.inputerType == inputerType) result += buff.value;
-        }
-        return result;
-    }
+    // public static int Compute(List<Buff> list, InputerType inputerType, EffectScope scope) {
+    //     List<Buff> temp = GetFromScope(list, scope);
+    //     int result = 0;
+    //     foreach (var buff in temp)
+    //     {
+    //         if (buff.inputerType == inputerType) result += buff.value;
+    //     }
+    //     return result;
+    // }
+    // public static List<Buff> GetFromScope(List<Buff> list, EffectScope scope)
+    // {
+    //     List<Buff> result = new List<Buff>();
+    //     foreach (var buff in list)
+    //     {
+    //         if (buff.scope == scope) result.Add(buff);
+    //     }
+    //     return result;
+    // }
 }
 
 public class ChessPad {
-    protected List<List<int>> chessGridStatus_ = new List<List<int>>{};
+    protected List<List<int>> chessGridStatus_ = new List<List<int>> { };
     protected List<List<Chess>> chessStatus_ = new List<List<Chess>>{};
     protected List<List<int>> chessLevelStatus_ = new List<List<int>>{};
     protected List<List<List<Buff>>> stayBuffMap_ = new List<List<List<Buff>>>{};
-    public ChessPad() {}
+    
+    protected List<List<int>> chessGridStatusBackUp_ = new List<List<int>>{};
+    public ChessPad() { }
     public ChessPad(
         List<List<int>> chessGridStatus, List<List<Chess>> chessStatus,
-        List<List<int>> chessLevelStatus, List<List<List<Buff>>> stayBuffMap) {
+        List<List<int>> chessLevelStatus, List<List<List<Buff>>> stayBuffMap, List<List<int>> chessGridStatusBackUp)
+    {
         chessGridStatus_ = chessGridStatus;
         chessLevelStatus_ = chessLevelStatus;
         chessStatus_ = chessStatus;
         stayBuffMap_ = stayBuffMap;
+        chessGridStatusBackUp_ = chessGridStatusBackUp;
     }
     public Int2D GetSize() {
         return new Int2D(chessGridStatus_.Count, chessGridStatus_[0].Count);
@@ -122,7 +172,8 @@ public class ChessPad {
             Utils.DeepCopy2DList(chessGridStatus_),
             Utils.DeepCopy(chessStatus_),
             Utils.DeepCopy2DList(chessLevelStatus_),
-            Utils.DeepCopy(stayBuffMap_)
+            Utils.DeepCopy(stayBuffMap_),
+            Utils.DeepCopy2DList(chessGridStatusBackUp_)
         );
     }
     public List<List<int>> GetChessGridStatus() {
@@ -138,7 +189,20 @@ public class ChessPad {
     public void SetChessStatus(List<List<Chess>> src) {
         chessStatus_ = src;
     }
-    public List<List<int>> GetCardLevelResult() {
+    public List<List<int>> GetCardLevelResult(InputerType inputerType)
+    {
+        List<List<int>> stayBuffMapResult = Utils.DeepCopy2DList(chessLevelStatus_);
+        for (int x = 0; x < chessLevelStatus_.Count; x++)
+        {
+            for (int y = 0; y < chessLevelStatus_[0].Count; y++)
+            {
+                stayBuffMapResult[x][y] = Buff.Compute(stayBuffMap_[x][y], inputerType);
+            }
+        }
+        return Utils.Compose2DList(chessLevelStatus_, stayBuffMapResult);
+    }
+    public List<List<int>> GetCardLevelResult()
+    {
         List<List<int>> stayBuffMapResult = Utils.DeepCopy2DList(chessLevelStatus_);
         for (int x = 0; x < chessLevelStatus_.Count; x++)
         {
@@ -167,19 +231,42 @@ public class ChessPad {
     public List<List<List<Buff>>> GetStayBuffMap() {
         return stayBuffMap_;
     }
-    public bool AddStayBuff(Int2D pos, Buff buff) {
+    public List<List<int>> GetGridBackUp()
+    {
+        return chessGridStatusBackUp_;
+    }
+    public bool AddStayBuff(Int2D pos, Buff buff)
+    {
         stayBuffMap_[pos.x][pos.y].Add(buff);
         return true;
     }
 
-    public bool RemoveStayBuff(string id) {
-        for (int x = 0; x < stayBuffMap_.Count; x++) {
+    public void RestPos(Int2D pos)
+    {
+        chessGridStatus_[pos.x][pos.y] = chessGridStatusBackUp_[pos.x][pos.y];
+        chessLevelStatus_[pos.x][pos.y] = 0;
+        RemoveStayBuff(chessStatus_[pos.x][pos.y].GetID());
+        chessStatus_[pos.x][pos.y] = null;
+    }
+    public void RestPos(List<Int2D> pos)
+    {
+        foreach (var p in pos)
+        {
+            RestPos(p);
+        }
+    }
+    public bool RemoveStayBuff(string id)
+    {
+        for (int x = 0; x < stayBuffMap_.Count; x++)
+        {
             var line = stayBuffMap_[x];
-            for (int y = 0; y < line.Count; y++) {
+            for (int y = 0; y < line.Count; y++)
+            {
                 var buffs = line[y];
                 for (int z = 0; z < buffs.Count; z++)
                 {
-                    if (buffs[z].id == id) {
+                    if (buffs[z].id == id)
+                    {
                         buffs.Remove(buffs[z]);
                     }
                 }
@@ -195,8 +282,10 @@ public class ChessPad {
         chessLevelStatus_ = chessPad.GetChessLevelStatus();
         chessStatus_ = chessPad.GetChessStatus();
         stayBuffMap_ = chessPad.GetStayBuffMap();
+        chessGridStatusBackUp_ = chessPad.GetGridBackUp();
     }
-    public void InitStandard() {
+    public void InitStandard()
+    {
         chessGridStatus_ = new List<List<int>>{
             new List<int> { 1, 10, 10, 10, 11 },
             new List<int> { 1, 10, 10, 10, 11 },
@@ -217,5 +306,6 @@ public class ChessPad {
             new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },
             new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} }
         };
+        chessGridStatusBackUp_ = Utils.DeepCopy2DList(chessGridStatus_);
     }
 }
