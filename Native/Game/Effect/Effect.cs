@@ -53,20 +53,20 @@ public struct EffectConfig {
 
 public enum EffectCondition {
     //once
-    Played = 0,
-    Dead_Self = 1,
+    ON_PLAYED = 0,
+    ON_SELF_DEAD = 1,
     Frist_Buffed = 2,
     Frist_Debuffed = 3,
     LevelFristReach7 = 4,
     //many times
-    Stay = 5,
+    ON_POSITION = 5,
     //many times increase
     Num_All,
     Num_Friend,
     Num_Enemy,
     Dead_All,
     Dead_Friend,
-    Dead_Enemy,
+    ON_ENEMY_DEAD,
     EveryTime_Buffed,
     EveryTime_Debuffed,
     FriendPlayed,
@@ -77,10 +77,11 @@ public enum EffectCondition {
 }
 
 public enum EffectScope {
-    All,
-    Friend,
-    Enemy,
+    DOTOALL,
+    FRIEND_ONLY,
+    ENEMY_ONLY,
     Self,
+    FRIEND_INCREASE_ENEMY_REDUCE_ONCE,
     ScoreCounter
 }
 

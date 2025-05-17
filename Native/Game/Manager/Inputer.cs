@@ -62,7 +62,7 @@ public class Inputer
         {
             if (input.pos.x == vaildChessGrid.Item1.x && input.pos.y == vaildChessGrid.Item1.y)
             {
-                Log.TestLine("---Input is VAILD---", TextColor.RED, true);
+                Log.TestLine("---Input is VAILD---", TextColor.BLACK, true);
                 return true;
             }
         }
@@ -139,20 +139,29 @@ public class Inputer
 
     public void DoEffcet(Input input, ChessPad chessPad)
     {
-        switch (input.chess.GetChessProperty().CardEffectConfig.condition)
+        string id = input.chess.GetChessProperty().Name + "_X_" + input.pos.x.ToString() + "_Y_" + input.pos.y.ToString();
+        int level = input.chess.GetChessProperty().Level;
+        EffectScope scope = input.chess.GetChessProperty().CardEffectConfig.scope;
+        InputerType inputerType = inputerType_;
+
+        // Do Self
+        Buff selfBuff = new Buff(id, level, scope, inputerType);
+        chessPad.AddStayBuff(input.pos, selfBuff);
+
+        // Do Others
+        switch (input.chess.GetChessProperty().CardEffects.Item2)
         {
-            case EffectCondition.Played:
+            case EffectCondition.ON_PLAYED:
                 chessPad.SetChessLevelStatus(CardEffect.DoCardEffect(input, chessPad));
                 break;
-            case EffectCondition.Stay:
+            case EffectCondition.ON_POSITION:
                 List<Tuple<Int2D, int>> effectTasks = CardEffect.ParseCardEffect(input, GetChessPad());
-                foreach (var task in effectTasks) {
-                    string id = input.chess.GetChessProperty().Name + "_X_" + input.pos.x.ToString() + "_Y_" + input.pos.y.ToString();
+                // Log.TestLine("ON_POSITION TASK NUM: " + effectTasks.Count);
+                foreach (var task in effectTasks)
+                {
                     int value = task.Item2;
-                    EffectScope scope = input.chess.GetChessProperty().CardEffectConfig.scope;
-                    InputerType inputerType = inputerType_;
                     Buff buff = new Buff(id, value, scope, inputerType);
-                    chessPad.AddStayBuff(input.pos, buff);
+                    chessPad.AddStayBuff(task.Item1, buff);
                 }
                 break;
             case EffectCondition.Frist_Buffed: break;
@@ -163,8 +172,8 @@ public class Inputer
             case EffectCondition.Num_Enemy: break;
             case EffectCondition.Dead_All: break;
             case EffectCondition.Dead_Friend: break;
-            case EffectCondition.Dead_Enemy: break;
-            case EffectCondition.Dead_Self: break;
+            case EffectCondition.ON_ENEMY_DEAD: break;
+            case EffectCondition.ON_SELF_DEAD: break;
             case EffectCondition.EveryTime_Buffed: break;
             case EffectCondition.EveryTime_Debuffed: break;
             case EffectCondition.FriendPlayed: break;

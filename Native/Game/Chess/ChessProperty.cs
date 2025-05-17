@@ -6,9 +6,8 @@ public class ChessProperty {
     public int Level;
     public int Cost;
     public List<List<int>> PosEffects;
-    public List<List<int>> CardEffect;
     public EffectConfig CardEffectConfig;
-    public Tuple<CardEffectsScope, CardEffectsType, List<List<int>>> CardEffects;
+    public Tuple<EffectScope, EffectCondition, List<List<int>>> CardEffects;
     public string Description;
     public ChessProperty() {}
     public ChessProperty(ChessProperty chessProperty){
@@ -17,7 +16,7 @@ public class ChessProperty {
         Level = chessProperty.Level;
         Cost = chessProperty.Cost;
         PosEffects = Utils.DeepCopy2DList(chessProperty.PosEffects);
-        CardEffects = chessProperty.CardEffect == null ? null : new Tuple<CardEffectsScope, CardEffectsType, List<List<int>>>(
+        CardEffects = new Tuple<EffectScope, EffectCondition, List<List<int>>>(
             chessProperty.CardEffects.Item1,chessProperty.CardEffects.Item2, Utils.DeepCopy2DList(chessProperty.CardEffects.Item3));
         Description = chessProperty.Description;
     }

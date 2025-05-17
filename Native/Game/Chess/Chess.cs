@@ -93,7 +93,8 @@ public struct Buff
     public static int Compute(List<Buff> list, InputerType inputerType) {
         int result = 0;
         foreach(var buff in list) {
-            if(buff.inputerType == inputerType) result += buff.value;
+            // Log.TestLine("Found Buff: " + buff.id);
+            if (buff.inputerType == inputerType) result += buff.value;
         }
         return result;
     }
@@ -137,7 +138,25 @@ public class ChessPad {
     public void SetChessStatus(List<List<Chess>> src) {
         chessStatus_ = src;
     }
-
+    public List<List<int>> GetCardLevelResult() {
+        List<List<int>> stayBuffMapResult = Utils.DeepCopy2DList(chessLevelStatus_);
+        for (int x = 0; x < chessLevelStatus_.Count; x++)
+        {
+            for (int y = 0; y < chessLevelStatus_[0].Count; y++)
+            {
+                // Log.TestLine("x : "+ x +" y: "+ y + " buffCount: " + stayBuffMap_[x][y].Count);
+                ChessPosStatus chessPosStatus = (ChessPosStatus)chessGridStatus_[x][y];
+                int buffValue = 0;
+                switch (chessPosStatus)
+                {
+                    case ChessPosStatus.OCCUPIED_FRIEND: buffValue = Buff.Compute(stayBuffMap_[x][y], InputerType.PLAYER); break;
+                    case ChessPosStatus.OCCUPIED_ENEMY: buffValue = Buff.Compute(stayBuffMap_[x][y], InputerType.RIVAL); break;
+                }
+                stayBuffMapResult[x][y] = buffValue;
+            }
+        }
+        return Utils.Compose2DList(chessLevelStatus_, stayBuffMapResult);
+    }
     public List<List<int>> GetChessLevelStatus() {
         return chessLevelStatus_;
     }
@@ -148,7 +167,6 @@ public class ChessPad {
     public List<List<List<Buff>>> GetStayBuffMap() {
         return stayBuffMap_;
     }
-
     public bool AddStayBuff(Int2D pos, Buff buff) {
         stayBuffMap_[pos.x][pos.y].Add(buff);
         return true;
@@ -176,6 +194,7 @@ public class ChessPad {
         chessGridStatus_ = chessPad.GetChessGridStatus();
         chessLevelStatus_ = chessPad.GetChessLevelStatus();
         chessStatus_ = chessPad.GetChessStatus();
+        stayBuffMap_ = chessPad.GetStayBuffMap();
     }
     public void InitStandard() {
         chessGridStatus_ = new List<List<int>>{

@@ -31,13 +31,19 @@ namespace Test
     public class ExpectPad : ChessPad
     {
         List<List<int>> expectGridMap_;
-        public ExpectPad(List<List<int>> chessGridStatus) : base()
+        List<List<int>> expectLevelMap_;
+        public ExpectPad(List<List<int>> chessGridStatus, List<List<int>> chessLevelStatus = null) : base()
         {
             expectGridMap_ = chessGridStatus;
+            expectLevelMap_ = chessLevelStatus;
         }
         public List<List<int>> GetExpectGridMap()
         {
             return expectGridMap_;
+        }
+        public List<List<int>> GetExpectLevelMap()
+        {
+            return expectLevelMap_;
         }
     }
 
@@ -65,44 +71,47 @@ namespace Test
             this.stepList_ = steps;
         }
 
-        public static void ShowGridLevel(ChessPad chessPad)
+        public static void ShowErrorDiff(List<List<int>> expcet, List<List<int>> result = null)
         {
-            for (int x = 0; x < chessPad.GetChessGridStatus().Count; x++)
+            Log.TestLine("Expect:");
+            if (expcet == null)
             {
-                for (int y = 0; y < chessPad.GetChessGridStatus()[0].Count; y++)
+                Log.TestLine("The 2D List is null!");
+                return;
+            }
+            else
+            { 
+                for (int x = 0; x < expcet.Count; x++)
                 {
-                    Chess chess = chessPad.GetChessStatus()[x][y];
-                    int posStatus = chessPad.GetChessGridStatus()[x][y];
-                    TextColor textColor;
-                    bool ifHightLight = true;
-                    if ((posStatus > 10 && posStatus < 14) || posStatus == 15)
+                    for (int y = 0; y < expcet[0].Count; y++)
                     {
-                        textColor = TextColor.RED;
+                        Log.Test(Utils.FixLength(expcet[x][y].ToString(), 15), expcet[x][y] == result[x][y] ? TextColor.BLACK : TextColor.RED);
                     }
-                    else if (posStatus < 10 || posStatus == 14)
-                    {
-                        textColor = TextColor.GREEN;
-                    }
-                    else
-                    {
-                        textColor = TextColor.NONE;
-                        ifHightLight = false;
-                    }
-
-                    string output = (posStatus % 10).ToString();
-                    if (chess != null)
-                    {
-                        output = chess.GetChessProperty().Name;
-                    }
-                    Log.Test(Utils.FixLength(output, 15), textColor, ifHightLight);
+                    Log.Test("\n");
                 }
-                Log.Test("\n");
+            }
+            Log.TestLine("Result:");
+            if (result == null)
+            {
+                Log.TestLine("The 2D List is null!");
+                return;
+            }
+            else
+            { 
+                for (int x = 0; x < result.Count; x++)
+                {
+                    for (int y = 0; y < result[0].Count; y++)
+                    {
+                        Log.Test(Utils.FixLength(result[x][y].ToString(), 15), expcet[x][y] == result[x][y] ? TextColor.BLACK : TextColor.RED);
+                    }
+                    Log.Test("\n");
+                }
             }
         }
 
         public void ShowChessGrid()
         {
-            Log.TestLine("The ChessGrid:", TextColor.BLUE, true);
+            Log.TestLine("The ChessGrid:");
             int index = 0;
             for (int x = 0; x < chessPad_.GetChessGridStatus().Count; x++)
             {
@@ -111,7 +120,6 @@ namespace Test
                     Chess chess = chessPad_.GetChessStatus()[x][y];
                     int posStatus = chessPad_.GetChessGridStatus()[x][y];
                     TextColor textColor;
-                    bool ifHightLight = true;
                     if ((posStatus > 10 && posStatus < 14) || posStatus == 15)
                     {
                         textColor = TextColor.RED;
@@ -123,7 +131,6 @@ namespace Test
                     else
                     {
                         textColor = TextColor.NONE;
-                        ifHightLight = false;
                     }
 
                     string output = (posStatus % 10).ToString();
@@ -131,8 +138,8 @@ namespace Test
                     {
                         output = chess.GetChessProperty().Name;
                     }
-                    Log.Test("(" + index.ToString("D2") + ")", TextColor.BLACK, false);
-                    Log.Test(Utils.FixLength(output, 15), textColor, ifHightLight);
+                    Log.Test("(" + index.ToString("D2") + ")", TextColor.BLACK);
+                    Log.Test(Utils.FixLength(output, 15), textColor);
                     index++;
                 }
                 Log.Test("\n");
@@ -141,7 +148,7 @@ namespace Test
 
         public void ShowChess()
         {
-            Log.TestLine("The Chess:", TextColor.BLUE, true);
+            Log.TestLine("The Chess:");
             for (int x = 0; x < chessPad_.GetChessGridStatus().Count; x++)
             {
                 for (int y = 0; y < chessPad_.GetChessGridStatus()[0].Count; y++)
@@ -149,7 +156,6 @@ namespace Test
                     Chess chess = chessPad_.GetChessStatus()[x][y];
                     int posStatus = chessPad_.GetChessGridStatus()[x][y];
                     TextColor textColor;
-                    bool ifHightLight = true;
                     if ((posStatus > 10 && posStatus < 14) || posStatus == 15)
                     {
                         textColor = TextColor.RED;
@@ -161,7 +167,6 @@ namespace Test
                     else
                     {
                         textColor = TextColor.NONE;
-                        ifHightLight = false;
                     }
 
                     string output = "null";
@@ -169,7 +174,7 @@ namespace Test
                     {
                         output = chess.GetChessProperty().Name;
                     }
-                    Log.Test(Utils.FixLength(output, 15), textColor, ifHightLight);
+                    Log.Test(Utils.FixLength(output, 15), textColor);
                 }
                 Log.Test("\n");
             }
@@ -195,10 +200,10 @@ namespace Test
 
         public void ShowInfo(string info, TextColor textColor = TextColor.NONE)
         {
+            Log.TestLine(info, textColor);
+            Log.TestLine("GameTurn: " + GameTurns + "\nInput ChessPad Index: " + stepList_[GameTurns].index + "\nCardCode: " + stepList_[GameTurns].cardCode, TextColor.BLACK);
             ShowChessGrid();
             ShowChess();
-            Log.TestLine("GameTurn: " + GameTurns + "\nChessPad Index: " + stepList_[GameTurns].index + "\nCardCode: " + stepList_[GameTurns].cardCode, TextColor.YELLOW, true);
-            Log.TestLine(info, textColor, true);
         }
         public override void RunGameTurns(int TimeEveryTurn)
         {
@@ -216,45 +221,58 @@ namespace Test
         {
             PlayerTurn();
         }
+        bool Compare(List<List<int>> result, List<List<int>> expect)
+        {
+            if (!Utils.Compare(result, expect))
+            {
+                Log.TestLine("Campare Failed!", TextColor.RED, true);
+                ShowInfo("Error Info:");
+                ShowErrorDiff(expect, result);
+                return false;
+            }
+            return true;
+        }
         public override void PlayerTurn()
         {
             if (GameTurns >= stepList_.Count)
             {
-                TestResult = true;
-                Log.TestLine("Success: GameTurns Done!", TextColor.GREEN);
                 gameStatus_ = GameStatus.GAME_END;
+                TestResult = true;
+                Log.TestLine("Success: Steps Done!", TextColor.GREEN, true);
+                return;
+            }
+            int stepNum = GameTurns;
+            Step step = stepList_[stepNum];
+            Input input = new Input(chessGridIndexMap_[step.index], step.cardCode);
+            if (!DoATurn((step.inputerType == InputerType.PLAYER) ? player_ : rival_, input))
+            {
+                gameStatus_ = GameStatus.GAME_END;
+                TestResult = false;
+                Log.TestLine("Error: DoATurn Failed!", TextColor.RED, true);
+                Log.TestLine("Step " + stepNum + " Failed!", TextColor.RED, true);
             }
             else
             {
-                Input input = new Input(chessGridIndexMap_[stepList_[GameTurns].index], stepList_[GameTurns].cardCode);
-                if (!DoATurn((stepList_[GameTurns].inputerType == InputerType.PLAYER) ? player_ : rival_, input))
+                List<List<int>> resultG = chessPad_.GetChessGridStatus();
+                List<List<int>> resultC = chessPad_.GetCardLevelResult();
+                List<List<int>> expectG = step.expectPad.GetExpectGridMap();
+                List<List<int>> expectC = step.expectPad.GetExpectLevelMap();
+                bool cardLevelError = false;
+                bool gridLevelError;
+                if ((gridLevelError = !Compare(resultG, expectG)) || (cardLevelError = !Compare(resultC, expectC)))
                 {
-                    TestResult = false;
-                    Log.TestLine("Error: DoATurn Failed!", TextColor.RED);
-                    ShowInfo("Step " + GameTurns + " Failed!", TextColor.RED);
                     gameStatus_ = GameStatus.GAME_END;
+                    TestResult = false;
+                    if (gridLevelError) Log.TestLine("Error: Compare Grid Level Failed!", TextColor.RED, true);
+                    if (cardLevelError) Log.TestLine("Error: Compare Card Level Failed!", TextColor.RED, true);
+                    Log.TestLine("Step " + stepNum + " Failed!", TextColor.RED, true);
                 }
                 else
                 {
-                    if (!CompareChessPad(chessPad_, stepList_[GameTurns].expectPad))
-                    {
-                        TestResult = false;
-                        Log.TestLine("Error: CompareChessPad Failed!", TextColor.RED);
-                        ShowInfo("Step " + GameTurns + " Failed!", TextColor.RED);
-                        gameStatus_ = GameStatus.GAME_END;
-                    }
-                    else
-                    {
-                        ShowInfo("Step " + GameTurns + " Success!", TextColor.GREEN);
-                    }
+                    Log.TestLine("Step " + stepNum + " Success!", TextColor.GREEN, true);
                 }
             }
             base.PlayerTurn();
-        }
-
-        private bool CompareChessPad(ChessPad nowPad, ExpectPad expectPad)
-        {
-            return Utils.Compare(nowPad.GetChessGridStatus(), expectPad.GetExpectGridMap());
         }
 
         private bool DoATurn(Gamer gamer, Input input)
@@ -290,13 +308,14 @@ namespace Test
             initChessPad.InitStandard();
             return initChessPad;
         }
-        public virtual void AddStep(InputerType inputerType, int index, string cardCode, List<List<int>> expectPad1)
+        public virtual void AddStep(InputerType inputerType, int index, string cardCode, List<List<int>> expectPad1, List<List<int>> expectPad2 = null)
         {
             testSuite_.AddStep(new Step(
                 inputerType,
                 index, cardCode,
                 new ExpectPad(
-                    expectPad1
+                    expectPad1,
+                    expectPad2
                 )
             ));
         }

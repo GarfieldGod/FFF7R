@@ -15,14 +15,14 @@ public class EffectsMaker {
         if (effectTasks_.ContainsKey(effectPos)) {
             return false;
         }
-        if (property.CardEffectConfig.condition < EffectCondition.Stay) {
+        if (property.CardEffectConfig.condition < EffectCondition.ON_POSITION) {
             CardEffect.ParseCardEffect(effectPos, property, effectStatusEnhanced_, UsePosStatus());
         } else if (property.CardEffectConfig.condition >= EffectCondition.CoverInput) {
             //special
         } else {
             //many times
             int initTimes = 0;
-            if (property.CardEffectConfig.condition == EffectCondition.Stay) {
+            if (property.CardEffectConfig.condition == EffectCondition.ON_POSITION) {
                 initTimes = 1;
             }
             effectTasks_.Add(effectPos, new Tuple<ChessProperty, int>(property, initTimes));
@@ -142,7 +142,7 @@ static class CardEffect {
     public static List<List<int>> DoCardEffect(Int2D pos, ChessProperty property, ChessPad chessPad) {
         List<List<int>> GridMap = chessPad.GetChessGridStatus();
         List<List<int>> LevelMap = Utils.DeepCopy2DList(chessPad.GetChessLevelStatus());
-        Tuple<CardEffectsScope, CardEffectsType, List<List<int>>> cardEffects = property.CardEffects;
+        Tuple<EffectScope, EffectCondition, List<List<int>>> cardEffects = property.CardEffects;
         if (cardEffects == null || cardEffects.Item3 == null || cardEffects.Item3.Count == 0) {
             return LevelMap;
         }
@@ -154,7 +154,7 @@ static class CardEffect {
     }
     public static List<List<int>> ParseCardEffect(Int2D chessGridPos, ChessProperty property, List<List<int>> effectsMap, List<List<int>> posMap) {
         List<List<int>> chessGridStatusTemp = Utils.DeepCopy2DList(effectsMap);
-        Tuple<CardEffectsScope, CardEffectsType, List<List<int>>> cardEffects = property.CardEffects;
+        Tuple<EffectScope, EffectCondition, List<List<int>>> cardEffects = property.CardEffects;
         if (cardEffects == null || cardEffects.Item3 == null || cardEffects.Item3.Count == 0) {
             return chessGridStatusTemp;
         }
@@ -191,24 +191,24 @@ static class CardEffect {
     //     }
     //     return chessGridCardEffectsStatusTemp;
     // }
-    private static List<Tuple<Int2D, int>> GetEffectInEffectScope(CardEffectsScope cardEffectsScope, List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridPosEffectStatus) {
+    private static List<Tuple<Int2D, int>> GetEffectInEffectScope(EffectScope cardEffectsScope, List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridPosEffectStatus) {
         var tasksToRun = new List<Tuple<Int2D, int>>{};
         foreach(var task in effectTask) {
             switch (cardEffectsScope) {
-                case CardEffectsScope.DOTOALL:
+                case EffectScope.DOTOALL:
                     tasksToRun.Add(task);
                     break;
-                case CardEffectsScope.FRIEND_ONLY:
+                case EffectScope.FRIEND_ONLY:
                     if (chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_FRIEND) {
                         tasksToRun.Add(task);
                     }
                     break;
-                case CardEffectsScope.ENEMY_ONLY:
+                case EffectScope.ENEMY_ONLY:
                     if (chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_ENEMY) {
                         tasksToRun.Add(task);
                     }
                     break;
-                case CardEffectsScope.FRIEND_INCREASE_ENEMY_REDUCE_ONCE:
+                case EffectScope.FRIEND_INCREASE_ENEMY_REDUCE_ONCE:
                     if ((chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_ENEMY  && task.Item2 < 0) ||
                         (chessGridPosEffectStatus[task.Item1.x][task.Item1.y] == (int)ChessPosStatus.OCCUPIED_FRIEND && task.Item2 > 0)) {
                         tasksToRun.Add(task);

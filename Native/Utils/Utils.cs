@@ -9,12 +9,14 @@ public enum TextColor {
     WHITE
 }
 public class Log {
-    public static void TestLine (string info, TextColor color = TextColor.NONE, bool ifHightLight = false) {
+    public static void TestLine(string info, TextColor color = TextColor.NONE, bool ifHightLight = false)
+    {
         string textColor = GetColorText(color, ifHightLight);
-    #if UNITY_ENGINE
+#if UNITY_ENGINE
         Debug.Log(textColor + info);
-    #else
-        Console.WriteLine(textColor + info);
+#else
+        Test(info, color, ifHightLight);
+        Test("\n");
     #endif
     }
     public static void Test (string info, TextColor color = TextColor.NONE, bool ifHightLight = false) {
@@ -133,9 +135,12 @@ public static class Utils {
         return deepCopiedList;
     }
     public static bool Compare(List<List<int>> list1, List<List<int>> list2) {
-        for (int x = 0; x < list1.Count; x++) {
-            for (int y = 0; y < list1[0].Count; y++) {
-                if(list1[x][y] != list2[x][y]) return false;
+        if (list1 == null || list2 == null) return false;
+        for (int x = 0; x < list1.Count; x++)
+        {
+            for (int y = 0; y < list1[0].Count; y++)
+            {
+                if (list1[x][y] != list2[x][y]) return false;
             }
         }
         return true;

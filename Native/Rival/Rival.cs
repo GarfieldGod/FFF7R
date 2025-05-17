@@ -90,19 +90,19 @@ public class Rival
             reversedLine.Reverse();
             result.Add(reversedLine);
         }
-        for (int x = 0; x < result.Count; x++) {
-            var line = result[x];
-            for (int y = 0; y < line.Count; y++) {
-                var buffs = line[y];
-                for (int z = 0; z < buffs.Count; z++)
-                {
-                    var buff = buffs[z];
-                    if (buff.inputerType == InputerType.PLAYER) buff.inputerType = InputerType.RIVAL;
-                    else if (buff.inputerType == InputerType.RIVAL) buff.inputerType = InputerType.RIVAL;
-                    buffs[z] = buff;
-                }
-            }
-        }
+        // for (int x = 0; x < result.Count; x++) {
+        //     var line = result[x];
+        //     for (int y = 0; y < line.Count; y++) {
+        //         var buffs = line[y];
+        //         for (int z = 0; z < buffs.Count; z++)
+        //         {
+        //             var buff = buffs[z];
+        //             if (buff.inputerType == InputerType.PLAYER) buff.inputerType = InputerType.RIVAL;
+        //             else if (buff.inputerType == InputerType.RIVAL) buff.inputerType = InputerType.RIVAL;
+        //             buffs[z] = buff;
+        //         }
+        //     }
+        // }
         return result;
     }
 
