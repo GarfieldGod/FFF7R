@@ -7,7 +7,7 @@ public class AiRival {
     public static Input GetTheBestInput(ChessPad chessPad, List<Chess> chessInHand) {
         Input result = new Input();
         List<List<int>> RivalViewChessStatus = Utils.DeepCopy2DList(chessPad.GetGridStatusMap());
-        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(RivalViewChessStatus);
+        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(RivalViewChessStatus, InputerType.RIVAL);
         if (vaildChessGrids.Count == 0) {
             return result;
         }
@@ -36,8 +36,8 @@ public class AiRival {
                     continue;
                 }
                 Int2D chessGridPos = new Int2D(vaildChessGrid.Item1.x, vaildChessGrid.Item1.y);
-                List<List<int>> chessGridStatusTemp = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridPosStatus);
-                int effectResult = Rival.GetAllFriendEmptyGrids(chessGridStatusTemp).Count;
+                List<List<int>> chessGridStatusTemp = PosEffect.DoPosEffect(chessGridPos, property.PosEffects, chessGridPosStatus, InputerType.RIVAL);
+                int effectResult = Rival.GetAllFriendEmptyGrids(chessGridStatusTemp, InputerType.RIVAL).Count;
                 if (effectResult >= chessPosPoint) {
                     chessPosPoint = effectResult;
                     posX = vaildChessGrid.Item1.x;
@@ -199,7 +199,7 @@ public class Rival
             return result;
         }
 
-        List<Tuple<Int2D, int>> friendEmpty = GetAllFriendEmptyGrids(chessStatus);
+        List<Tuple<Int2D, int>> friendEmpty = GetAllFriendEmptyGrids(chessStatus, InputerType.RIVAL);
         List<Tuple<Int2D, int>> friendOccupied = GetAllFriendOccupiedGrids(chessStatus);
         bool hasCoverInput = false;
         int lowestCardLevel = int.MaxValue;
@@ -221,12 +221,23 @@ public class Rival
         result.AddRange(friendEmpty.Where(grid => grid.Item2 >= lowestCardLevel));
         return result;
     }
-    public static List<Tuple<Int2D, int>> GetAllFriendEmptyGrids(List<List<int>> chessStatus) {
+    public static List<Tuple<Int2D, int>> GetAllFriendEmptyGrids(List<List<int>> chessStatus, InputerType inputerType) {
         List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>{};
         for(int i = 0; i < chessStatus.Count; i++) {
             for(int j = 0; j < chessStatus[i].Count; j++) {
-                if (chessStatus[i][j] > 0 && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
-                    result.Add(new Tuple<Int2D, int>(new Int2D(i, j), chessStatus[i][j]));
+                if (inputerType == InputerType.PLAYER)
+                {
+                    if (chessStatus[i][j] > (int)ChessPosStatus.EMPTY % 10 && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_FRIEND)
+                    {
+                        result.Add(new Tuple<Int2D, int>(new Int2D(i, j), chessStatus[i][j]));
+                    }
+                }
+                else
+                { 
+                    if (chessStatus[i][j] > (int)ChessPosStatus.EMPTY && chessStatus[i][j] <= (int)ChessPosStatus.LEVEL_THREE_ENEMY)
+                    {
+                        result.Add(new Tuple<Int2D, int>(new Int2D(i, j), chessStatus[i][j]));
+                    }
                 }
             }
         }

@@ -56,10 +56,15 @@ public class PadGrid
         neverBuffed_ = padGrid.GetBuffStatus();
         chessId_ = padGrid.GetID();
         buffs_ = new List<Buff>();
-        foreach (var buff in padGrid.GetBuffList()) {
+        foreach (var buff in padGrid.GetBuffList())
+        {
             buffs_.Add(new Buff(buff));
         }
         pos_ = new Int2D(padGrid.GetPos().x, padGrid.GetPos().y);
+        if (padGrid.Effcet != null)
+        {
+            Effcet += padGrid.Effcet;
+        }
     }
     public bool Empty()
     {
@@ -107,8 +112,17 @@ public class PadGrid
     }
     public int GetLevel()
     {
-        Log.TestLine(GetID() + " buffCount: " + buffs_.Count(), TextColor.PURPLE);
-        return Buff.Compute(buffs_, posStatus_);
+        // Log.TestLine(GetID() + " buffCount: " + buffs_.Count() + " Result: " + Buff.Compute(buffs_, posStatus_, new Int2D(-1, -1)), TextColor.PURPLE);
+        // foreach (var buff in buffs_)
+        // {
+        //     Log.TestLine("buff.id: " + buff.id + " buff.inputerType: " + buff.inputerType + " buff.scope: " + buff.scope + " buff.value: " + buff.value);
+        // }
+        return Buff.Compute(buffs_, posStatus_, new Int2D(-1, -1));
+    }
+    public int GetLevelWithoutSelf()
+    {
+        // Log.TestLine(GetID() + " buffCount: " + buffs_.Count(), TextColor.PURPLE);
+        return Buff.Compute(buffs_, posStatus_, pos_);
     }
     public List<Buff> GetBuffList()
     {
@@ -129,41 +143,10 @@ public class PadGrid
     public void AddBuff(Buff buff)
     {
         buffs_.Add(buff);
-        // if (!Empty() && GetLevel() <= 0)
-        // { 
-        //     Log.TestLine(GetChess().Name + " Dead Level: " + GetLevel().ToString() + "\nstatus:" + GetGridStatus(), TextColor.PURPLE);
-        //     Reset();
-        // }
-        if (property_ != null)
-        {
-            if (neverBuffed_)
-            {
-                // FristBuffed(Int2D pos, buff.value);
-                neverBuffed_ = false;
-            }
-        }
-        else
-        {
-            neverBuffed_ = true;
-        }
-
     }
-    // public void FristBuffed(Int2D pos, int recvValue)
-    // {
-    //     if (property_.CardEffects.Item2 == EffectCondition.Frist_Buffed && recvValue > 0)
-    //     {
-    //         Input input = new Input(pos, property_);
-    //         Inputer.DoCardEffcet(input, this, posStatus_ == ChessPosStatus.OCCUPIED_FRIEND ? InputerType.PLAYER : InputerType.RIVAL);
-    //     }
-    //     else if (chessProperty.CardEffects.Item2 == EffectCondition.Frist_Debuffed && recvValue < 0)
-    //     {
-    //         Log.TestLine("Frist_Debuffed", TextColor.PURPLE, true);
-    //         Input input = new Input(pos, property_);
-    //         Inputer.DoCardEffcet(input, this, posStatus_ == ChessPosStatus.OCCUPIED_FRIEND ? InputerType.PLAYER : InputerType.RIVAL);
-    //     }
-    // }
     public void Reset()
     {
+        Log.TestLine("Reset: " + GetID() + " Level: " + GetLevel().ToString() + " posStatusBackUp_: " + posStatusBackUp_, TextColor.PURPLE);
         posStatus_ = posStatusBackUp_;
         neverBuffed_ = true;
         property_ = null;
@@ -173,35 +156,32 @@ public class PadGrid
     {
 
     }
-    public delegate void EffcetHandler(PadGrid sender, EventArgs e);
+
+    public delegate void EffcetHandler(PadGrid sender, int value);
     public event EffcetHandler Effcet;
-    public void DoEffcet()
+    public void SendEffcet(string info)
     {
-        Log.TestLine("DoDeadEffcet");
-        OnEffcet(EventArgs.Empty);
     }
-    protected virtual void OnEffcet(EventArgs e)
+    protected virtual void OnEffcet(int value)
     {
-        Effcet?.Invoke(this, e);
-    }
-    public void OnRecvEffcet(PadGrid sender, EventArgs e)
-    {
-        if (sender == this) return;
+        Effcet?.Invoke(this, value);
     }
 }
 
 public struct Buff
 {
     public string id;
+    public Int2D source;
     public int value;
     public EffectScope scope;
     public InputerType inputerType;
-    public Buff(string id, int value, EffectScope scope, InputerType inputerType)
+    public Buff(Int2D source, string id, int value, EffectScope scope, InputerType inputerType)
     {
         this.id = id;
         this.value = value;
         this.scope = scope;
         this.inputerType = inputerType;
+        this.source = new Int2D(source.x, source.y);
     }
     public Buff(Buff buff)
     {
@@ -209,12 +189,14 @@ public struct Buff
         this.value = buff.value;
         this.scope = buff.scope;
         this.inputerType = buff.inputerType;
+        this.source = new Int2D(buff.source.x, buff.source.y);
     }
-    public static int Compute(List<Buff> list, ChessPosStatus posStatus)
+    public static int Compute(List<Buff> list, ChessPosStatus posStatus, Int2D source)
     {
         int result = 0;
         foreach (var buff in list)
         {
+            if (buff.source == source) continue; 
             // Log.TestLine(inputerType + " buff.scope: " + buff.scope + " buff.inputerType: " + buff.inputerType);
             if (posStatus == ChessPosStatus.OCCUPIED_FRIEND)
             {

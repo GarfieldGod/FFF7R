@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Test;
 
 public class EffectsMaker {
     public EffectsMaker(List<List<int>> PosStatusMap, InputerType inputerType = InputerType.PLAYER) {
@@ -93,27 +94,57 @@ public class EffectsMaker {
 }
 
 static class PosEffect {
-    public static List<List<int>> DoPosEffect(Int2D chessGridPos, List<List<int>> posEffects, List<List<int>> chessGridPosEffectStatus) {
+    public static List<List<int>> DoPosEffect(Int2D chessGridPos, List<List<int>> posEffects, List<List<int>> chessGridPosEffectStatus, InputerType inputerType) {
         List<List<int>> chessGridStatusTemp = Utils.DeepCopy2DList(chessGridPosEffectStatus);
-        chessGridStatusTemp[chessGridPos.x][chessGridPos.y] = (int)ChessPosStatus.OCCUPIED_FRIEND;
+        chessGridStatusTemp[chessGridPos.x][chessGridPos.y] = inputerType  == InputerType.PLAYER ? (int)ChessPosStatus.OCCUPIED_FRIEND : (int)ChessPosStatus.OCCUPIED_ENEMY;
         Int2D chessPadSize = new Int2D(chessGridStatusTemp.Count, chessGridStatusTemp[0].Count);
         var effectTask = EffectsParser.ParseEffectsInPosition(chessPadSize, chessGridPos,  EffectsParser.ParseEffectsInRelative(posEffects, true));
-        return ExecutePosEffect(effectTask, chessGridStatusTemp);
+        return ExecutePosEffect(effectTask, chessGridStatusTemp, inputerType);
     }
-    private static List<List<int>> ExecutePosEffect(List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridStatus) {
-        foreach (Tuple<Int2D, int> Task in effectTask) {
+    private static List<List<int>> ExecutePosEffect(List<Tuple<Int2D, int>> effectTask, List<List<int>> chessGridStatus, InputerType inputerType) {
+        // Log.TestLine("effectTask: " + effectTask.Count, TextColor.PURPLE);
+        foreach (Tuple<Int2D, int> Task in effectTask)
+        {
+            // Log.TestLine("Task: x: " + Task.Item1.x + " y: " + Task.Item1.y + " value: " + Task.Item2, TextColor.PURPLE);
             int pastLevel = chessGridStatus[Task.Item1.x][Task.Item1.y];
-            if ((ChessPosStatus)pastLevel >= ChessPosStatus.OCCUPIED_FRIEND) {
+            if ((ChessPosStatus)pastLevel >= ChessPosStatus.OCCUPIED_FRIEND)
+            {
                 continue;
             }
-            int newLevel = pastLevel % 10;
-            if (pastLevel <= (int)ChessPosStatus.EMPTY) {
-                newLevel += Task.Item2;
+            int newLevel = pastLevel;
+            if (inputerType == InputerType.PLAYER)
+            {
+                if (pastLevel > (int)ChessPosStatus.EMPTY)
+                {
+                    newLevel -= (int)ChessPosStatus.EMPTY;
+                }
+                else
+                {
+                    newLevel = pastLevel % 10;
+                    newLevel += Task.Item2;
+                }
             }
-            if (newLevel > (int)ChessPosStatus.LEVEL_THREE_FRIEND) {
+            else if (inputerType == InputerType.RIVAL)
+            {
+                if (pastLevel >= (int)ChessPosStatus.EMPTY)
+                {
+                    newLevel += Task.Item2;
+                }
+                else
+                {
+                    newLevel += (int)ChessPosStatus.EMPTY;
+                }
+            }
+            if (newLevel > (int)ChessPosStatus.LEVEL_THREE_FRIEND && inputerType == InputerType.PLAYER)
+            {
                 newLevel = (int)ChessPosStatus.LEVEL_THREE_FRIEND;
             }
+            else if (newLevel > (int)ChessPosStatus.LEVEL_THREE_ENEMY && inputerType == InputerType.RIVAL)
+            {
+                newLevel = (int)ChessPosStatus.LEVEL_THREE_ENEMY;
+            }
             chessGridStatus[Task.Item1.x][Task.Item1.y] = newLevel;
+            // Log.TestLine("pastLevel: " + pastLevel + " newLevel: " + newLevel, TextColor.PURPLE);
         }
         return chessGridStatus;
     }

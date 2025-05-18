@@ -150,8 +150,8 @@ public class Game
             
             // RunGameTurns(30);
         }
-        if (Rival.GetAllFriendEmptyGrids(chessPad_.GetGridStatusMap()).Count == 0
-            && Rival.GetAllFriendEmptyGrids(Rival.GetChessPosStatusInRivalView(chessPad_.GetGridStatusMap())).Count == 0) {
+        if (Rival.GetAllFriendEmptyGrids(chessPad_.GetGridStatusMap(), InputerType.RIVAL).Count == 0
+            && Rival.GetAllFriendEmptyGrids(chessPad_.GetGridStatusMap(), InputerType.PLAYER).Count == 0) {
             gameStatus_ = GameStatus.GAME_END;
         }
     }

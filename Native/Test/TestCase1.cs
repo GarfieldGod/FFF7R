@@ -47,7 +47,7 @@ namespace Test
             );
             // Step 2
             AddStep(InputerType.RIVAL,
-                0, "CardTest1",
+                4, "CardTest1",
                 new List<List<int>>{
                 new List<int> { FF,  FF,  F1,  E1,  EE },
                 new List<int> { F2,  F1,  O ,  O ,  E2 },
@@ -75,7 +75,7 @@ namespace Test
             );
             // Step 4
             AddStep(InputerType.RIVAL,
-                5, "Card009",
+                9, "Card009",
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E1,  EE },
@@ -89,7 +89,7 @@ namespace Test
             );
             // Step 5
             AddStep(InputerType.RIVAL,
-                10, "CardTest1",
+                14, "CardTest1",
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E1,  EE },
@@ -103,7 +103,7 @@ namespace Test
             );
             // Step 6
             AddStep(InputerType.RIVAL,
-                11, "CardTest0",
+                13, "CardTest0",
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E2,  EE },
@@ -117,32 +117,32 @@ namespace Test
             );
             // Step 7
             AddStep(InputerType.RIVAL,
-                1, "CardTest0",
+                3, "CardTest0",
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  EE,  E1 },
                 new List<int> { F2,  F1,  F1,  E3,  EE },
                 new List<int> { F1,  O ,  E1,  EE,  EE }
                 },
                 new List<List<int>>{
-                new List<int> { 2,  3,  1 ,  2 ,  0 },
-                new List<int> { 0,  0,  0 ,  0 ,  3 },
+                new List<int> { 2,  3,  1 ,  1 ,  0 },
+                new List<int> { 0,  0,  0 ,  0 ,  2 },
                 new List<int> { 0,  0,  0 ,  2 ,  1 }
                 }
             );
-            // // Step 8
-            // AddStep(InputerType.RIVAL,
-            //     0, "CardTest2",
-            //     new List<List<int>>{
-            //     new List<int> { FF,  FF,  FF,  E1,  EE },
-            //     new List<int> { F2,  F1,  F1,  E3,  E1 },
-            //     new List<int> { F1,  O ,  E1,  EE,  EE }
-            //     },
-            //     new List<List<int>>{
-            //     new List<int> { 2,  3,  1 ,  2 ,  0 },
-            //     new List<int> { 0,  0,  0 ,  0 ,  3 },
-            //     new List<int> { 0,  0,  0 ,  2 ,  1 }
-            //     }
-            // );
+            // Step 8
+            AddStep(InputerType.RIVAL,
+                4, "CardTest2",
+                new List<List<int>>{
+                new List<int> { FF,  FF,  FF,  E1,  EE },
+                new List<int> { F2,  F1,  F1,  E3,  E2 },
+                new List<int> { F1,  O ,  E1,  EE,  E1 }
+                },
+                new List<List<int>>{
+                new List<int> { 2,  3,  2 ,  0 ,  2 },
+                new List<int> { 0,  0,  0 ,  0 ,  0 },
+                new List<int> { 0,  0,  0 ,  1 ,  0 }
+                }
+            );
         }
     }
 }

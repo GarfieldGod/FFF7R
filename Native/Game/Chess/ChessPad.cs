@@ -1,6 +1,7 @@
 using System.Drawing;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualBasic;
+using Test;
 
 public class ChessPad
 {
@@ -52,13 +53,15 @@ public class ChessPad
     }
     public List<List<int>> GetGridStatusMap()
     {
-        List<List<int>> result = Utils.NewEmpty2DList(padGrids_[0].Count, padGrids_.Count);
+        List<List<int>> result = new List<List<int>>();
         for (int x = 0; x < padGrids_.Count; x++)
         {
+            var line = new List<int>();
             for (int y = 0; y < padGrids_[0].Count; y++)
             {
-                result[x][y] = (int)padGrids_[x][y].GetGridStatus();
+                line.Add((int)padGrids_[x][y].GetGridStatus());
             }
+            result.Add(line);
         }
         return result;
     }
@@ -68,6 +71,10 @@ public class ChessPad
         {
             for (int y = 0; y < padGrids_[0].Count; y++)
             {
+                if ((ChessPosStatus)src[x][y] <= ChessPosStatus.OCCUPIED_FRIEND)
+                { 
+                    padGrids_[x][y].SetGridBackUp(padGrids_[x][y].GetGridStatus());
+                }
                 padGrids_[x][y].SetGridStatus((ChessPosStatus)src[x][y]);
             }
         }
@@ -121,7 +128,7 @@ public class ChessPad
         {
             for (int y = 0; y < stayBuffMapResult[0].Count; y++)
             {
-                stayBuffMapResult[x][y] = Buff.Compute(padGrids_[x][y].GetBuffList(), inputerType == InputerType.PLAYER ? ChessPosStatus.OCCUPIED_FRIEND : ChessPosStatus.OCCUPIED_ENEMY);
+                stayBuffMapResult[x][y] = Buff.Compute(padGrids_[x][y].GetBuffList(), inputerType == InputerType.PLAYER ? ChessPosStatus.OCCUPIED_FRIEND : ChessPosStatus.OCCUPIED_ENEMY, new Int2D(-1, -1));
             }
         }
         return stayBuffMapResult;
@@ -134,8 +141,8 @@ public class ChessPad
             for (int y = 0; y < stayBuffMapResult[0].Count; y++)
             {
                 ChessPosStatus chessPosStatus = padGrids_[x][y].GetGridStatus();
-                int buffValue = Buff.Compute(padGrids_[x][y].GetBuffList(), chessPosStatus);
-                Log.TestLine("x : "+ x +" y: "+ y + " buffValue: " + buffValue);
+                int buffValue = Buff.Compute(padGrids_[x][y].GetBuffList(), chessPosStatus, new Int2D(-1, -1));
+                // Log.TestLine("x : "+ x +" y: "+ y + " buffValue: " + buffValue);
                 stayBuffMapResult[x][y] = buffValue;
             }
         }
@@ -207,12 +214,37 @@ public class ChessPad
     {
         PadGrid padGrid = padGrids_[pos.x][pos.y];
         padGrid.AddBuff(buff);
-        return true;
+        CheckDead(padGrid);
+        if (!padGrid.Empty())
+        {
+            if (padGrid.GetLevelWithoutSelf() != 0 && !padGrid.Empty())
+            {
+                Log.TestLine("Frist_Buffed or Frist_Debuffed", TextColor.PURPLE);
+                padGrid.SetBuffStatus(false);
+                ChessProperty property = padGrid.GetChess();
+                if (property.CardEffects != null && (property.CardEffects.Item2 == EffectCondition.Frist_Buffed || property.CardEffects.Item2 == EffectCondition.Frist_Debuffed))
+                    return true;
+            }
+        }
+        return false;
     }
     public void RestPos(Int2D pos)
     {
         RemoveBuffs(padGrids_[pos.x][pos.y].GetID());
         padGrids_[pos.x][pos.y].Reset();
+    }
+    public void CheckDead(PadGrid padGrid)
+    {
+        if (!padGrid.Empty() && padGrid.GetLevel() <= 0)
+        {
+            RestPos(padGrid.GetPos());
+            foreach (var line in padGrids_)
+            {
+                foreach (var padGrids in line) {
+                    CheckDead(padGrids);
+                }
+            }
+        }
     }
     public void RestPos(List<Int2D> pos)
     {
@@ -223,18 +255,25 @@ public class ChessPad
     }
     public bool RemoveBuffs(string id)
     {
+        Log.TestLine("---RemoveBuffs---");
         for (int x = 0; x < padGrids_.Count; x++)
         {
-            var line = padGrids_[x];
-            for (int y = 0; y < line.Count; y++)
+            for (int y = 0; y < padGrids_[x].Count; y++)
             {
-                var buffs = line[y].GetBuffList();
+                var buffs = padGrids_[x][y].GetBuffList();
+                List<Buff> buffsToRemove = new List<Buff>();
                 for (int z = 0; z < buffs.Count; z++)
                 {
+                    Log.TestLine("FoundBuffs: " + buffs[z].id + " value: " + buffs[z].value);
                     if (buffs[z].id == id)
                     {
-                        buffs.Remove(buffs[z]);
+                        Log.TestLine("__RemoveBuffs: " + buffs[z].id + " value: " + buffs[z].value);
+                        buffsToRemove.Add(buffs[z]);
                     }
+                }
+                foreach (var buff in buffsToRemove)
+                {
+                    buffs.Remove(buff);
                 }
             }
         }

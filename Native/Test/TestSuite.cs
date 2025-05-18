@@ -85,7 +85,7 @@ namespace Test
                 {
                     for (int y = 0; y < expcet[0].Count; y++)
                     {
-                        Log.Test(Utils.FixLength(expcet[x][y].ToString(), 15), expcet[x][y] == result[x][y] ? TextColor.BLACK : TextColor.RED);
+                        Log.Test(Utils.FixLength(expcet[x][y].ToString(), 15), result != null ? (expcet[x][y] == result[x][y] ? TextColor.BLACK : TextColor.RED) : TextColor.PURPLE);
                     }
                     Log.Test("\n");
                 }

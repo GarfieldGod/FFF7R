@@ -131,7 +131,7 @@ public static class Utils
                 var thirdLevelCopiedList = new List<Buff>();
                 foreach (var buff in thirdLevelList)
                 {
-                    var copiedBuff = new Buff(buff.id, buff.value, buff.scope, buff.inputerType);
+                    var copiedBuff = new Buff(buff.source, buff.id, buff.value, buff.scope, buff.inputerType);
                     thirdLevelCopiedList.Add(copiedBuff);
                 }
                 secondLevelCopiedList.Add(thirdLevelCopiedList);
@@ -220,6 +220,14 @@ public static class Utils
             return input.Substring(0, maxLength);
         }
         return input.PadRight(maxLength, ' ');
+    }
+    public static List<List<int>> Reverse(List<List<int>> list)
+    {
+        foreach (var line in list)
+        {
+            line.Reverse();
+        }
+        return list;
     }
     public static ChessPosStatus Reverse(ChessPosStatus posStatus)
     {
