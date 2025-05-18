@@ -115,7 +115,7 @@ namespace Test
                 new List<int> { 0,  0,  0 ,  2 ,  1 }
                 }
             );
-            // Step 6
+            // Step 7
             AddStep(InputerType.RIVAL,
                 1, "CardTest0",
                 new List<List<int>>{
@@ -129,6 +129,20 @@ namespace Test
                 new List<int> { 0,  0,  0 ,  2 ,  1 }
                 }
             );
+            // // Step 8
+            // AddStep(InputerType.RIVAL,
+            //     0, "CardTest2",
+            //     new List<List<int>>{
+            //     new List<int> { FF,  FF,  FF,  E1,  EE },
+            //     new List<int> { F2,  F1,  F1,  E3,  E1 },
+            //     new List<int> { F1,  O ,  E1,  EE,  EE }
+            //     },
+            //     new List<List<int>>{
+            //     new List<int> { 2,  3,  1 ,  2 ,  0 },
+            //     new List<int> { 0,  0,  0 ,  0 ,  3 },
+            //     new List<int> { 0,  0,  0 ,  2 ,  1 }
+            //     }
+            // );
         }
     }
 }

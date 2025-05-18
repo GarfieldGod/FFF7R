@@ -238,6 +238,8 @@ namespace Test
             {
                 gameStatus_ = GameStatus.GAME_END;
                 TestResult = true;
+                GameTurns -= 1;
+                ShowInfo("End status:");
                 Log.TestLine("Success: Steps Done!", TextColor.GREEN, true);
                 return;
             }

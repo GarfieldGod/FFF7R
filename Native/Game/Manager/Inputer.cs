@@ -52,19 +52,20 @@ public class Inputer
         int chessPosLevel = GetChessPad().GetChessGridStatus()[input.pos.x][input.pos.y] % 10;
         if (chessPosLevel < input.chess.GetChessProperty().Cost)
         {
-            // Log.TestLine("chessPosLevel: " + chessPosLevel + "\nCost: " + input.chess.GetChessProperty().Cost);
+            Log.TestLine("CheckInput Failed: chessPosLevel: " + chessPosLevel + "\nCost: " + input.chess.GetChessProperty().Cost, TextColor.BLACK);
             return false;
         }
         List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(GetChessPad().GetChessGridStatus());
-        // Log.TestLine("vaildChessGrids: " + vaildChessGrids.Count);
+        Log.TestLine("Vaild ChessGrids: " + vaildChessGrids.Count, TextColor.BLACK);
         foreach (var vaildChessGrid in vaildChessGrids)
         {
             if (input.pos.x == vaildChessGrid.Item1.x && input.pos.y == vaildChessGrid.Item1.y)
             {
-                Log.TestLine("---Input is VAILD---", TextColor.BLACK, true);
+                Log.TestLine("CheckInput Success: ---Input is VAILD---", TextColor.BLACK);
                 return true;
             }
         }
+        Log.TestLine("CheckInput Failed: ---Input is INVAILD---", TextColor.BLACK);
         return false;
     }
 
@@ -91,8 +92,7 @@ public class Inputer
 
         ChessPad tempChessPad = GetChessPad().DeepCopy();
         DoPosEffect(input, tempChessPad);
-        DoCardEffcet(input, tempChessPad);
-        RemoveDead(tempChessPad);
+        DoCardEffcet(input, tempChessPad, inputerType_);
 
         originChessPad_.Copy(chessPad_);
         chessPad_.Copy(GetChessPadByType(tempChessPad));
@@ -134,19 +134,18 @@ public class Inputer
         return Rival.GetAllFriendOccupiedGrids(GetChessPad().GetChessGridStatus());
     }
     public void DoPosEffect(Input input, ChessPad chessPad)
-    { 
+    {
         Int2D pos = input.pos;
         ChessProperty property = input.chess.GetChessProperty();
 
         List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, property.PosEffects, chessPad.GetChessGridStatus());
         chessPad.SetChessGridStatus(tempGridStatus);
     }
-    public void DoCardEffcet(Input input, ChessPad chessPad)
+    public static void DoCardEffcet(Input input, ChessPad chessPad, InputerType inputerType)
     {
         string id = input.chess.GetChessProperty().Name + "_X_" + input.pos.x.ToString() + "_Y_" + input.pos.y.ToString();
         int level = input.chess.GetChessProperty().Level;
         EffectScope scope = input.chess.GetChessProperty().CardEffects.Item1;
-        InputerType inputerType = inputerType_;
 
         // Do Self
         Buff selfBuff = new Buff(id, level, scope, inputerType);
@@ -156,12 +155,23 @@ public class Inputer
         switch (input.chess.GetChessProperty().CardEffects.Item2)
         {
             case EffectCondition.ON_PLAYED:
-                chessPad.SetChessLevelStatus(CardEffect.DoCardEffect(input, chessPad));
+                List<Tuple<Int2D, int>> onPlayedTasks = CardEffect.ParseCardEffect(input, chessPad);
+                List<List<Chess>> chessMap = chessPad.GetChessStatus();
+                foreach (var task in onPlayedTasks)
+                {
+                    if (chessMap[task.Item1.x][task.Item1.y] != null)
+                    {
+                        id = chessMap[task.Item1.x][task.Item1.y].GetChessProperty().Name + "_X_" + task.Item1.x.ToString() + "_Y_" + task.Item1.y.ToString();
+                        int value = task.Item2;
+                        Buff buff = new Buff(id, value, scope, inputerType);
+                        chessPad.AddStayBuff(task.Item1, buff);
+                    }
+                }
                 break;
             case EffectCondition.ON_POSITION:
-                List<Tuple<Int2D, int>> effectTasks = CardEffect.ParseCardEffect(input, GetChessPad());
+                List<Tuple<Int2D, int>> onPositionTasks = CardEffect.ParseCardEffect(input, chessPad);
                 // Log.TestLine("ON_POSITION TASK NUM: " + effectTasks.Count);
-                foreach (var task in effectTasks)
+                foreach (var task in onPositionTasks)
                 {
                     int value = task.Item2;
                     Buff buff = new Buff(id, value, scope, inputerType);
@@ -185,9 +195,10 @@ public class Inputer
             case EffectCondition.CoverInput: break;
             case EffectCondition.LineWin: break;
         }
+        RemoveDead(chessPad, inputerType);
     }
 
-    void RemoveDead(ChessPad tempChessPad)
+    static void RemoveDead(ChessPad tempChessPad, InputerType inputerType)
     {
         var gridLevelMap = tempChessPad.GetChessGridStatus();
         List<Int2D> result = new List<Int2D>();
@@ -196,7 +207,7 @@ public class Inputer
             for (int j = 0; j < gridLevelMap[0].Count; j++)
             {
                 ChessPosStatus chessPosStatus = (ChessPosStatus)gridLevelMap[i][j];
-                if (chessPosStatus == ChessPosStatus.OCCUPIED_FRIEND && tempChessPad.GetCardLevelResult(inputerType_)[i][j] <= 0)
+                if (chessPosStatus == ChessPosStatus.OCCUPIED_FRIEND && tempChessPad.GetCardLevelMapInInputerType(inputerType)[i][j] <= 0)
                 {
                     result.Add(new Int2D(i, j));
                 }

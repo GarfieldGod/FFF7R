@@ -112,11 +112,6 @@ public class ConsoleGame : Game {
                 new List<Chess> { null, null, null, null, null },
                 new List<Chess> { null, null, null, null, null }
             },
-            new List<List<int>>{
-                new List<int> { 0, 0, 0, 0, 0 },
-                new List<int> { 0, 0, 0, 0, 0 },
-                new List<int> { 0, 0, 0, 0, 0 }
-            },
             new List<List<List<Buff>>>{
                 new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },
                 new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },

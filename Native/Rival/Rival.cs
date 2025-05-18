@@ -76,7 +76,6 @@ public class Rival
         return new ChessPad(
             GetChessPosStatusInRivalView(originalChessPad.GetChessGridStatus()),
             GetChessStatusInRivalView(originalChessPad.GetChessStatus()),
-            GetChessLevelStatusInRivalView(originalChessPad.GetChessLevelStatus()),
             GetStayBuffMapInRivalView(originalChessPad.GetStayBuffMap()),
             GetChessPosStatusInRivalView(originalChessPad.GetGridBackUp())
         );

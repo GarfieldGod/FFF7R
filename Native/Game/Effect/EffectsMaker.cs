@@ -141,7 +141,7 @@ static class CardEffect {
     }
     public static List<List<int>> DoCardEffect(Int2D pos, ChessProperty property, ChessPad chessPad) {
         List<List<int>> GridMap = chessPad.GetChessGridStatus();
-        List<List<int>> LevelMap = Utils.DeepCopy2DList(chessPad.GetChessLevelStatus());
+        List<List<int>> LevelMap = Utils.DeepCopy2DList(chessPad.GetCardLevelResult());
         Tuple<EffectScope, EffectCondition, List<List<int>>> cardEffects = property.CardEffects;
         if (cardEffects == null || cardEffects.Item3 == null || cardEffects.Item3.Count == 0) {
             return LevelMap;
