@@ -6,7 +6,7 @@ using System.Reflection.Metadata;
 public class AiRival {
     public static Input GetTheBestInput(ChessPad chessPad, List<Chess> chessInHand) {
         Input result = new Input();
-        List<List<int>> RivalViewChessStatus = Utils.DeepCopy2DList(chessPad.GetChessGridStatus());
+        List<List<int>> RivalViewChessStatus = Utils.DeepCopy2DList(chessPad.GetGridStatusMap());
         List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(RivalViewChessStatus);
         if (vaildChessGrids.Count == 0) {
             return result;
@@ -71,14 +71,6 @@ public class Rival
 
     public static List<List<int>> GetGridLevelInRivalView(List<List<int>> originChessStatus) {
         return GetChessPosStatusInRivalView(originChessStatus);
-    }
-    public static ChessPad GetChessPadInRivalView(ChessPad originalChessPad) {
-        return new ChessPad(
-            GetChessPosStatusInRivalView(originalChessPad.GetChessGridStatus()),
-            GetChessStatusInRivalView(originalChessPad.GetChessStatus()),
-            GetStayBuffMapInRivalView(originalChessPad.GetStayBuffMap()),
-            GetChessPosStatusInRivalView(originalChessPad.GetGridBackUp())
-        );
     }
 
     public static List<List<List<Buff>>> GetStayBuffMapInRivalView(List<List<List<Buff>>> src) {
@@ -162,7 +154,7 @@ public class Rival
         return srcTemp;
     }
 
-    public static List<List<Chess>> GetChessStatusInRivalView(List<List<Chess>> chessCardStatus) {
+    public static List<List<Chess>> GetChessMapInRivalView(List<List<Chess>> chessCardStatus) {
         List<List<Chess>> result = new List<List<Chess>>();
         foreach (var line in chessCardStatus) {
             List<Chess> reversedLine = new List<Chess>{};
@@ -172,10 +164,22 @@ public class Rival
         }
         return result;
     }
+    public static List<List<bool>> GetBuffStatusInRivalView(List<List<bool>> chessBuffStatus) {
+        List<List<bool>> result = new List<List<bool>>();
+        foreach (var line in chessBuffStatus) {
+            List<bool> reversedLine = new List<bool>{};
+            reversedLine.AddRange(line);
+            reversedLine.Reverse();
+            result.Add(reversedLine);
+        }
+        return result;
+    }
 
-    public static List<Tuple<Int2D, int>> GetAllVaildChessGrids(List<Chess> chessInHand, List<List<int>> chessStatus) {
-        List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>{};
-        if(chessInHand.Count == 0) {
+    public static List<Tuple<Int2D, int>> GetAllVaildChessGrids(List<Chess> chessInHand, List<List<int>> chessStatus)
+    {
+        List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>> { };
+        if (chessInHand.Count == 0)
+        {
             return result;
         }
 
@@ -183,14 +187,19 @@ public class Rival
         List<Tuple<Int2D, int>> friendOccupied = GetAllFriendOccupiedGrids(chessStatus);
         bool hasCoverInput = false;
         int lowestCardLevel = int.MaxValue;
-        foreach(Chess chess in chessInHand) {
-            if(chess.GetChessProperty().CardEffectConfig.condition == EffectCondition.CoverInput) {
-                hasCoverInput = true; 
-            } else {
+        foreach (Chess chess in chessInHand)
+        {
+            if (chess.GetChessProperty().CardEffectConfig.condition == EffectCondition.CoverInput)
+            {
+                hasCoverInput = true;
+            }
+            else
+            {
                 lowestCardLevel = Math.Min(chess.GetChessProperty().Level, lowestCardLevel);
             }
         }
-        if(hasCoverInput) {
+        if (hasCoverInput)
+        {
             result.AddRange(friendOccupied);
         }
         result.AddRange(friendEmpty.Where(grid => grid.Item2 >= lowestCardLevel));

@@ -11,7 +11,7 @@ namespace Test
     {
         public override ChessPad InitChessPad()
         {
-            ChessPad initChessPad = new ChessPad();
+            ChessPad initChessPad = new ChessPad(3, 5);
             initChessPad.InitStandard();
             return initChessPad;
         }

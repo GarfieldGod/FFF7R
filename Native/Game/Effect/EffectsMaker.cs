@@ -131,7 +131,7 @@ static class CardEffect {
     public static List<Tuple<Int2D, int>> ParseCardEffectInScope(Input input, ChessPad chessPad) {
         ChessProperty property = input.chess.GetChessProperty();
         var vaildTasksInPosition = ParseCardEffect(input, chessPad);
-        var gridLevelMap = chessPad.GetChessGridStatus();
+        var gridLevelMap = chessPad.GetGridStatusMap();
         var vaildTasksInScope = GetEffectInEffectScope(property.CardEffects.Item1, vaildTasksInPosition, gridLevelMap);
         return vaildTasksInScope;
     }
@@ -140,7 +140,7 @@ static class CardEffect {
         return DoCardEffect(parms.pos, property, chessPad);
     }
     public static List<List<int>> DoCardEffect(Int2D pos, ChessProperty property, ChessPad chessPad) {
-        List<List<int>> GridMap = chessPad.GetChessGridStatus();
+        List<List<int>> GridMap = chessPad.GetGridStatusMap();
         List<List<int>> LevelMap = Utils.DeepCopy2DList(chessPad.GetCardLevelResult());
         Tuple<EffectScope, EffectCondition, List<List<int>>> cardEffects = property.CardEffects;
         if (cardEffects == null || cardEffects.Item3 == null || cardEffects.Item3.Count == 0) {

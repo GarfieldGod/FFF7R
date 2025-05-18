@@ -28,11 +28,11 @@ namespace Test
         }
     }
 
-    public class ExpectPad : ChessPad
+    public class ExpectPad
     {
         List<List<int>> expectGridMap_;
         List<List<int>> expectLevelMap_;
-        public ExpectPad(List<List<int>> chessGridStatus, List<List<int>> chessLevelStatus = null) : base()
+        public ExpectPad(List<List<int>> chessGridStatus, List<List<int>> chessLevelStatus = null)
         {
             expectGridMap_ = chessGridStatus;
             expectLevelMap_ = chessLevelStatus;
@@ -113,12 +113,12 @@ namespace Test
         {
             Log.TestLine("The ChessGrid:");
             int index = 0;
-            for (int x = 0; x < chessPad_.GetChessGridStatus().Count; x++)
+            for (int x = 0; x < chessPad_.GetGridStatusMap().Count; x++)
             {
-                for (int y = 0; y < chessPad_.GetChessGridStatus()[0].Count; y++)
+                for (int y = 0; y < chessPad_.GetGridStatusMap()[0].Count; y++)
                 {
-                    Chess chess = chessPad_.GetChessStatus()[x][y];
-                    int posStatus = chessPad_.GetChessGridStatus()[x][y];
+                    Chess chess = chessPad_.GetChessMap()[x][y];
+                    int posStatus = chessPad_.GetGridStatusMap()[x][y];
                     TextColor textColor;
                     if ((posStatus > 10 && posStatus < 14) || posStatus == 15)
                     {
@@ -149,12 +149,12 @@ namespace Test
         public void ShowChess()
         {
             Log.TestLine("The Chess:");
-            for (int x = 0; x < chessPad_.GetChessGridStatus().Count; x++)
+            for (int x = 0; x < chessPad_.GetGridStatusMap().Count; x++)
             {
-                for (int y = 0; y < chessPad_.GetChessGridStatus()[0].Count; y++)
+                for (int y = 0; y < chessPad_.GetGridStatusMap()[0].Count; y++)
                 {
-                    Chess chess = chessPad_.GetChessStatus()[x][y];
-                    int posStatus = chessPad_.GetChessGridStatus()[x][y];
+                    Chess chess = chessPad_.GetChessMap()[x][y];
+                    int posStatus = chessPad_.GetGridStatusMap()[x][y];
                     TextColor textColor;
                     if ((posStatus > 10 && posStatus < 14) || posStatus == 15)
                     {
@@ -184,12 +184,12 @@ namespace Test
 
         public override ChessPad InitChessPadStandard()
         {
-            ChessPad chessPad = new ChessPad();
+            ChessPad chessPad = new ChessPad(3, 5);
             chessPad.InitStandard();
             int index = 0;
-            for (int x = 0; x < chessPad.GetChessGridStatus().Count; x++)
+            for (int x = 0; x < chessPad.GetGridStatusMap().Count; x++)
             {
-                for (int y = 0; y < chessPad.GetChessGridStatus()[0].Count; y++)
+                for (int y = 0; y < chessPad.GetGridStatusMap()[0].Count; y++)
                 {
                     chessGridIndexMap_.Add(index, new Int2D(x, y));
                     index++;
@@ -255,7 +255,7 @@ namespace Test
             }
             else
             {
-                List<List<int>> resultG = chessPad_.GetChessGridStatus();
+                List<List<int>> resultG = chessPad_.GetGridStatusMap();
                 List<List<int>> resultC = chessPad_.GetCardLevelResult();
                 List<List<int>> expectG = step.expectPad.GetExpectGridMap();
                 List<List<int>> expectC = step.expectPad.GetExpectLevelMap();
@@ -306,7 +306,7 @@ namespace Test
         }
         public virtual ChessPad InitChessPad()
         {
-            ChessPad initChessPad = new ChessPad();
+            ChessPad initChessPad = new ChessPad(3, 5);
             initChessPad.InitStandard();
             return initChessPad;
         }

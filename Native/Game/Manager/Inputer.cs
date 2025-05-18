@@ -37,7 +37,7 @@ public class Inputer
     private readonly ChessPad chessPad_;
     private InputerType inputerType_;
     //--------------------------------------------
-    private ChessPad originChessPad_ = new ChessPad();
+    private ChessPad originChessPad_ = new ChessPad(0, 0);
     private Input input_;
     public Inputer(Dispenser dispenser, Selector selector, ChessPad chessPad, InputerType inputerType = InputerType.PLAYER)
     {
@@ -49,13 +49,13 @@ public class Inputer
 
     bool CheckInput(Input input)
     {
-        int chessPosLevel = GetChessPad().GetChessGridStatus()[input.pos.x][input.pos.y] % 10;
+        int chessPosLevel = GetChessPad().GetGridStatusMap()[input.pos.x][input.pos.y] % 10;
         if (chessPosLevel < input.chess.GetChessProperty().Cost)
         {
             Log.TestLine("CheckInput Failed: chessPosLevel: " + chessPosLevel + "\nCost: " + input.chess.GetChessProperty().Cost, TextColor.BLACK);
             return false;
         }
-        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(GetChessPad().GetChessGridStatus());
+        List<Tuple<Int2D, int>> vaildChessGrids = Rival.GetAllFriendEmptyGrids(GetChessPad().GetGridStatusMap());
         Log.TestLine("Vaild ChessGrids: " + vaildChessGrids.Count, TextColor.BLACK);
         foreach (var vaildChessGrid in vaildChessGrids)
         {
@@ -77,7 +77,7 @@ public class Inputer
     public ChessPad GetChessPadByType(ChessPad chessPad)
     {
         return inputerType_ == InputerType.PLAYER ?
-        chessPad : Rival.GetChessPadInRivalView(chessPad);
+        chessPad : ChessPad.Reverse(chessPad);
     }
 
     public List<Chess> GetChessInHand()
@@ -101,17 +101,17 @@ public class Inputer
     public void RestoreInput()
     {
         chessPad_.Copy(originChessPad_);
-        originChessPad_ = new ChessPad();
+        originChessPad_ = new ChessPad(chessPad_.GetSize());
     }
     public void CommitInput()
     {
         ChessPad tempChessPad = GetChessPad().DeepCopy();
-        List<List<Chess>> chesses = tempChessPad.GetChessStatus();
+        List<List<Chess>> chesses = tempChessPad.GetChessMap();
         chesses[input_.pos.x][input_.pos.y] = input_.chess;
-        tempChessPad.SetChessStatus(chesses);
+        tempChessPad.SetChessMap(chesses);
 
         chessPad_.Copy(GetChessPadByType(tempChessPad));
-        originChessPad_ = new ChessPad();
+        originChessPad_ = new ChessPad(chessPad_.GetSize());
     }
 
     public bool CanInput()
@@ -121,25 +121,25 @@ public class Inputer
 
     public List<Tuple<Int2D, int>> GetVaildGrids()
     {
-        return Rival.GetAllVaildChessGrids(selector_.GetAllChess(), GetChessPad().GetChessGridStatus());
+        return Rival.GetAllVaildChessGrids(selector_.GetAllChess(), GetChessPad().GetGridStatusMap());
     }
 
     public List<Tuple<Int2D, int>> GetEmptyFriendGrids()
     {
-        return Rival.GetAllFriendEmptyGrids(GetChessPad().GetChessGridStatus());
+        return Rival.GetAllFriendEmptyGrids(GetChessPad().GetGridStatusMap());
     }
 
     public List<Tuple<Int2D, int>> GetOccupiedFriendGrids()
     {
-        return Rival.GetAllFriendOccupiedGrids(GetChessPad().GetChessGridStatus());
+        return Rival.GetAllFriendOccupiedGrids(GetChessPad().GetGridStatusMap());
     }
     public void DoPosEffect(Input input, ChessPad chessPad)
     {
         Int2D pos = input.pos;
         ChessProperty property = input.chess.GetChessProperty();
 
-        List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, property.PosEffects, chessPad.GetChessGridStatus());
-        chessPad.SetChessGridStatus(tempGridStatus);
+        List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, property.PosEffects, chessPad.GetGridStatusMap());
+        chessPad.SetGridStatusMap(tempGridStatus);
     }
     public static void DoCardEffcet(Input input, ChessPad chessPad, InputerType inputerType)
     {
@@ -149,14 +149,14 @@ public class Inputer
 
         // Do Self
         Buff selfBuff = new Buff(id, level, scope, inputerType);
-        chessPad.AddStayBuff(input.pos, selfBuff);
+        chessPad.AddBuff(input.pos, selfBuff);
 
         // Do Others
         switch (input.chess.GetChessProperty().CardEffects.Item2)
         {
             case EffectCondition.ON_PLAYED:
                 List<Tuple<Int2D, int>> onPlayedTasks = CardEffect.ParseCardEffect(input, chessPad);
-                List<List<Chess>> chessMap = chessPad.GetChessStatus();
+                List<List<Chess>> chessMap = chessPad.GetChessMap();
                 foreach (var task in onPlayedTasks)
                 {
                     if (chessMap[task.Item1.x][task.Item1.y] != null)
@@ -164,18 +164,17 @@ public class Inputer
                         id = chessMap[task.Item1.x][task.Item1.y].GetChessProperty().Name + "_X_" + task.Item1.x.ToString() + "_Y_" + task.Item1.y.ToString();
                         int value = task.Item2;
                         Buff buff = new Buff(id, value, scope, inputerType);
-                        chessPad.AddStayBuff(task.Item1, buff);
+                        chessPad.AddBuff(task.Item1, buff);
                     }
                 }
                 break;
             case EffectCondition.ON_POSITION:
                 List<Tuple<Int2D, int>> onPositionTasks = CardEffect.ParseCardEffect(input, chessPad);
-                // Log.TestLine("ON_POSITION TASK NUM: " + effectTasks.Count);
                 foreach (var task in onPositionTasks)
                 {
                     int value = task.Item2;
                     Buff buff = new Buff(id, value, scope, inputerType);
-                    chessPad.AddStayBuff(task.Item1, buff);
+                    chessPad.AddBuff(task.Item1, buff);
                 }
                 break;
             case EffectCondition.Frist_Buffed: break;
@@ -200,7 +199,7 @@ public class Inputer
 
     static void RemoveDead(ChessPad tempChessPad, InputerType inputerType)
     {
-        var gridLevelMap = tempChessPad.GetChessGridStatus();
+        var gridLevelMap = tempChessPad.GetGridStatusMap();
         List<Int2D> result = new List<Int2D>();
         for (int i = 0; i < gridLevelMap.Count; i++)
         {

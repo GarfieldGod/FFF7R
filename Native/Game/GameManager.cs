@@ -92,7 +92,7 @@ public class Game
     public int GameTurns = 0;
     public bool playerTurn_ = true;
 //----------------------------------------------------------------------------------------------------------------------------------INIT
-    protected readonly ChessPad chessPad_ = new ChessPad();
+    protected readonly ChessPad chessPad_ = new ChessPad(0, 0);
     protected  Gamer player_;
     protected  Gamer rival_;
 
@@ -133,7 +133,7 @@ public class Game
     }
 
     public virtual ChessPad InitChessPadStandard() {
-        ChessPad chessPad = new ChessPad();
+        ChessPad chessPad = new ChessPad(3, 5);
         chessPad.InitStandard();
         return chessPad;
     }
@@ -150,8 +150,8 @@ public class Game
             
             // RunGameTurns(30);
         }
-        if (Rival.GetAllFriendEmptyGrids(chessPad_.GetChessGridStatus()).Count == 0
-            && Rival.GetAllFriendEmptyGrids(Rival.GetChessPosStatusInRivalView(chessPad_.GetChessGridStatus())).Count == 0) {
+        if (Rival.GetAllFriendEmptyGrids(chessPad_.GetGridStatusMap()).Count == 0
+            && Rival.GetAllFriendEmptyGrids(Rival.GetChessPosStatusInRivalView(chessPad_.GetGridStatusMap())).Count == 0) {
             gameStatus_ = GameStatus.GAME_END;
         }
     }

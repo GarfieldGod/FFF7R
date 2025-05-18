@@ -16,10 +16,10 @@ public class ConsoleGame : Game {
     }
 
     public static void ShowChessGrid(ChessPad chessPad) {
-        for(int x = 0;x < chessPad.GetChessGridStatus().Count ; x++) {
-            for(int y = 0;y < chessPad.GetChessGridStatus()[0].Count ; y++) {
-                Chess chess = chessPad.GetChessStatus()[x][y];
-                int posStatus = chessPad.GetChessGridStatus()[x][y];
+        for(int x = 0;x < chessPad.GetGridStatusMap().Count ; x++) {
+            for(int y = 0;y < chessPad.GetGridStatusMap()[0].Count ; y++) {
+                Chess chess = chessPad.GetChessMap()[x][y];
+                int posStatus = chessPad.GetGridStatusMap()[x][y];
                 TextColor textColor;
                 bool ifHightLight = true;
                 if ((posStatus > 10 && posStatus < 14) || posStatus == 15) {
@@ -44,10 +44,10 @@ public class ConsoleGame : Game {
     public void ShowChessGrid() {
         Log.TestLine("The ChessGrid:", TextColor.BLUE, true);
         int index = 0;
-        for(int x = 0;x < chessPad_.GetChessGridStatus().Count ; x++) {
-            for(int y = 0;y < chessPad_.GetChessGridStatus()[0].Count ; y++) {
-                Chess chess = chessPad_.GetChessStatus()[x][y];
-                int posStatus = chessPad_.GetChessGridStatus()[x][y];
+        for(int x = 0;x < chessPad_.GetGridStatusMap().Count ; x++) {
+            for(int y = 0;y < chessPad_.GetGridStatusMap()[0].Count ; y++) {
+                Chess chess = chessPad_.GetChessMap()[x][y];
+                int posStatus = chessPad_.GetGridStatusMap()[x][y];
                 TextColor textColor;
                 bool ifHightLight = true;
                 if ((posStatus > 10 && posStatus < 14) || posStatus == 15) {
@@ -73,10 +73,10 @@ public class ConsoleGame : Game {
 
     public void ShowChess() {
         Log.TestLine("The Chess:", TextColor.BLUE, true);
-        for(int x = 0;x < chessPad_.GetChessGridStatus().Count ; x++) {
-            for(int y = 0;y < chessPad_.GetChessGridStatus()[0].Count ; y++) {
-                Chess chess = chessPad_.GetChessStatus()[x][y];
-                int posStatus = chessPad_.GetChessGridStatus()[x][y];
+        for(int x = 0;x < chessPad_.GetGridStatusMap().Count ; x++) {
+            for(int y = 0;y < chessPad_.GetGridStatusMap()[0].Count ; y++) {
+                Chess chess = chessPad_.GetChessMap()[x][y];
+                int posStatus = chessPad_.GetGridStatusMap()[x][y];
                 TextColor textColor;
                 bool ifHightLight = true;
                 if ((posStatus > 10 && posStatus < 14) || posStatus == 15) {
@@ -101,31 +101,11 @@ public class ConsoleGame : Game {
     Dictionary<int, Int2D> chessGridIndexMap_ = [];
 
     public override ChessPad InitChessPadStandard() {
-        ChessPad chessPad = new ChessPad(
-            new List<List<int>>{
-                new List<int> { 1, 10, 10, 10, 11 },
-                new List<int> { 1, 10, 10, 10, 11 },
-                new List<int> { 1, 10, 10, 10, 11 }
-            },
-            new List<List<Chess>>{
-                new List<Chess> { null, null, null, null, null },
-                new List<Chess> { null, null, null, null, null },
-                new List<Chess> { null, null, null, null, null }
-            },
-            new List<List<List<Buff>>>{
-                new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },
-                new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} },
-                new List<List<Buff>> { new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{}, new List<Buff>{} }
-            },
-            new List<List<int>>{
-                new List<int> { 1, 10, 10, 10, 11 },
-                new List<int> { 1, 10, 10, 10, 11 },
-                new List<int> { 1, 10, 10, 10, 11 }
-            }
-        );
+        ChessPad chessPad = new ChessPad(3, 5);
+        chessPad.InitStandard();
         int index = 0;
-        for(int x = 0;x < chessPad.GetChessGridStatus().Count ; x++) {
-            for(int y = 0;y < chessPad.GetChessGridStatus()[0].Count ; y++) {
+        for(int x = 0;x < chessPad.GetGridStatusMap().Count ; x++) {
+            for(int y = 0;y < chessPad.GetGridStatusMap()[0].Count ; y++) {
                 chessGridIndexMap_.Add(index, new Int2D(x,y));
                 index++;
             }

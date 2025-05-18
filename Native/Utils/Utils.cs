@@ -62,6 +62,19 @@ public class Log {
 }
 
 public static class Utils {
+    public static List<List<int>> NewEmpty2DList(int lengh, int height) {
+        List<List<int>> result = new List<List<int>> {};
+        for (int x = 0; x < height; x++)
+        {
+            List<int> line = new List<int>();
+            for (int y = 0; y < lengh; y++)
+            {
+                line.Add(0);
+            }
+            result.Add(line);
+        }
+        return result;
+    }
     public static readonly List<List<int>> EmptyStandard2DList = new List<List<int>> {
         new List<int> { 0, 0, 0, 0, 0 },
         new List<int> { 0, 0, 0, 0, 0 },
@@ -134,7 +147,23 @@ public static class Utils {
         }
         return deepCopiedList;
     }
-    public static bool Compare(List<List<int>> list1, List<List<int>> list2) {
+    public static List<List<bool>> DeepCopy(this List<List<bool>> original)
+    {
+        if (original == null) {
+            return null;
+        }
+        var deepCopiedList = new List<List<bool>>();
+        foreach (var secondLevelList in original) {
+            var secondLevelCopiedList = new List<bool>();
+            foreach (var chess in secondLevelList) {
+                secondLevelCopiedList.Add(chess);
+            }
+            deepCopiedList.Add(secondLevelCopiedList);
+        }
+        return deepCopiedList;
+    }
+    public static bool Compare(List<List<int>> list1, List<List<int>> list2)
+    {
         if (list1 == null || list2 == null) return false;
         for (int x = 0; x < list1.Count; x++)
         {
