@@ -13,15 +13,57 @@ public class PadGrid
     private bool neverBuffed_ = true;
     private List<Buff> buffs_ = new List<Buff>();
     private string chessId_ = null;
-    public PadGrid() {}
+    private Int2D pos_ = new Int2D(-1, -1);
+    public PadGrid Reverse()
+    {
+        PadGrid newPadGrid = new PadGrid(this);
+        newPadGrid.SetGridStatus(Utils.Reverse(newPadGrid.GetGridStatus()));
+        newPadGrid.SetGridBackUp(Utils.Reverse(newPadGrid.GetGridBackUp()));
+        List<Buff> newBuffs = new List<Buff>();
+        foreach (var buff in newPadGrid.GetBuffList())
+        {
+            var newBuff = new Buff(buff);
+            if (newBuff.scope == EffectScope.ENEMY_ONLY)
+            {
+                newBuff.scope = EffectScope.FRIEND_ONLY;
+            }
+            else if (newBuff.scope == EffectScope.FRIEND_ONLY)
+            {
+                newBuff.scope = EffectScope.ENEMY_ONLY;
+            }
+            if (newBuff.inputerType == InputerType.PLAYER)
+            {
+                newBuff.inputerType = InputerType.RIVAL;
+            }
+            else if (newBuff.inputerType == InputerType.RIVAL)
+            {
+                newBuff.inputerType = InputerType.PLAYER;
+            }
+            newBuffs.Add(newBuff);
+        }
+        newPadGrid.SetBuffList(newBuffs);
+        return newPadGrid;
+    }
+    public PadGrid(Int2D pos)
+    {
+        pos_ = pos;
+    }
     public PadGrid(PadGrid padGrid)
     {
         posStatus_ = padGrid.GetGridStatus();
         posStatusBackUp_ = padGrid.GetGridBackUp();
         property_ = padGrid.GetChess();
         neverBuffed_ = padGrid.GetBuffStatus();
-        buffs_ = padGrid.GetBuffList();
         chessId_ = padGrid.GetID();
+        buffs_ = new List<Buff>();
+        foreach (var buff in padGrid.GetBuffList()) {
+            buffs_.Add(new Buff(buff));
+        }
+        pos_ = new Int2D(padGrid.GetPos().x, padGrid.GetPos().y);
+    }
+    public bool Empty()
+    {
+        return property_ == null && chessId_ == null;
     }
     public void SetID(string id)
     {
@@ -30,6 +72,10 @@ public class PadGrid
     public string GetID()
     {
         return chessId_;
+    }
+    public Int2D GetPos()
+    {
+        return pos_;
     }
     public ChessPosStatus GetGridStatus()
     {
@@ -59,6 +105,11 @@ public class PadGrid
     {
         neverBuffed_ = neverBuffed;
     }
+    public int GetLevel()
+    {
+        Log.TestLine(GetID() + " buffCount: " + buffs_.Count(), TextColor.PURPLE);
+        return Buff.Compute(buffs_, posStatus_);
+    }
     public List<Buff> GetBuffList()
     {
         return buffs_;
@@ -78,6 +129,11 @@ public class PadGrid
     public void AddBuff(Buff buff)
     {
         buffs_.Add(buff);
+        // if (!Empty() && GetLevel() <= 0)
+        // { 
+        //     Log.TestLine(GetChess().Name + " Dead Level: " + GetLevel().ToString() + "\nstatus:" + GetGridStatus(), TextColor.PURPLE);
+        //     Reset();
+        // }
         if (property_ != null)
         {
             if (neverBuffed_)
@@ -87,7 +143,7 @@ public class PadGrid
             }
         }
         else
-        { 
+        {
             neverBuffed_ = true;
         }
 
@@ -147,13 +203,20 @@ public struct Buff
         this.scope = scope;
         this.inputerType = inputerType;
     }
-    public static int Compute(List<Buff> list, InputerType inputerType)
+    public Buff(Buff buff)
+    {
+        this.id = buff.id;
+        this.value = buff.value;
+        this.scope = buff.scope;
+        this.inputerType = buff.inputerType;
+    }
+    public static int Compute(List<Buff> list, ChessPosStatus posStatus)
     {
         int result = 0;
         foreach (var buff in list)
         {
             // Log.TestLine(inputerType + " buff.scope: " + buff.scope + " buff.inputerType: " + buff.inputerType);
-            if (inputerType == InputerType.PLAYER)
+            if (posStatus == ChessPosStatus.OCCUPIED_FRIEND)
             {
                 if (buff.scope == EffectScope.DOTOALL)
                 {
@@ -168,7 +231,7 @@ public struct Buff
                     result += buff.value;
                 }
             }
-            else
+            else if (posStatus == ChessPosStatus.OCCUPIED_ENEMY)
             {
                 if (buff.scope == EffectScope.DOTOALL)
                 {

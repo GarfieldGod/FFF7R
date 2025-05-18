@@ -61,9 +61,11 @@ public class Log {
     }
 }
 
-public static class Utils {
-    public static List<List<int>> NewEmpty2DList(int lengh, int height) {
-        List<List<int>> result = new List<List<int>> {};
+public static class Utils
+{
+    public static List<List<int>> NewEmpty2DList(int lengh, int height)
+    {
+        List<List<int>> result = new List<List<int>> { };
         for (int x = 0; x < height; x++)
         {
             List<int> line = new List<int>();
@@ -80,7 +82,8 @@ public static class Utils {
         new List<int> { 0, 0, 0, 0, 0 },
         new List<int> { 0, 0, 0, 0, 0 },
     };
-    public static List<List<List<int>>> DeepCopy3DList(List<List<List<int>>> original) {
+    public static List<List<List<int>>> DeepCopy3DList(List<List<List<int>>> original)
+    {
         List<List<List<int>>> result = original
         .Select(outerList => outerList
             .Select(innerList => new List<int>(innerList))
@@ -88,20 +91,26 @@ public static class Utils {
         .ToList();
         return result;
     }
-    public static List<List<int>> DeepCopy2DList(List<List<int>> original) {
+    public static List<List<int>> DeepCopy2DList(List<List<int>> original)
+    {
         List<List<int>> result = original.Select(innerList => new List<int>(innerList)).ToList();
         return result;
     }
-    public static List<List<int>> Compose2DList(List<List<int>> ListA, List<List<int>> ListB) {
-        if (ListA.Count == 0 || ListB.Count == 0 || ListA.Count != ListB.Count) {
+    public static List<List<int>> Compose2DList(List<List<int>> ListA, List<List<int>> ListB)
+    {
+        if (ListA.Count == 0 || ListB.Count == 0 || ListA.Count != ListB.Count)
+        {
             return null;
         }
-        if (ListA[0].Count == 0 || ListB[0].Count == 0 || ListA[0].Count != ListB[0].Count) {
+        if (ListA[0].Count == 0 || ListB[0].Count == 0 || ListA[0].Count != ListB[0].Count)
+        {
             return null;
         }
         List<List<int>> result = DeepCopy2DList(ListA);
-        for(int i = 0; i < result.Count; i++) {
-            for(int j = 0; j < result[0].Count; j++) {
+        for (int i = 0; i < result.Count; i++)
+        {
+            for (int j = 0; j < result[0].Count; j++)
+            {
                 result[i][j] += ListB[i][j];
             }
         }
@@ -109,15 +118,19 @@ public static class Utils {
     }
     public static List<List<List<Buff>>> DeepCopy(this List<List<List<Buff>>> original)
     {
-        if (original == null) {
+        if (original == null)
+        {
             return null;
         }
         var deepCopiedList = new List<List<List<Buff>>>();
-        foreach (var secondLevelList in original) {
+        foreach (var secondLevelList in original)
+        {
             var secondLevelCopiedList = new List<List<Buff>>();
-            foreach (var thirdLevelList in secondLevelList) {
+            foreach (var thirdLevelList in secondLevelList)
+            {
                 var thirdLevelCopiedList = new List<Buff>();
-                foreach (var buff in thirdLevelList) {
+                foreach (var buff in thirdLevelList)
+                {
                     var copiedBuff = new Buff(buff.id, buff.value, buff.scope, buff.inputerType);
                     thirdLevelCopiedList.Add(copiedBuff);
                 }
@@ -127,16 +140,39 @@ public static class Utils {
         }
         return deepCopiedList;
     }
+    public static List<List<PadGrid>> DeepCopy(this List<List<PadGrid>> original)
+    {
+        if (original == null)
+        {
+            return null;
+        }
+        var deepCopiedList = new List<List<PadGrid>>();
+        foreach (var secondLevelList in original)
+        {
+            var secondLevelCopiedList = new List<PadGrid>();
+            foreach (var padGrid in secondLevelList)
+            {
+                var newPadGrid = new PadGrid(padGrid);
+                secondLevelCopiedList.Add(newPadGrid);
+            }
+            deepCopiedList.Add(secondLevelCopiedList);
+        }
+        return deepCopiedList;
+    }
     public static List<List<Chess>> DeepCopy(this List<List<Chess>> original)
     {
-        if (original == null) {
+        if (original == null)
+        {
             return null;
         }
         var deepCopiedList = new List<List<Chess>>();
-        foreach (var secondLevelList in original) {
+        foreach (var secondLevelList in original)
+        {
             var secondLevelCopiedList = new List<Chess>();
-            foreach (var chess in secondLevelList) {
-                if (chess == null) {
+            foreach (var chess in secondLevelList)
+            {
+                if (chess == null)
+                {
                     secondLevelCopiedList.Add(null);
                     continue;
                 }
@@ -149,13 +185,16 @@ public static class Utils {
     }
     public static List<List<bool>> DeepCopy(this List<List<bool>> original)
     {
-        if (original == null) {
+        if (original == null)
+        {
             return null;
         }
         var deepCopiedList = new List<List<bool>>();
-        foreach (var secondLevelList in original) {
+        foreach (var secondLevelList in original)
+        {
             var secondLevelCopiedList = new List<bool>();
-            foreach (var chess in secondLevelList) {
+            foreach (var chess in secondLevelList)
+            {
                 secondLevelCopiedList.Add(chess);
             }
             deepCopiedList.Add(secondLevelCopiedList);
@@ -181,6 +220,31 @@ public static class Utils {
             return input.Substring(0, maxLength);
         }
         return input.PadRight(maxLength, ' ');
+    }
+    public static ChessPosStatus Reverse(ChessPosStatus posStatus)
+    {
+        switch (posStatus)
+        {
+            case ChessPosStatus.LEVEL_ONE_FRIEND:
+            case ChessPosStatus.LEVEL_TWO_FRIEND:
+            case ChessPosStatus.LEVEL_THREE_FRIEND:
+                posStatus = (ChessPosStatus)((int)posStatus + (int)ChessPosStatus.EMPTY);
+                break;
+            case ChessPosStatus.LEVEL_ONE_ENEMY:
+            case ChessPosStatus.LEVEL_TWO_ENEMY:
+            case ChessPosStatus.LEVEL_THREE_ENEMY:
+                posStatus = (ChessPosStatus)((int)posStatus - (int)ChessPosStatus.EMPTY);
+                break;
+            case ChessPosStatus.OCCUPIED_FRIEND:
+                posStatus = ChessPosStatus.OCCUPIED_ENEMY;
+                break;
+            case ChessPosStatus.OCCUPIED_ENEMY:
+                posStatus = ChessPosStatus.OCCUPIED_FRIEND;
+                break;
+            default:
+                break;
+        }
+        return posStatus;
     }
 }
 

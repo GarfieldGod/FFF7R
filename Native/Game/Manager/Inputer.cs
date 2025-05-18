@@ -91,6 +91,7 @@ public class Inputer
         input_ = input;
 
         ChessPad tempChessPad = GetChessPad().DeepCopy();
+        tempChessPad.SetChess(input.pos, input_.chess);
         DoPosEffect(input, tempChessPad);
         DoCardEffcet(input, tempChessPad, inputerType_);
 
@@ -105,12 +106,6 @@ public class Inputer
     }
     public void CommitInput()
     {
-        ChessPad tempChessPad = GetChessPad().DeepCopy();
-        List<List<Chess>> chesses = tempChessPad.GetChessMap();
-        chesses[input_.pos.x][input_.pos.y] = input_.chess;
-        tempChessPad.SetChessMap(chesses);
-
-        chessPad_.Copy(GetChessPadByType(tempChessPad));
         originChessPad_ = new ChessPad(chessPad_.GetSize());
     }
 
@@ -149,32 +144,32 @@ public class Inputer
 
         // Do Self
         Buff selfBuff = new Buff(id, level, scope, inputerType);
-        chessPad.AddBuff(input.pos, selfBuff);
+        chessPad.AddBuff(input.pos, selfBuff, inputerType);
 
         // Do Others
+        List<Tuple<Int2D, int>> tasks = CardEffect.ParseCardEffect(input, chessPad);
+        List<Tuple<Int2D, int>> vaildTasks = new List<Tuple<Int2D, int>>();
         switch (input.chess.GetChessProperty().CardEffects.Item2)
         {
             case EffectCondition.ON_PLAYED:
-                List<Tuple<Int2D, int>> onPlayedTasks = CardEffect.ParseCardEffect(input, chessPad);
                 List<List<Chess>> chessMap = chessPad.GetChessMap();
-                foreach (var task in onPlayedTasks)
+                foreach (var task in tasks)
                 {
                     if (chessMap[task.Item1.x][task.Item1.y] != null)
                     {
                         id = chessMap[task.Item1.x][task.Item1.y].GetChessProperty().Name + "_X_" + task.Item1.x.ToString() + "_Y_" + task.Item1.y.ToString();
                         int value = task.Item2;
                         Buff buff = new Buff(id, value, scope, inputerType);
-                        chessPad.AddBuff(task.Item1, buff);
+                        chessPad.AddBuff(task.Item1, buff, inputerType);
                     }
                 }
                 break;
             case EffectCondition.ON_POSITION:
-                List<Tuple<Int2D, int>> onPositionTasks = CardEffect.ParseCardEffect(input, chessPad);
-                foreach (var task in onPositionTasks)
+                foreach (var task in tasks)
                 {
                     int value = task.Item2;
                     Buff buff = new Buff(id, value, scope, inputerType);
-                    chessPad.AddBuff(task.Item1, buff);
+                    chessPad.AddBuff(task.Item1, buff, inputerType);
                 }
                 break;
             case EffectCondition.Frist_Buffed: break;

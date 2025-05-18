@@ -1,18 +1,21 @@
 using System.Drawing;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.VisualBasic;
 
 public class ChessPad
 {
     private Int2D size_;
-    protected List<List<PadGrid>> padGrids_ = new List<List<PadGrid>> { };
+    private List<List<PadGrid>> padGrids_ = new List<List<PadGrid>> { };
+    private Dictionary<Int2D, PadGrid> padGridsposMap_ = new Dictionary<Int2D, PadGrid>();
     public ChessPad(int x, int y)
     {
         size_ = new Int2D(x, y);
-        padGrids_ = InitGridMap(x, y);
+        InitGridMap(x, y);
     }
     public ChessPad(Int2D size)
     {
         size_ = new Int2D(size.x, size.y);
-        padGrids_ = InitGridMap(size.x, size.y);
+        InitGridMap(size.x, size.y);
     }
     public ChessPad(List<List<PadGrid>> padGrids)
     {
@@ -25,23 +28,23 @@ public class ChessPad
     }
     public ChessPad DeepCopy()
     {
-        var result = new ChessPad(GetSize().x, GetSize().y);
-        result.SetGridStatusMap(Utils.DeepCopy2DList(GetGridStatusMap()));
-        result.SetChessMap(Utils.DeepCopy(GetChessMap()));
-        result.SetBuffsMap(Utils.DeepCopy(GetBuffsMap()));
-        result.SetGridBackUpMap(Utils.DeepCopy2DList(GetGridBackUp()));
-        result.SetBuffStatus(Utils.DeepCopy(GetBuffStatus()));
+        var result = new ChessPad(Utils.DeepCopy(GetGridMap()));
         return result;
     }
     public static ChessPad Reverse(ChessPad originalChessPad)
     {
-        var result = new ChessPad(originalChessPad.GetSize().x, originalChessPad.GetSize().y);
-        result.SetGridStatusMap(Rival.GetChessPosStatusInRivalView(originalChessPad.GetGridStatusMap()));
-        result.SetChessMap(Rival.GetChessMapInRivalView(originalChessPad.GetChessMap()));
-        result.SetBuffsMap(Rival.GetStayBuffMapInRivalView(originalChessPad.GetBuffsMap()));
-        result.SetGridBackUpMap(Rival.GetChessPosStatusInRivalView(originalChessPad.GetGridBackUp()));
-        result.SetBuffStatus(Rival.GetBuffStatusInRivalView(originalChessPad.GetBuffStatus()));
-        return result;
+        var temp = originalChessPad.DeepCopy();
+        var result = new List<List<PadGrid>>();
+        foreach (var line in temp.GetGridMap())
+        {
+            line.Reverse();
+            for(int i = 0; i < line.Count; i++)
+            {
+                line[i] = line[i].Reverse();
+            }
+            result.Add(line);
+        }
+        return new ChessPad(result);
     }
     public List<List<PadGrid>> GetGridMap()
     {
@@ -100,21 +103,15 @@ public class ChessPad
         }
         return result;
     }
-    public void SetChessMap(List<List<Chess>> src)
+    public void SetChess(Int2D pos, Chess src)
     {
-        for (int x = 0; x < padGrids_.Count; x++)
+        if (src != null)
         {
-            for (int y = 0; y < padGrids_[0].Count; y++)
-            {
-                if (src[x][y] != null)
-                {
-                    padGrids_[x][y].SetChess(src[x][y].GetChessProperty());
-                }
-                else
-                {
-                    padGrids_[x][y].SetChess(null);
-                }
-            }
+            padGrids_[pos.x][pos.y].SetChess(src.GetChessProperty());
+        }
+        else
+        {
+            padGrids_[pos.x][pos.y].SetChess(null);
         }
     }
     public List<List<int>> GetCardLevelMapInInputerType(InputerType inputerType)
@@ -124,7 +121,7 @@ public class ChessPad
         {
             for (int y = 0; y < stayBuffMapResult[0].Count; y++)
             {
-                stayBuffMapResult[x][y] = Buff.Compute(padGrids_[x][y].GetBuffList(), inputerType);
+                stayBuffMapResult[x][y] = Buff.Compute(padGrids_[x][y].GetBuffList(), inputerType == InputerType.PLAYER ? ChessPosStatus.OCCUPIED_FRIEND : ChessPosStatus.OCCUPIED_ENEMY);
             }
         }
         return stayBuffMapResult;
@@ -136,14 +133,9 @@ public class ChessPad
         {
             for (int y = 0; y < stayBuffMapResult[0].Count; y++)
             {
-                // Log.TestLine("x : "+ x +" y: "+ y + " buffCount: " + stayBuffMap_[x][y].Count);
                 ChessPosStatus chessPosStatus = padGrids_[x][y].GetGridStatus();
-                int buffValue = 0;
-                switch (chessPosStatus)
-                {
-                    case ChessPosStatus.OCCUPIED_FRIEND: buffValue = Buff.Compute(padGrids_[x][y].GetBuffList(), InputerType.PLAYER); break;
-                    case ChessPosStatus.OCCUPIED_ENEMY: buffValue = Buff.Compute(padGrids_[x][y].GetBuffList(), InputerType.RIVAL); break;
-                }
+                int buffValue = Buff.Compute(padGrids_[x][y].GetBuffList(), chessPosStatus);
+                Log.TestLine("x : "+ x +" y: "+ y + " buffValue: " + buffValue);
                 stayBuffMapResult[x][y] = buffValue;
             }
         }
@@ -211,9 +203,10 @@ public class ChessPad
             }
         }
     }
-    public bool AddBuff(Int2D pos, Buff buff)
+    public bool AddBuff(Int2D pos, Buff buff, InputerType inputerType)
     {
-        padGrids_[pos.x][pos.y].AddBuff(buff);
+        PadGrid padGrid = padGrids_[pos.x][pos.y];
+        padGrid.AddBuff(buff);
         return true;
     }
     public void RestPos(Int2D pos)
@@ -256,7 +249,7 @@ public class ChessPad
     }
     public void InitStandard()
     {
-        padGrids_ = InitGridMap(3, 5);
+        InitGridMap(3, 5);
         var chessGridStatus = new List<List<int>>{
             new List<int> { 1, 10, 10, 10, 11 },
             new List<int> { 1, 10, 10, 10, 11 },
@@ -265,7 +258,7 @@ public class ChessPad
         SetGridStatusMap(chessGridStatus);
         SetGridBackUpMap(chessGridStatus);
     }
-    public static List<List<PadGrid>> InitGridMap(int height, int lengh)
+    public void InitGridMap(int height, int lengh)
     {
         List<List<PadGrid>> padGrids = new List<List<PadGrid>> { };
         for (int x = 0; x < height; x++)
@@ -273,11 +266,12 @@ public class ChessPad
             List<PadGrid> line = new List<PadGrid>();
             for (int y = 0; y < lengh; y++)
             {
-                PadGrid padGrid = new PadGrid();
+                PadGrid padGrid = new PadGrid(new Int2D(x, y));
+                // padGridsposMap_.Add(new Int2D(x, y), padGrid);
                 line.Add(padGrid);
             }
             padGrids.Add(line);
         }
-        return padGrids;
+        padGrids_ = padGrids;
     }
 }

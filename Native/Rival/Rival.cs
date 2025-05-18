@@ -91,6 +91,8 @@ public class Rival
         //             var buff = buffs[z];
         //             if (buff.inputerType == InputerType.PLAYER) buff.inputerType = InputerType.RIVAL;
         //             else if (buff.inputerType == InputerType.RIVAL) buff.inputerType = InputerType.RIVAL;
+        //             if (buff.scope == EffectScope.FRIEND_ONLY) buff.scope = EffectScope.ENEMY_ONLY;
+        //             else if (buff.scope == EffectScope.ENEMY_ONLY) buff.scope = EffectScope.FRIEND_ONLY;
         //             buffs[z] = buff;
         //         }
         //     }
@@ -174,6 +176,20 @@ public class Rival
         }
         return result;
     }
+
+    // public static List<List<PadGrid>> GetPadGridsInRivalView(List<List<PadGrid>> padGrids) {
+    //     List<List<PadGrid>> result = new List<List<PadGrid>>();
+    //     foreach (var line in padGrids) {
+    //         List<PadGrid> reversedLine = new List<PadGrid>{};
+    //         for (int i = line.Count; i >= 0; i--)
+    //         {
+    //             PadGrid newPadGrid = new PadGrid(line[i]);
+    //             reversedLine.Add(newPadGrid);
+    //         }
+    //         result.Add(reversedLine);
+    //     }
+    //     return result;
+    // }
 
     public static List<Tuple<Int2D, int>> GetAllVaildChessGrids(List<Chess> chessInHand, List<List<int>> chessStatus)
     {
