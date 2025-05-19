@@ -215,17 +215,7 @@ public class ChessPad
         PadGrid padGrid = padGrids_[pos.x][pos.y];
         padGrid.AddBuff(buff);
         CheckDead(padGrid);
-        if (!padGrid.Empty())
-        {
-            if (padGrid.GetLevelWithoutSelf() != 0 && !padGrid.Empty())
-            {
-                Log.TestLine("Frist_Buffed or Frist_Debuffed", TextColor.PURPLE);
-                padGrid.SetBuffStatus(false);
-                ChessProperty property = padGrid.GetChess();
-                if (property.CardEffects != null && (property.CardEffects.Item2 == EffectCondition.Frist_Buffed || property.CardEffects.Item2 == EffectCondition.Frist_Debuffed))
-                    return true;
-            }
-        }
+        CheckFristBuffed(padGrid);
         return false;
     }
     public void RestPos(Int2D pos)
@@ -233,10 +223,54 @@ public class ChessPad
         RemoveBuffs(padGrids_[pos.x][pos.y].GetID());
         padGrids_[pos.x][pos.y].Reset();
     }
+    public void CheckFristBuffed(PadGrid padGrid) { 
+        if (!padGrid.Empty())
+        {   ChessProperty property = padGrid.GetChess();
+            if (property.CardEffects == null) return;
+            int deBuffValue = padGrid.GetDebuffValue();
+            int buffValue = padGrid.GetBuffValue();
+            if(deBuffValue != 0 || buffValue != 0) padGrid.SetBuffStatus(false);
+            if (buffValue > 0 && property.CardEffects.Item2 == EffectCondition.Frist_Buffed)
+            {
+                Log.TestLine("Frist_Buffed", TextColor.PURPLE);
+                EffectTrrigger(padGrid.GetPos());
+            } else if (property.CardEffects.Item2 == EffectCondition.Frist_Debuffed && deBuffValue < 0){ 
+                Log.TestLine("Frist_Debuffed", TextColor.PURPLE);
+                EffectTrrigger(padGrid.GetPos());
+            }
+        }
+    }
+    public void EffectTrrigger(Int2D src)
+    {
+        Log.TestLine("EffectTrrigger On", TextColor.RED);
+        List<List<PadGrid>> gridMap = GetGridMap();
+        ChessPosStatus status = gridMap[src.x][src.y].GetGridStatus();
+        InputerType inputerType = status == ChessPosStatus.OCCUPIED_FRIEND ? InputerType.PLAYER : InputerType.RIVAL;
+        ChessProperty property = gridMap[src.x][src.y].GetChess();
+        if (property == null) return;
+        EffectScope scope = property.CardEffects.Item1;
+        EffectCondition condition = property.CardEffects.Item2;
+        Input input = new Input(src, property);
+        List<Tuple<Int2D, int>> tasks = CardEffect.ParseCardEffect(input, this);
+        if (condition == EffectCondition.Frist_Buffed || condition == EffectCondition.Frist_Debuffed)
+        {
+            foreach (var dst in tasks)
+            {
+                if (!gridMap[dst.Item1.x][dst.Item1.y].Empty())
+                {
+                    string id = gridMap[dst.Item1.x][dst.Item1.y].GetChess().Name + "_X_" + dst.Item1.x.ToString() + "_Y_" + dst.Item1.y.ToString();
+                    int value = dst.Item2;
+                    Buff buff = new Buff(src, id, value, scope, inputerType);
+                    AddBuff(dst.Item1, buff, inputerType);
+                }
+            }
+        }
+    }
     public void CheckDead(PadGrid padGrid)
     {
         if (!padGrid.Empty() && padGrid.GetLevel() <= 0)
         {
+
             RestPos(padGrid.GetPos());
             foreach (var line in padGrids_)
             {

@@ -62,7 +62,49 @@ namespace Test
         }
     }
 
-    public class TestGame : Game
+    public class TestCase
+    {
+        protected TestSuite testSuite_;
+        protected ChessPad initChessPad_;
+        public bool Run()
+        {
+            initChessPad_ = InitChessPad();
+            testSuite_ = new TestSuite(initChessPad_);
+            InitSteps();
+            return testSuite_.Run();
+        }
+        public virtual ChessPad InitChessPad()
+        {
+            ChessPad initChessPad = new ChessPad(3, 5);
+            initChessPad.InitStandard();
+            return initChessPad;
+        }
+        public virtual void AddStep(InputerType inputerType, int index, string cardCode, List<List<int>> expectPad1, List<List<int>> expectPad2 = null)
+        {
+            testSuite_.AddStep(new Step(
+                inputerType,
+                index, cardCode,
+                new ExpectPad(
+                    expectPad1,
+                    expectPad2
+                )
+            ));
+        }
+        public virtual void InitSteps()
+        {
+        }
+        protected readonly int O = 10;
+        protected readonly int F1 = 1;
+        protected readonly int F2 = 2;
+        protected readonly int F3 = 3;
+        protected readonly int E1 = 11;
+        protected readonly int E2 = 12;
+        protected readonly int E3 = 13;
+        protected readonly int FF = 14;
+        protected readonly int EE = 15;
+    }
+
+public class TestGame : Game
     {
         List<Step> stepList_;
         public bool TestResult = false;
@@ -291,47 +333,5 @@ namespace Test
             }
             return false;
         }
-    }
-
-    public class TestCase
-    {
-        protected TestSuite testSuite_;
-        protected ChessPad initChessPad_;
-        public bool Run()
-        {
-            initChessPad_ = InitChessPad();
-            testSuite_ = new TestSuite(initChessPad_);
-            InitSteps();
-            return testSuite_.Run();
-        }
-        public virtual ChessPad InitChessPad()
-        {
-            ChessPad initChessPad = new ChessPad(3, 5);
-            initChessPad.InitStandard();
-            return initChessPad;
-        }
-        public virtual void AddStep(InputerType inputerType, int index, string cardCode, List<List<int>> expectPad1, List<List<int>> expectPad2 = null)
-        {
-            testSuite_.AddStep(new Step(
-                inputerType,
-                index, cardCode,
-                new ExpectPad(
-                    expectPad1,
-                    expectPad2
-                )
-            ));
-        }
-        public virtual void InitSteps()
-        {
-        }
-        protected readonly int O = 10;
-        protected readonly int F1 = 1;
-        protected readonly int F2 = 2;
-        protected readonly int F3 = 3;
-        protected readonly int E1 = 11;
-        protected readonly int E2 = 12;
-        protected readonly int E3 = 13;
-        protected readonly int FF = 14;
-        protected readonly int EE = 15;
     }
 }

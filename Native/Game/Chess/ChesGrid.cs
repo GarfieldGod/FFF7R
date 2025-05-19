@@ -124,6 +124,14 @@ public class PadGrid
         // Log.TestLine(GetID() + " buffCount: " + buffs_.Count(), TextColor.PURPLE);
         return Buff.Compute(buffs_, posStatus_, pos_);
     }
+    public int GetDebuffValue()
+    {
+        return Buff.ComputeBuffOrDebuff(buffs_, posStatus_, pos_, true);
+    }
+    public int GetBuffValue()
+    {
+        return Buff.ComputeBuffOrDebuff(buffs_, posStatus_, pos_, false);
+    }
     public List<Buff> GetBuffList()
     {
         return buffs_;
@@ -198,6 +206,46 @@ public struct Buff
         {
             if (buff.source == source) continue; 
             // Log.TestLine(inputerType + " buff.scope: " + buff.scope + " buff.inputerType: " + buff.inputerType);
+            if (posStatus == ChessPosStatus.OCCUPIED_FRIEND)
+            {
+                if (buff.scope == EffectScope.DOTOALL)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.ENEMY_ONLY && buff.inputerType == InputerType.RIVAL)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.FRIEND_ONLY && buff.inputerType == InputerType.PLAYER)
+                {
+                    result += buff.value;
+                }
+            }
+            else if (posStatus == ChessPosStatus.OCCUPIED_ENEMY)
+            {
+                if (buff.scope == EffectScope.DOTOALL)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.ENEMY_ONLY && buff.inputerType == InputerType.PLAYER)
+                {
+                    result += buff.value;
+                }
+                else if (buff.scope == EffectScope.FRIEND_ONLY && buff.inputerType == InputerType.RIVAL)
+                {
+                    result += buff.value;
+                }
+            }
+        }
+        return result;
+    }
+    public static int ComputeBuffOrDebuff(List<Buff> list, ChessPosStatus posStatus, Int2D source, bool deBuff)
+    {
+        int result = 0;
+        foreach (var buff in list)
+        {
+            if (deBuff ? buff.value > 0 : buff.value < 0) continue;
+            if (buff.source == source) continue; 
             if (posStatus == ChessPosStatus.OCCUPIED_FRIEND)
             {
                 if (buff.scope == EffectScope.DOTOALL)

@@ -151,7 +151,7 @@ public class Inputer
         Buff selfBuff = new Buff(input.pos, id, level, scope, inputerType);
         chessPad.GetGridMap()[input.pos.x][input.pos.y].SetID(id);
         
-        TrriggerEffect(chessPad.AddBuff(input.pos, selfBuff, inputerType), input.pos, chessPad);
+        chessPad.AddBuff(input.pos, selfBuff, inputerType);
 
         // Do Others
         List<Tuple<Int2D, int>> tasks = CardEffect.ParseCardEffect(input, chessPad);
@@ -166,7 +166,7 @@ public class Inputer
                         id = chessMap[task.Item1.x][task.Item1.y].GetChessProperty().Name + "_X_" + task.Item1.x.ToString() + "_Y_" + task.Item1.y.ToString();
                         int value = task.Item2;
                         Buff buff = new Buff(input.pos, id, value, scope, inputerType);
-                        TrriggerEffect(chessPad.AddBuff(task.Item1, buff, inputerType), task.Item1, chessPad);
+                        chessPad.AddBuff(task.Item1, buff, inputerType);
                     }
                 }
                 break;
@@ -175,7 +175,7 @@ public class Inputer
                 {
                     int value = task.Item2;
                     Buff buff = new Buff(input.pos, id, value, scope, inputerType);
-                    TrriggerEffect(chessPad.AddBuff(task.Item1, buff, inputerType), task.Item1, chessPad);
+                    chessPad.AddBuff(task.Item1, buff, inputerType);
                 }
                 break;
             case EffectCondition.Frist_Buffed:
@@ -199,52 +199,5 @@ public class Inputer
             case EffectCondition.CoverInput: break;
             case EffectCondition.LineWin: break;
         }
-        // RemoveDead(chessPad, inputerType);
     }
-
-    public void TrriggerEffect(bool ifDoEffect, Int2D pos, ChessPad chessPad)
-    {
-        if (!ifDoEffect) return;
-        Log.TestLine("TrriggerEffect", TextColor.RED);
-        List<List<PadGrid>> gridMap = chessPad.GetGridMap();
-        ChessPosStatus status = gridMap[pos.x][pos.y].GetGridStatus();
-        ChessProperty property = gridMap[pos.x][pos.y].GetChess();
-        if (property == null) Log.TestLine("property == null", TextColor.PURPLE);
-        EffectScope scope = property.CardEffects.Item1;
-        Input input = new Input(pos, property);
-        InputerType inputerType = status == ChessPosStatus.OCCUPIED_FRIEND ? InputerType.PLAYER : InputerType.RIVAL;
-        if (property.CardEffects.Item2 == EffectCondition.Frist_Buffed || property.CardEffects.Item2 == EffectCondition.Frist_Debuffed)
-        {
-            List<Tuple<Int2D, int>> tasks = CardEffect.ParseCardEffect(input, chessPad);
-            foreach (var task in tasks)
-            {
-                Log.TestLine("task.Item1.x: " + task.Item1.x + " task.Item1.y: " + task.Item1.y + " value: " + task.Item2, TextColor.PURPLE);
-                if (!gridMap[task.Item1.x][task.Item1.y].Empty())
-                {
-                    string id = gridMap[task.Item1.x][task.Item1.y].GetChess().Name + "_X_" + task.Item1.x.ToString() + "_Y_" + task.Item1.y.ToString();
-                    int value = task.Item2;
-                    Buff buff = new Buff(pos, id, value, scope, inputerType);
-                    TrriggerEffect(chessPad.AddBuff(task.Item1, buff, inputerType), task.Item1, chessPad);
-                }
-            }
-        }
-    }
-
-    // static void RemoveDead(ChessPad tempChessPad, InputerType inputerType)
-    // {
-    //     var gridLevelMap = tempChessPad.GetGridStatusMap();
-    //     List<Int2D> result = new List<Int2D>();
-    //     for (int i = 0; i < gridLevelMap.Count; i++)
-    //     {
-    //         for (int j = 0; j < gridLevelMap[0].Count; j++)
-    //         {
-    //             ChessPosStatus chessPosStatus = (ChessPosStatus)gridLevelMap[i][j];
-    //             if (chessPosStatus == ChessPosStatus.OCCUPIED_FRIEND && tempChessPad.GetCardLevelMapInInputerType(inputerType)[i][j] <= 0)
-    //             {
-    //                 result.Add(new Int2D(i, j));
-    //             }
-    //         }
-    //     }
-    //     tempChessPad.RestPos(result);
-    // }
 }
