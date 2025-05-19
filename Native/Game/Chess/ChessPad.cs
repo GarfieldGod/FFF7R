@@ -242,7 +242,7 @@ public class ChessPad
     }
     public void EffectTrrigger(Int2D src)
     {
-        Log.TestLine("EffectTrrigger On", TextColor.RED);
+        Log.TestLine("EffectTrrigger On", TextColor.BLACK);
         List<List<PadGrid>> gridMap = GetGridMap();
         ChessPosStatus status = gridMap[src.x][src.y].GetGridStatus();
         InputerType inputerType = status == ChessPosStatus.OCCUPIED_FRIEND ? InputerType.PLAYER : InputerType.RIVAL;
@@ -273,7 +273,6 @@ public class ChessPad
                 if (!padGrid.Empty() && padGrid.GetLevel() <= 0)
                 {
                     hasDead = true;
-                    TestGame.ShowErrorDiff(GetCardLevelResult());
                     Log.TestLine("Dead: " + padGrid.GetID() + " Name: " + padGrid.GetChess().Name, TextColor.PURPLE);
                     DeadEffect(padGrid);
                     RestPos(padGrid.GetPos());
@@ -300,7 +299,7 @@ public class ChessPad
     }
     public bool RemoveBuffs(string id)
     {
-        Log.TestLine("---RemoveBuffs--- " + id);
+        // Log.TestLine("---RemoveBuffs--- " + id);
         for (int x = 0; x < padGrids_.Count; x++)
         {
             for (int y = 0; y < padGrids_[x].Count; y++)
@@ -309,10 +308,10 @@ public class ChessPad
                 List<Buff> buffsToRemove = new List<Buff>();
                 for (int z = 0; z < buffs.Count; z++)
                 {
-                    Log.TestLine("FoundBuffs: " + buffs[z].id + " value: " + buffs[z].value);
+                    // Log.TestLine("FoundBuffs: " + buffs[z].id + " value: " + buffs[z].value);
                     if (buffs[z].id == id)
                     {
-                        Log.TestLine("__RemoveBuffs: " + buffs[z].id + " value: " + buffs[z].value);
+                        // Log.TestLine("__RemoveBuffs: " + buffs[z].id + " value: " + buffs[z].value);
                         buffsToRemove.Add(buffs[z]);
                     }
                 }

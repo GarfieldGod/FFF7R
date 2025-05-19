@@ -6,11 +6,14 @@ class Program
 {
     static void Main()
     {
-        Test.TestCase1 testCase1 = new Test.TestCase1();
-        testCase1.Run();
+        StartTest();
         // StartConsoleGame();
     }
-
+    static void StartTest()
+    { 
+        Test.TestCase1 testCase1 = new Test.TestCase1();
+        testCase1.Run();
+    }
     static void StartConsoleGame()
     {
         Property.LoadChessProperties();
