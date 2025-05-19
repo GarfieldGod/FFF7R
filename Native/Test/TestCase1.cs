@@ -185,6 +185,34 @@ namespace Test
                 new List<int> { 0,  1,  0 ,  1 ,  0 }
                 }
             );
+            // Step 12
+            AddStep(InputerType.RIVAL,
+                8, "Card041",
+                new List<List<int>>{
+                new List<int> { FF,  FF,  FF,  E2,  EE },
+                new List<int> { F3,  FF,  E2,  EE,  E3 },
+                new List<int> { F3,  FF,  F2,  EE,  E1 }
+                },
+                new List<List<int>>{
+                new List<int> { 2,  1,  2 ,  0 ,  2 },
+                new List<int> { 0,  2,  0 ,  1 ,  0 },
+                new List<int> { 0,  1,  0 ,  1 ,  0 }
+                }
+            );
+            // Step 13
+            AddStep(InputerType.RIVAL,
+                7, "CardTest0",
+                new List<List<int>>{
+                new List<int> { FF,  F1,  F1,  E2,  E1 },
+                new List<int> { F3,  FF,  E2,  E3,  E3 },
+                new List<int> { F3,  FF,  E2,  E1,  E1 }
+                },
+                new List<List<int>>{
+                new List<int> { 1,  0,  0 ,  0 ,  0 },
+                new List<int> { 0,  1,  0 ,  0 ,  0 },
+                new List<int> { 0,  1,  0 ,  0 ,  0 }
+                }
+            );
         }
     }
 }

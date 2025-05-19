@@ -138,6 +138,8 @@ public class Inputer
         {
             Utils.Reverse(effect);
         }
+        var padGrid = chessPad.GetGridMap()[input.pos.x][input.pos.y];
+        padGrid.SetGridBackUp(padGrid.GetGridStatus());
         List<List<int>> tempGridStatus = PosEffect.DoPosEffect(pos, effect, chessPad.GetGridStatusMap(), inputerType);
         chessPad.SetGridStatusMap(tempGridStatus);
     }
@@ -150,7 +152,7 @@ public class Inputer
         // Do Self
         Buff selfBuff = new Buff(input.pos, id, level, scope, inputerType);
         chessPad.GetGridMap()[input.pos.x][input.pos.y].SetID(id);
-        
+
         chessPad.AddBuff(input.pos, selfBuff, inputerType);
 
         // Do Others
@@ -195,5 +197,6 @@ public class Inputer
             case EffectCondition.CoverInput: break;
             case EffectCondition.LineWin: break;
         }
+        chessPad.CheckDead();
     }
 }
