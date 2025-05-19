@@ -11,6 +11,7 @@ public class PadGrid
     private ChessPosStatus posStatusBackUp_ = ChessPosStatus.EMPTY;
     private ChessProperty property_ = null;
     private bool neverBuffed_ = true;
+    private bool neverDeBuffed_ = true;
     private List<Buff> buffs_ = new List<Buff>();
     private string chessId_ = null;
     private Int2D pos_ = new Int2D(-1, -1);
@@ -54,6 +55,7 @@ public class PadGrid
         posStatusBackUp_ = padGrid.GetGridBackUp();
         property_ = padGrid.GetChess();
         neverBuffed_ = padGrid.GetBuffStatus();
+        neverDeBuffed_ = padGrid.GetDeBuffStatus();
         chessId_ = padGrid.GetID();
         buffs_ = new List<Buff>();
         foreach (var buff in padGrid.GetBuffList())
@@ -106,9 +108,21 @@ public class PadGrid
         }
         return neverBuffed_;
     }
+    public bool GetDeBuffStatus()
+    {
+        if (property_ == null)
+        {
+            neverDeBuffed_ = true;
+        }
+        return neverDeBuffed_;
+    }
     public void SetBuffStatus(bool neverBuffed)
     {
         neverBuffed_ = neverBuffed;
+    }
+    public void SetDeBuffStatus(bool neverDeBuffed)
+    {
+        neverDeBuffed_ = neverDeBuffed;
     }
     public int GetLevel()
     {
@@ -157,6 +171,7 @@ public class PadGrid
         Log.TestLine("Reset: " + GetID() + " Level: " + GetLevel().ToString() + " posStatusBackUp_: " + posStatusBackUp_, TextColor.PURPLE);
         posStatus_ = posStatusBackUp_;
         neverBuffed_ = true;
+        neverDeBuffed_ = true;
         property_ = null;
         chessId_ = null;
     }

@@ -225,16 +225,21 @@ public class ChessPad
     }
     public void CheckFristBuffed(PadGrid padGrid) { 
         if (!padGrid.Empty())
-        {   ChessProperty property = padGrid.GetChess();
-            if (property.CardEffects == null) return;
+        {   
             int deBuffValue = padGrid.GetDebuffValue();
             int buffValue = padGrid.GetBuffValue();
-            if(deBuffValue != 0 || buffValue != 0) padGrid.SetBuffStatus(false);
-            if (buffValue > 0 && property.CardEffects.Item2 == EffectCondition.Frist_Buffed)
+            bool neverBuffed = padGrid.GetBuffStatus();
+            bool neverDeBuffed = padGrid.GetDeBuffStatus();
+            if(buffValue != 0) padGrid.SetBuffStatus(false);
+            if(deBuffValue != 0) padGrid.SetDeBuffStatus(false);
+
+            ChessProperty property = padGrid.GetChess();
+            if (property.CardEffects == null) return;
+            if (property.CardEffects.Item2 == EffectCondition.Frist_Buffed && buffValue > 0 && neverBuffed)
             {
                 Log.TestLine("Frist_Buffed", TextColor.PURPLE);
                 EffectTrrigger(padGrid.GetPos());
-            } else if (property.CardEffects.Item2 == EffectCondition.Frist_Debuffed && deBuffValue < 0){ 
+            } else if (property.CardEffects.Item2 == EffectCondition.Frist_Debuffed && deBuffValue < 0 && neverDeBuffed){ 
                 Log.TestLine("Frist_Debuffed", TextColor.PURPLE);
                 EffectTrrigger(padGrid.GetPos());
             }
@@ -270,7 +275,7 @@ public class ChessPad
     {
         if (!padGrid.Empty() && padGrid.GetLevel() <= 0)
         {
-
+            DeadEffect(padGrid);
             RestPos(padGrid.GetPos());
             foreach (var line in padGrids_)
             {
@@ -278,6 +283,15 @@ public class ChessPad
                     CheckDead(padGrids);
                 }
             }
+        }
+    }
+    public void DeadEffect(PadGrid padGrid) {
+        ChessProperty property = padGrid.GetChess();
+        if (property.CardEffects == null) return;
+        if (property.CardEffects.Item2 == EffectCondition.ON_SELF_DEAD)
+        {
+            Log.TestLine("ON_SELF_DEAD", TextColor.PURPLE);
+            EffectTrrigger(padGrid.GetPos());
         }
     }
     public void RestPos(List<Int2D> pos)

@@ -178,12 +178,8 @@ public class Inputer
                     chessPad.AddBuff(task.Item1, buff, inputerType);
                 }
                 break;
-            case EffectCondition.Frist_Buffed:
-                // gridMap[input.pos.x][input.pos.y].Effcet += OnRecvEffcet;
-                break;
-            case EffectCondition.Frist_Debuffed:
-                // gridMap[input.pos.x][input.pos.y].Effcet += OnRecvEffcet;
-                break;
+            case EffectCondition.Frist_Buffed: break;
+            case EffectCondition.Frist_Debuffed: break;
             case EffectCondition.LevelFristReach7: break; // BUFFED ONCE S
             case EffectCondition.Num_All: break;
             case EffectCondition.Num_Friend: break;

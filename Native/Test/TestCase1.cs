@@ -171,6 +171,20 @@ namespace Test
                 new List<int> { 0,  0,  0 ,  1 ,  0 }
                 }
             );
+            // Step 11
+            AddStep(InputerType.PLAYER,
+                11, "CardTest0",
+                new List<List<int>>{
+                new List<int> { FF,  FF,  FF,  E1,  EE },
+                new List<int> { F3,  FF,  F2,  E3,  E2 },
+                new List<int> { F3,  FF,  F2,  EE,  E1 }
+                },
+                new List<List<int>>{
+                new List<int> { 2,  1,  2 ,  0 ,  2 },
+                new List<int> { 0,  2,  0 ,  0 ,  0 },
+                new List<int> { 0,  1,  0 ,  1 ,  0 }
+                }
+            );
         }
     }
 }
