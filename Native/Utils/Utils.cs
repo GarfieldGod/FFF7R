@@ -30,7 +30,17 @@ public class Log {
     public static void Clear() {
     #if UNITY_ENGINE
     #else
-        Console.Clear();
+        if (Environment.UserInteractive && Console.In != StreamReader.Null)
+        {
+            try
+            {
+                Console.Clear();
+            }
+            catch (IOException)
+            {
+
+            }
+        }
     #endif
     }
 

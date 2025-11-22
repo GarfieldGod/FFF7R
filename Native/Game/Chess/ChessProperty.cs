@@ -40,7 +40,8 @@ public static class Property {
 #if UNITY_ENGINE
         string path = Path.Combine(Application.streamingAssetsPath, chessPropertiesJsonPath);
 #else
-        string path = chessPropertiesJsonPath;
+        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        string path = Path.Combine(baseDirectory, chessPropertiesJsonPath);
 #endif
         string ChessPropertiesData = System.IO.File.ReadAllText(path);
         ChessProperties_ = JsonConvert.DeserializeObject<List<ChessProperty>>(ChessPropertiesData);

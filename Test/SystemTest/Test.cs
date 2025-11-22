@@ -1,11 +1,14 @@
+using Xunit;
+
 namespace Test
 {
-    class SystemTest
+    public class SystemTest
     {
-        public static bool Run()
+        [Fact]
+        public static void Run()
         {
             Test.TestCase1 testCase1 = new Test.TestCase1();
-            return testCase1.Run();
+            Assert.True(testCase1.Run(), "系统测试失败");
         }
     }
 }
