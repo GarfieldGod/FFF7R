@@ -1,18 +1,14 @@
 using System;
 using System.Collections.Generic;
+using Test;
 
 #if !UNITY_ENGINE
 class Program
 {
     static void Main()
     {
-        StartTest();
+        SystemTest.Run();
         // StartConsoleGame();
-    }
-    static void StartTest()
-    { 
-        Test.TestCase1 testCase1 = new Test.TestCase1();
-        testCase1.Run();
     }
     static void StartConsoleGame()
     {
