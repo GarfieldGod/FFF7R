@@ -17,9 +17,9 @@ namespace Test
         }
         public override void InitSteps()
         {
+            IgnoreTurnLimit = true;
             // Step 0
-            AddStep(InputerType.PLAYER,
-                0, "CardTest1",
+            AddStep(PlayerType.PLAYER, "CardTest1", new Int2D(0, 0),
                 new List<List<int>>{
                 new List<int> { FF,  F1,  O ,  O ,  E1 },
                 new List<int> { F2,  O ,  O ,  O ,  E1 },
@@ -32,8 +32,7 @@ namespace Test
                 }
             );
             // Step 1
-            AddStep(InputerType.PLAYER,
-                1, "CardTest1",
+            AddStep(PlayerType.PLAYER, "CardTest1", new Int2D(0, 1),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  F1,  O ,  E1 },
                 new List<int> { F2,  F1,  O ,  O ,  E1 },
@@ -46,8 +45,7 @@ namespace Test
                 }
             );
             // Step 2
-            AddStep(InputerType.RIVAL,
-                4, "CardTest1",
+            AddStep(PlayerType.RIVAL, "CardTest1", new Int2D(0, 4),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  F1,  E1,  EE },
                 new List<int> { F2,  F1,  O ,  O ,  E2 },
@@ -60,8 +58,7 @@ namespace Test
                 }
             );
             // Step 3
-            AddStep(InputerType.PLAYER,
-                2, "CardTest1",
+            AddStep(PlayerType.PLAYER, "CardTest1", new Int2D(0, 2),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  F1,  EE },
                 new List<int> { F2,  F1,  F1,  O ,  E2 },
@@ -74,8 +71,7 @@ namespace Test
                 }
             );
             // Step 4
-            AddStep(InputerType.RIVAL,
-                9, "Card009",
+            AddStep(PlayerType.RIVAL, "Card009", new Int2D(1, 4),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E1,  EE },
@@ -88,8 +84,7 @@ namespace Test
                 }
             );
             // Step 5
-            AddStep(InputerType.RIVAL,
-                14, "CardTest1",
+            AddStep(PlayerType.RIVAL, "CardTest1", new Int2D(2, 4),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E1,  EE },
@@ -102,8 +97,7 @@ namespace Test
                 }
             );
             // Step 6
-            AddStep(InputerType.RIVAL,
-                13, "CardTest0",
+            AddStep(PlayerType.RIVAL, "CardTest0", new Int2D(2, 3),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E2,  EE },
@@ -116,8 +110,7 @@ namespace Test
                 }
             );
             // Step 7
-            AddStep(InputerType.RIVAL,
-                3, "CardTest0",
+            AddStep(PlayerType.RIVAL, "CardTest0", new Int2D(0, 3),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  EE,  E1 },
                 new List<int> { F2,  F1,  F1,  E3,  EE },
@@ -130,8 +123,7 @@ namespace Test
                 }
             );
             // Step 8
-            AddStep(InputerType.RIVAL,
-                4, "CardTest2",
+            AddStep(PlayerType.RIVAL, "CardTest2", new Int2D(0, 4),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E3,  E2 },
@@ -144,8 +136,7 @@ namespace Test
                 }
             );
             // Step 9
-            AddStep(InputerType.PLAYER,
-                6, "CardTest2",
+            AddStep(PlayerType.PLAYER, "CardTest2", new Int2D(1, 1),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F3,  FF,  F2,  E3,  E2 },
@@ -158,8 +149,7 @@ namespace Test
                 }
             );
             // Step 10
-            AddStep(InputerType.PLAYER,
-                11, "CardTest0",
+            AddStep(PlayerType.PLAYER, "CardTest0", new Int2D(2, 1),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F3,  FF,  F2,  E3,  E2 },
@@ -172,8 +162,7 @@ namespace Test
                 }
             );
             // Step 11
-            AddStep(InputerType.PLAYER,
-                11, "CardTest0",
+            AddStep(PlayerType.PLAYER, "CardTest0", new Int2D(2, 1),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F3,  FF,  F2,  E3,  E2 },
@@ -186,8 +175,7 @@ namespace Test
                 }
             );
             // Step 12
-            AddStep(InputerType.RIVAL,
-                8, "Card041",
+            AddStep(PlayerType.RIVAL, "Card041", new Int2D(1, 3),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E2,  EE },
                 new List<int> { F3,  FF,  E2,  EE,  E3 },
@@ -200,8 +188,7 @@ namespace Test
                 }
             );
             // Step 13
-            AddStep(InputerType.RIVAL,
-                7, "CardTest0",
+            AddStep(PlayerType.RIVAL, "CardTest0", new Int2D(1, 2),
                 new List<List<int>>{
                 new List<int> { FF,  F1,  F1,  E2,  E1 },
                 new List<int> { F3,  FF,  E2,  E3,  E3 },

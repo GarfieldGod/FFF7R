@@ -31,13 +31,13 @@ init the test chessboard at the start of the game by override the `ChessPad Init
 
 ### Add test steps
 
-`AddStep(InputerType inputerType, int index, string cardCode, List<List<int>> expectPad1, List<List<int>> expectPad2)`
+`AddStep(PlayerType playerType, int index, string cardCode, List<List<int>> expectPad1, List<List<int>> expectPad2)`
 
 You should use the `AddStep` method inside the `void InitSteps()` method to define the steps for your test case.
 
 #### Parameters Explanation:
 
-* `inputerType`: Indicates who performed the input on the chessboard. It can be either `InputerType.PLAYER` or `InputerType.RIVAL`.
+* `playerType`: Indicates who performed the input on the chessboard. It can be either `PlayerType.PLAYER` or `PlayerType.RIVAL`.
 * `index`: Specifies which grid on the chessboard you want to input to. The range is based on the size of the chessboard.
 * `cardCode`: Specifies which card you want to input. For more information, see `Json/ChessProperties.json`.
 * `expectPad1`: Represents the expected grid levels on the chessboard. It should have the same meaning as the corresponding effects in FF7Rb.
@@ -50,7 +50,7 @@ Create an instance of your test case class and call the `Run()` method to execut
 ### Notes
 
 * Ensure that the `cardCode` matches one of the valid codes defined in `Json/ChessProperties.json`.
-* Ensure that your input is valid. Note that if the `InputerType` is `RIVAL`, the `GridEffect` and `CardEffect` caused by the input will be reversed.
+* Ensure that your input is valid. Note that if the `PlayerType` is `RIVAL`, the `GridEffect` and `CardEffect` caused by the input will be reversed.
 
 ## Console Game
 

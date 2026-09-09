@@ -63,7 +63,7 @@
     ],
     "CardEffects": {
         "Item1": "DOTOALL",
-        "Item2": "Frist_Debuffed",
+        "Item2": "First_DeBuffed",
         "Item3":[
             [0, 0, 0,  0,   0,   0, 0, 0, 0],
             [0, 0, 0,  0,  -2,   0, 0, 0, 0],
@@ -87,7 +87,7 @@
     ],
     "CardEffects": {
         "Item1": "DOTOALL",
-        "Item2": "Frist_Debuffed",
+        "Item2": "First_DeBuffed",
         "Item3":[
             [0, 0, 0,  0,   0,   0, 0, 0, 0],
             [0, 0, 0,  0,  -2,   0, 0, 0, 0],

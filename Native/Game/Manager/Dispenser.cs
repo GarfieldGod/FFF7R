@@ -3,8 +3,28 @@ using System.Collections.Generic;
 
 public class Dispenser
 {
+    public List<Chess> ChessPool => chessPool_;
+    public int Count => chessPool_.Count;
+    private List<Chess> chessPool_;
+
     public Dispenser(List<Chess> chessPool){
         chessPool_ = chessPool;
+    }
+
+    public Chess this[int index]
+    {
+        get
+        {
+            if (index < 0 || index >= chessPool_.Count)
+            {
+                return null;
+            }
+            return chessPool_[index];
+        }
+        set
+        {
+            chessPool_[index] = value;
+        }
     }
 
     public Dispenser(List<string> chessName){
@@ -16,7 +36,6 @@ public class Dispenser
         }
         chessPool_ = chessPool;
     }
-    private List<Chess> chessPool_;
 
     public Chess Dispense() {
         if (chessPool_.Count == 0) {
@@ -27,9 +46,5 @@ public class Dispenser
         Chess chess = chessPool_[randomIndex];
         chessPool_.RemoveAt(randomIndex);
         return chess;
-    }
-
-    public List<Chess> GetChessInChessPool() {
-        return chessPool_;
     }
 }

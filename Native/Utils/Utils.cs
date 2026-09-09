@@ -141,7 +141,7 @@ public static class Utils
                 var thirdLevelCopiedList = new List<Buff>();
                 foreach (var buff in thirdLevelList)
                 {
-                    var copiedBuff = new Buff(buff.source, buff.id, buff.value, buff.scope, buff.inputerType);
+                    var copiedBuff = new Buff(buff.source, buff.value, buff.scope, buff.type);
                     thirdLevelCopiedList.Add(copiedBuff);
                 }
                 secondLevelCopiedList.Add(thirdLevelCopiedList);
@@ -233,31 +233,34 @@ public static class Utils
     }
     public static List<List<int>> Reverse(List<List<int>> list)
     {
-        foreach (var line in list)
+        var newList = new List<List<int>>();
+        foreach (var oldLine in list)
         {
-            line.Reverse();
+            var newLine = new List<int>(oldLine);
+            newLine.Reverse();
+            newList.Add(newLine);
         }
-        return list;
+        return newList;
     }
-    public static ChessPosStatus Reverse(ChessPosStatus posStatus)
+    public static PosStatus Reverse(PosStatus posStatus)
     {
         switch (posStatus)
         {
-            case ChessPosStatus.LEVEL_ONE_FRIEND:
-            case ChessPosStatus.LEVEL_TWO_FRIEND:
-            case ChessPosStatus.LEVEL_THREE_FRIEND:
-                posStatus = (ChessPosStatus)((int)posStatus + (int)ChessPosStatus.EMPTY);
+            case PosStatus.LEVEL_ONE_PLAYER:
+            case PosStatus.LEVEL_TWO_PLAYER:
+            case PosStatus.LEVEL_THREE_PLAYER:
+                posStatus = (PosStatus)((int)posStatus + (int)PosStatus.EMPTY);
                 break;
-            case ChessPosStatus.LEVEL_ONE_ENEMY:
-            case ChessPosStatus.LEVEL_TWO_ENEMY:
-            case ChessPosStatus.LEVEL_THREE_ENEMY:
-                posStatus = (ChessPosStatus)((int)posStatus - (int)ChessPosStatus.EMPTY);
+            case PosStatus.LEVEL_ONE_RIVAL:
+            case PosStatus.LEVEL_TWO_RIVAL:
+            case PosStatus.LEVEL_THREE_RIVAL:
+                posStatus = (PosStatus)((int)posStatus - (int)PosStatus.EMPTY);
                 break;
-            case ChessPosStatus.OCCUPIED_FRIEND:
-                posStatus = ChessPosStatus.OCCUPIED_ENEMY;
+            case PosStatus.OCCUPIED_PLAYER:
+                posStatus = PosStatus.OCCUPIED_RIVAL;
                 break;
-            case ChessPosStatus.OCCUPIED_ENEMY:
-                posStatus = ChessPosStatus.OCCUPIED_FRIEND;
+            case PosStatus.OCCUPIED_RIVAL:
+                posStatus = PosStatus.OCCUPIED_PLAYER;
                 break;
             default:
                 break;
@@ -299,6 +302,11 @@ public struct Int2D
     public override readonly int GetHashCode()
     {
         return x.GetHashCode() ^ y.GetHashCode();
+    }
+
+    public override readonly string ToString()
+    {
+        return $"({x}, {y})";
     }
 }
 

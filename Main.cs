@@ -13,7 +13,7 @@
 //     static void StartConsoleGame()
 //     {
 //         Property.LoadChessProperties();
-//         SingleGameConfig singleGameConfig = new SingleGameConfig(
+//         GameConfig GameConfig = new GameConfig(
 //             1,
 //             new List<string>{
 //                 "CardTest0", "CardTest0", "CardTest0", "CardTest0",
@@ -28,7 +28,7 @@
 //                 "Card009", "Card009", "Card009", "Card009",
 //             }
 //         );
-//         ConsoleGame consoleGame = new ConsoleGame(singleGameConfig);
+//         ConsoleGame consoleGame = new ConsoleGame(GameConfig);
 //         consoleGame.RunGameTurns(30);
 //     }
 // }

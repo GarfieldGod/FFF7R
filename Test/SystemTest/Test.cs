@@ -7,8 +7,9 @@ namespace Test
         [Fact]
         public static void Run()
         {
-            Test.TestCase1 testCase1 = new Test.TestCase1();
-            Assert.True(testCase1.Run(), "系统测试失败");
+            TestSuite test = new TestSuite();
+            test.Add(new TestCase1());
+            Assert.True(test.Run(), "系统测试失败");
         }
     }
 }

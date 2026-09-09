@@ -1,14 +1,16 @@
 static class EffectsParser {
+    // 计算以效果图为中心，有效果的相对位置
     public static List<Tuple<Int2D, int>> ParseEffectsInRelative(List<List<int>> effects, bool ignoreSelf)
     {
         var result = new List<Tuple<Int2D, int>>();
         var midPos = new Int2D((effects.Count - 1) / 2, (effects[0].Count - 1) / 2);
         for (int i = 0; i < effects.Count; i++) {
             for (int j = 0; j < effects[i].Count; j++) {
-                if (effects[i][j] != 0) {
+                int value = effects[i][j];
+                if (value != 0) {
                     int posX = i - midPos.x;
                     int posY = j - midPos.y;
-                    var posWithValue = new Tuple<Int2D, int>(new Int2D(posX, posY), effects[i][j]);
+                    var posWithValue = new Tuple<Int2D, int>(new Int2D(posX, posY), value);
                     if (ignoreSelf) {
                         if (posX != 0 || posY != 0) {
                             result.Add(posWithValue);
@@ -23,16 +25,18 @@ static class EffectsParser {
         return result;
     }
 
+    // 计算效果位置在棋盘上的实际位置
     public static List<Tuple<Int2D, int>> ParseEffectsInPosition(Int2D chessPadSize, Int2D posPos, List<Tuple<Int2D, int>> parsedEffects)
     {
         List<Tuple<Int2D, int>> result = new List<Tuple<Int2D, int>>();
-        if (posPos.x < 0 || posPos.y < 0) {
+        if (posPos.x < 0 || posPos.y < 0)
+        {
             return result;
         }
         foreach (var effect in parsedEffects) {
             int posX = posPos.x + effect.Item1.x;
             int posY = posPos.y + effect.Item1.y;
-            if (posX <  chessPadSize.x && posX >= 0 && posY <  chessPadSize.y && posY >= 0) {
+            if (posX < chessPadSize.x && posX >= 0 && posY < chessPadSize.y && posY >= 0) {
                 // Log.TestLine($"ParseEffectsInPosition: vertical: {posY} horizontal: {posX} value: {effect.Item2}");
                 var affectedPos = new Int2D(posX, posY);
                 var next = new Tuple<Int2D, int>(affectedPos, effect.Item2);
@@ -53,13 +57,13 @@ public struct EffectConfig {
 
 public enum EffectCondition {
     //once
-    ON_PLAYED = 0,
-    ON_SELF_DEAD = 1,
-    Frist_Buffed = 2,
-    Frist_Debuffed = 3,
-    LevelFristReach7 = 4,
+    ON_PLAYED,
+    ON_SELF_DEAD,
+    First_Buffed,
+    First_DeBuffed,
+    LevelFirstReach7,
     //many times
-    ON_POSITION = 5,
+    ON_POSITION,
     //many times increase
     Num_All,
     Num_Friend,
