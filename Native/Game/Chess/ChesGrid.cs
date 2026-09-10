@@ -1,3 +1,4 @@
+using Effect;
 // PLAYED ONCE
 // DEAD ONCE
 // EVENT ONPLAYED
@@ -12,6 +13,7 @@ public class PadGrid
     public bool Empty => property_ == null;
 
     private PosStatus posStatus_ = PosStatus.EMPTY;
+    private PosStatus posStatusBackUp_ = PosStatus.EMPTY;
     private ChessProperty property_ = null;
     private BuffList buffs_;
     private Int2D pos_ = new Int2D(-1, -1);
@@ -28,7 +30,14 @@ public class PadGrid
     public ChessProperty Chess
     {
         get => property_;
-        set => property_ = value;
+        set
+        {
+            if (property_ == null && value != null)
+            {
+                posStatusBackUp_ = posStatus_;
+            }
+            property_ = value;
+        }
     }
 
     public BuffList BuffList
@@ -49,6 +58,7 @@ public class PadGrid
         buffs_ = new BuffList(this);
 
         posStatus_ = padGrid.Status;
+        posStatusBackUp_ = padGrid.posStatusBackUp_;
         property_ = padGrid.Chess;
         neverBuffed_ = padGrid.NeverBuffed;
         neverDeBuffed_ = padGrid.NeverDeBuffed;
@@ -92,14 +102,14 @@ public class PadGrid
     public int BuffValue
     {
         get{
-            return buffs_.Compute(b => b.value > 0);
+            return buffs_.Compute(b => b.value > 0 && b.source != pos_);
         }
     }
 
     public int DeBuffValue
     {
         get{
-            return buffs_.Compute(b => b.value < 0);
+            return buffs_.Compute(b => b.value < 0 && b.source != pos_);
         }
     }
 
@@ -110,10 +120,16 @@ public class PadGrid
 
     public void Reset()
     {
-        // Log.TestLine("Reset: " + GetID() + " Level: " + GetLevel().ToString() + " posStatusBackUp_: " + posStatusBackUp_, TextColor.PURPLE);
+        Log.TestLine("Reset: Level: " + Level.ToString() + " posStatusBackUp_: " + posStatusBackUp_ + " Pos: " + pos_, TextColor.PURPLE);
+        Log.TestLine("  BuffCount before Reset: " + buffs_.Count, TextColor.PURPLE);
+        foreach (var b in buffs_)
+        {
+            Log.TestLine("    buff: value=" + b.value + " owner=" + b.owner + " source=" + b.source + " dstType=" + b.dstType, TextColor.PURPLE);
+        }
         neverBuffed_ = true;
         neverDeBuffed_ = true;
         property_ = null;
+        posStatus_ = posStatusBackUp_;
     }
 
     public void ChessDead()

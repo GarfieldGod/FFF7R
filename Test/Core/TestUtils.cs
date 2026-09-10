@@ -41,7 +41,7 @@ namespace Test
             "StepNum: " + index.ToString() + 
             "\nPlayer: " + step.input.playerType + 
             "\nInput Pos: " + step.input.pos + 
-            "\nCardCode: " + step.input.chess.Property.CardCode,
+            "\nCardCode: " + step.input.chess.CardCode,
             TextColor.BLACK);
         }
 
@@ -157,10 +157,6 @@ namespace Test
                     }
 
                     string output = level.ToString();
-                    if (grid.Chess != null)
-                    {
-                        output = grid.Chess.Name;
-                    }
                     Log.Test("(" + x.ToString() + ", " + y.ToString() + ")", TextColor.BLACK);
                     Log.Test(Utils.FixLength(output, 15), textColor);
                 }

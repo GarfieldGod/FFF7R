@@ -9,21 +9,21 @@
 //     private Dictionary<Int2D, Tuple<ChessProperty, int>> effectTasks_ = new Dictionary<Int2D, Tuple<ChessProperty, int>>();
 //     private PlayerType inputerType_;
 //     private List<List<int>> posStatus_;
-//     private List<List<int>> effectStatusBase_ = Utils.DeepCopy2DList(Utils.EmptyStandard2DList);
-//     private List<List<int>> effectStatusEnhanced_ = Utils.DeepCopy2DList(Utils.EmptyStandard2DList);
+//     private List<List<int>> effectStatusBase_ = Utils.DeepCopy(Utils.EmptyStandard2DList);
+//     private List<List<int>> effectStatusEnhanced_ = Utils.DeepCopy(Utils.EmptyStandard2DList);
 
 //     public bool AddEffectsTask(Int2D effectPos, ChessProperty property) {
 //         if (effectTasks_.ContainsKey(effectPos)) {
 //             return false;
 //         }
-//         if (property.CardEffectConfig.condition < EffectCondition.ON_POSITION) {
+//         if (property.CardEffectConfig.condition < EffectCondition.OnPosition) {
 //             CardEffect.ParseCardEffect(effectPos, property, effectStatusEnhanced_, UsePosStatus());
 //         } else if (property.CardEffectConfig.condition >= EffectCondition.CoverInput) {
 //             //special
 //         } else {
 //             //many times
 //             int initTimes = 0;
-//             if (property.CardEffectConfig.condition == EffectCondition.ON_POSITION) {
+//             if (property.CardEffectConfig.condition == EffectCondition.OnPosition) {
 //                 initTimes = 1;
 //             }
 //             effectTasks_.Add(effectPos, new Tuple<ChessProperty, int>(property, initTimes));
@@ -51,7 +51,7 @@
 //         return Utils.Compose2DList(effectEnhancedFinal, effectStatusBase_);
 //     }
 //     public List<List<int>> CalculateEnhancedEffectsList() {
-//         List<List<int>> result = Utils.DeepCopy2DList(Utils.EmptyStandard2DList);
+//         List<List<int>> result = Utils.DeepCopy(Utils.EmptyStandard2DList);
 //         foreach(var effectTask in effectTasks_) {
 //             for(int i = 0; i <= effectTask.Value.Item2;i++) {
 //                 CardEffect.ParseCardEffect(effectTask.Key, effectTask.Value.Item1, result, UsePosStatus());
@@ -71,21 +71,21 @@
 //         }
 //     }
 //     private List<List<int>> UsePosStatus(){
-//         List<List<int>> result = Utils.DeepCopy2DList(posStatus_);
+//         List<List<int>> result = Utils.DeepCopy(posStatus_);
 //         if (inputerType_ == PlayerType.RIVAL) {
 //             Rival.GetChessPosStatusInRivalView(result);
 //         }
 //         return result;
 //     }
 //     private List<List<int>> UseEffectStatusBase(){
-//         List<List<int>> result = Utils.DeepCopy2DList(effectStatusBase_);
+//         List<List<int>> result = Utils.DeepCopy(effectStatusBase_);
 //         if (inputerType_ == PlayerType.RIVAL) {
 //             Rival.GetChessLevelStatusInRivalView(result);
 //         }
 //         return result;
 //     }
 //     private List<List<int>> UseEffectStatusEnhanced(){
-//         List<List<int>> result = Utils.DeepCopy2DList(effectStatusEnhanced_);
+//         List<List<int>> result = Utils.DeepCopy(effectStatusEnhanced_);
 //         if (inputerType_ == PlayerType.RIVAL) {
 //             Rival.GetChessLevelStatusInRivalView(result);
 //         }

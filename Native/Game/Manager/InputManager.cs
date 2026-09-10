@@ -9,21 +9,16 @@ public enum PlayerType {
 
 public struct Input {
     public Int2D pos;
-    public Chess chess;
+    public ChessProperty chess;
     public PlayerType playerType;
-    public Input(Int2D pos, Chess chess, PlayerType playerType) {
+    public Input(Int2D pos, ChessProperty chess, PlayerType playerType) {
         this.pos = pos;
         this.chess = chess;
         this.playerType = playerType;
     }
-    public Input(Int2D pos, ChessProperty chess, PlayerType playerType) {
-        this.pos = pos;
-        this.chess = new Chess(chess);
-        this.playerType = playerType;
-    }
     public Input(Int2D pos, string cardCode, PlayerType playerType) {
         this.pos = pos;
-        this.chess = new Chess(Property.GetChessProperty(cardCode));
+        this.chess = Property.GetChessProperty(cardCode);
         this.playerType = playerType;
     }
     public readonly bool Empty => chess == null;
@@ -117,7 +112,7 @@ public struct Input {
 //     public void DoPosEffect(Input input, ChessPad chessPad, PlayerType playerType)
 //     {
 //         Int2D pos = input.pos;
-//         List<List<int>> effect = input.chess.GetChessProperty().PosEffects;
+//         List<List<int>> effect = input.chess.GetChessProperty().PosEffect;
 //         if (playerType == PlayerType.RIVAL)
 //         {
 //             Utils.Reverse(effect);

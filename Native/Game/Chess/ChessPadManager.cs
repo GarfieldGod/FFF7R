@@ -1,9 +1,17 @@
+using Effect;
+
 public class ChessPadManager
 {
     private ChessPad chessPad_;
+
+    private EventSystem eventSystem_;
+
+    private Queue<Action> operationQueue_ = new Queue<Action>();
+
     public ChessPadManager(ChessPad chessPad)
     {
         chessPad_ = chessPad;
+        eventSystem_ = new EventSystem();
     }
 
     public bool Input(Input input)
@@ -11,11 +19,13 @@ public class ChessPadManager
         if(!CheckInput(input)) return false;
 
         PadGrid padGrid = chessPad_[input.pos.x, input.pos.y];
-        padGrid.Chess = input.chess.Property;
+        padGrid.Chess = input.chess;
 
         DoPosEffect(input, chessPad_);
+        DoSelfPower(input, chessPad_);
         DoCardEffect(input, chessPad_);
 
+        eventSystem_.RaiseChessPlaced(input);
         return true;
     }
 
@@ -25,7 +35,7 @@ public class ChessPadManager
 
         ChessPad previewPad = new ChessPad(chessPad_);
 
-        previewPad[input.pos.x, input.pos.y].Chess = input.chess.Property;
+        previewPad[input.pos.x, input.pos.y].Chess = input.chess;
 
         DoPosEffect(input, previewPad);
         DoCardEffect(input, previewPad);
@@ -34,92 +44,263 @@ public class ChessPadManager
 
     public bool CheckInput(Input input)
     {
-        int posLevel = (int)chessPad_[input.pos.x, input.pos.y].Status % 10;
-        if (posLevel > 0 && posLevel < (int)PosStatus.OCCUPIED_PLAYER && posLevel < input.chess.Property.Cost)
+        if (input.chess == null) return false;
+
+        if (!chessPad_.IsInBoard(input.pos))
         {
-            Log.TestLine("CheckInput Failed: chessPosLevel: " + posLevel + "\nCost: " + input.chess.Property.Cost, TextColor.BLACK);
+            Log.TestLine("CheckInput Failed: pos out of board", TextColor.BLACK);
             return false;
         }
 
-        HashSet<Int2D> validGrids = Rival.GetEmptyGrids(chessPad_.StatusMap, input.playerType);
-        Log.TestLine("Valid ChessGrids: " + validGrids.Count, TextColor.BLACK);
-        if (validGrids.Contains(input.pos)) return true;
-
-        Log.TestLine("CheckInput Failed: ---Input is INVAILD---", TextColor.BLACK);
-        return false;
-    }
-
-    public void DoPosEffect(Input input, ChessPad chessPad)
-    {
-        List<List<int>> effect = input.chess.Property.PosEffects;
-        if (input.playerType == PlayerType.RIVAL)
+        PosStatus posStatus = chessPad_[input.pos.x, input.pos.y].Status;
+        int posLevel = (int)posStatus % 10;
+        if (input.chess.Cost > 0)
         {
-            Utils.Reverse(effect);
+            if (posStatus >= PosStatus.OCCUPIED_PLAYER || posLevel < input.chess.Cost) return false;
+        } 
+        else
+        {
+            if (posStatus < PosStatus.OCCUPIED_PLAYER) return false;
+            if (input.playerType == PlayerType.PLAYER && posStatus != PosStatus.OCCUPIED_PLAYER) return false;
+            if (input.playerType == PlayerType.RIVAL && posStatus != PosStatus.OCCUPIED_RIVAL) return false;
         }
-        chessPad.StatusMap = PosEffect.DoPosEffect(input.pos, effect, chessPad.StatusMap, input.playerType);
+
+        return true;
     }
 
-    public void DoCardEffect(Input input, ChessPad chessPad)
+    public static void DoPosEffect(Input input, ChessPad chessPad)
     {
-        // Do Self
-        // chessPad[input.pos.x][input.pos.y].SetID(id);
-        int level = input.chess.Property.Level;
-        Buff selfLevelBuff = new Buff(input.pos, level, EffectScope.Self, input.playerType);
-        chessPad.AddBuff(input.pos, selfLevelBuff, input.playerType, false);
+        chessPad.StatusMap = PosEffect.DoPosEffect(input, chessPad);
+    }
 
-        EffectScope scope = input.chess.Property.CardEffects.Item1;
-        EffectCondition condition = input.chess.Property.CardEffects.Item2;
+    private void DoSelfPower(Input input, ChessPad chessPad)
+    {
+        int power = input.chess.Level;
+        Buff selfLevelBuff = new Buff(input.pos, input.pos, power, EffectTarget.Self, input.playerType);
+        chessPad.AddBuff(input.pos, selfLevelBuff, false);
+    }
 
+    public void DoCardEffect(Input input, ChessPad chessPad, bool preview = false)
+    {
+        if (input.chess.CardEffect == null) return;
         // Do Others
-        List<Tuple<Int2D, int>> tasks = CardEffect.ParseCardEffect(input, chessPad);
+        EffectCondition condition = input.chess.CardEffect.Condition;
         switch (condition)
         {
-            case EffectCondition.ON_PLAYED:
-                EffectToBuff(input, true);
+            case EffectCondition.OnPlayed:
+                EffectOperationHelper.PowerChangeOnce(input, chessPad);
                 break;
-            case EffectCondition.ON_POSITION:
-                EffectToBuff(input, false);
+            case EffectCondition.OnSelfDead: break;
+            case EffectCondition.OnPosition:
+                EffectOperationHelper.PowerChangeLasting(input, chessPad);
                 break;
-            case EffectCondition.First_Buffed: break;
-            case EffectCondition.First_DeBuffed: break;
-            case EffectCondition.LevelFirstReach7: break; // BUFFED ONCE S
-            case EffectCondition.Num_All: break;
-            case EffectCondition.Num_Friend: break;
-            case EffectCondition.Num_Enemy: break;
-            case EffectCondition.Dead_All: break;
-            case EffectCondition.Dead_Friend: break;
-            case EffectCondition.ON_ENEMY_DEAD: break;
-            case EffectCondition.ON_SELF_DEAD: break;
-            case EffectCondition.EveryTime_Buffed: break;
-            case EffectCondition.EveryTime_Debuffed: break;
-            case EffectCondition.FriendPlayed: break;
-            case EffectCondition.EnemyPlayed: break;
-            case EffectCondition.CoverInput: break;
-            case EffectCondition.LineWin: break;
+            case EffectCondition.OnFirstBuffed:
+            case EffectCondition.OnFirstDeBuffed:
+            case EffectCondition.OnFirstBuffedOrDeBuffed:
+            case EffectCondition.OnBuffed:
+            case EffectCondition.OnDeBuffed:
+            case EffectCondition.OnBuffedOrDeBuffed:
+                PadGrid padGrid = chessPad[input.pos];
+                chessPad.CheckBuffEvent(padGrid, padGrid.BuffList.Compute(b => b.source != input.pos));
+                break;
+            case EffectCondition.OnFriendOrEnemyDead:
+            case EffectCondition.OnFriendDead:
+            case EffectCondition.OnEnemyDead:
+                if (!preview) SubscribeDeadEvent(condition, input);
+                break;
+            case EffectCondition.BuffedFriendNum:
+            case EffectCondition.BuffedEnemyNum:
+            case EffectCondition.BuffedFriendOrEnemyNum:
+            case EffectCondition.DeBuffedFriendNum:
+            case EffectCondition.DeBuffedEnemyNum:
+            case EffectCondition.DeBuffedFriendOrEnemyNum:
+                if (!preview) SubscribeBuffedEvent(condition, input);
+                break;
+            case EffectCondition.OnFriendPlayed:
+            case EffectCondition.OnEnemyPlayed:
+            case EffectCondition.OnFriendOrEnemyPlayed:
+                if (!preview) SubscribePlacedEvent(condition, input);
+                break;
+            case EffectCondition.OnPowerFirstReach:
+                // TODO
+                break;
+            case EffectCondition.OnTurnEnd:
+                // TODO
+                break;
+            case EffectCondition.OnLineWin:
+                // TODO
+                break;
         }
-        chessPad.CheckDead();
+        CheckDead(chessPad);
+    }
+//---------------------------------------------------------------------------------------------PlacedEvent
+    private Dictionary<Int2D, EventHandler<Input>> placedEventHandler_ = new();
+
+    private void UnsubscribePlacedEvent(Int2D pos)
+    {
+        if (placedEventHandler_.TryGetValue(pos, out var handler))
+        {
+            eventSystem_.OnChessPlaced -= handler;
+            placedEventHandler_.Remove(pos);
+        }
     }
 
-    public void EffectToBuff(Input input, bool dstOwned)
+    private void SubscribePlacedEvent(EffectCondition condition, Input input)
     {
-        Log.TestLine("OnPlayedEffect", TextColor.BLACK);
-
-        PadGrid grid = chessPad_[input.pos];
-        if (dstOwned && grid.Empty) return;
-
-        PlayerType type = grid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
-        ChessProperty property = grid.Chess;
-
-        EffectScope scope = property.CardEffects.Item1;
-        List<Tuple<Int2D, int>> tasks = dstOwned ? CardEffect.ParseCardEffectInScope(input, chessPad_) : CardEffect.ParseCardEffect(input, chessPad_);
-
-        foreach (var task in tasks)
+        UnsubscribePlacedEvent(input.pos);
+        EventHandler<Input> handler = (sender, placedInput) =>
         {
-            Int2D dstPos = task.Item1;
-            int value = task.Item2;
+            if (input.pos == placedInput.pos) return;
 
-            Buff buff = new Buff(dstOwned ? dstPos : input.pos, value, scope, type);
-            chessPad_.AddBuff(dstPos, buff, type);
+            PlayerType owner = placedInput.playerType;
+            if (condition == EffectCondition.OnFriendOrEnemyPlayed)
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+            else if (condition == EffectCondition.OnFriendPlayed && 
+                (owner == PlayerType.PLAYER && input.playerType == PlayerType.PLAYER || 
+                owner == PlayerType.RIVAL && input.playerType == PlayerType.RIVAL))
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+            else if (condition == EffectCondition.OnEnemyPlayed &&
+                (owner == PlayerType.PLAYER && input.playerType == PlayerType.RIVAL || 
+                owner == PlayerType.RIVAL && input.playerType == PlayerType.PLAYER))
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+        };
+        placedEventHandler_[input.pos] = handler;
+        eventSystem_.OnChessPlaced += handler;
+    }
+//---------------------------------------------------------------------------------------------BuffedEvent
+    private Dictionary<Int2D, EventHandler<EventSystem.ChessBuffedEventArgs>> buffedEventHandler_ = new();
+
+    private void UnsubscribeBuffedEvent(Int2D pos)
+    {
+        if (buffedEventHandler_.TryGetValue(pos, out var handler))
+        {
+            eventSystem_.OnChessBuffed -= handler;
+            buffedEventHandler_.Remove(pos);
         }
+    }
+
+    private void SubscribeBuffedEvent(EffectCondition condition, Input input)
+    {
+        UnsubscribeBuffedEvent(input.pos);
+        EventHandler<EventSystem.ChessBuffedEventArgs> handler = (sender, buffedOne) =>
+        {
+            int value = buffedOne.Value;
+            PlayerType owner = buffedOne.Owner;
+            Int2D pos = buffedOne.Position;
+            if (input.pos == pos) return;
+
+            if (condition == EffectCondition.OnFriendOrEnemyDead)
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+            else if (condition == EffectCondition.OnFriendDead && 
+                (buffedOne.Owner == PlayerType.PLAYER && input.playerType == PlayerType.PLAYER || 
+                buffedOne.Owner == PlayerType.RIVAL && input.playerType == PlayerType.RIVAL))
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+            else if (condition == EffectCondition.OnEnemyDead &&
+                (buffedOne.Owner == PlayerType.PLAYER && input.playerType == PlayerType.RIVAL || 
+                buffedOne.Owner == PlayerType.RIVAL && input.playerType == PlayerType.PLAYER))
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+        };
+        buffedEventHandler_[input.pos] = handler;
+        eventSystem_.OnChessBuffed += handler;
+    }
+//---------------------------------------------------------------------------------------------DeadEvent
+    private Dictionary<Int2D, EventHandler<EventSystem.ChessDeadEventArgs>> deadEventHandler_ = new();
+
+    private void UnsubscribeDeadEvent(Int2D pos)
+    {
+        if(deadEventHandler_.TryGetValue(pos, out var handler))
+        {
+            eventSystem_.OnChessDead -= handler;
+            deadEventHandler_.Remove(pos);
+        }
+    }
+
+    private void SubscribeDeadEvent(EffectCondition condition, Input input)
+    {
+        UnsubscribeDeadEvent(input.pos);
+        EventHandler<EventSystem.ChessDeadEventArgs> handler = (sender, deadOne) =>
+        {
+            if (condition == EffectCondition.OnFriendOrEnemyDead)
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+            else if (condition == EffectCondition.OnFriendDead && 
+                (deadOne.Owner == PlayerType.PLAYER && input.playerType == PlayerType.PLAYER || 
+                deadOne.Owner == PlayerType.RIVAL && input.playerType == PlayerType.RIVAL))
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+            else if (condition == EffectCondition.OnEnemyDead &&
+                (deadOne.Owner == PlayerType.PLAYER && input.playerType == PlayerType.RIVAL || 
+                deadOne.Owner == PlayerType.RIVAL && input.playerType == PlayerType.PLAYER))
+            {
+                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
+            }
+        };
+        deadEventHandler_[input.pos] = handler;
+        eventSystem_.OnChessDead += handler;
+    }
+
+    public void CheckDead(ChessPad chessPad)
+    {
+        bool hasDead = false;
+        foreach (var line in chessPad)
+        {
+            foreach (var padGrid in line)
+            {
+                if (!padGrid.Empty && padGrid.Level <= 0)
+                {
+                    hasDead = true;
+                    // Log.TestLine("Dead: " + padGrid.GetID() + " Name: " + padGrid.GetChess().Name, TextColor.PURPLE);
+                    if (padGrid.Chess.CardEffect != null && padGrid.Chess.CardEffect.Condition == EffectCondition.OnSelfDead)
+                    {
+                        EffectOperationHelper.TriggerEffect(chessPad, padGrid.Position);
+                    }
+
+                    PlayerType owner = padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
+                    UnsubscribeDeadEvent(padGrid.Position);
+                    UnsubscribeBuffedEvent(padGrid.Position);
+                    eventSystem_.RaiseChessDead(new EventSystem.ChessDeadEventArgs(padGrid.Chess, owner));
+                    chessPad.RestPos(padGrid.Position);
+                }
+            }
+        }
+        if (hasDead) CheckDead(chessPad);
+    }
+
+//---------------------------------------------------------------------------------------------清理
+    ~ChessPadManager()
+    {
+        foreach(var kv in deadEventHandler_)
+        {
+            eventSystem_.OnChessDead -= kv.Value;
+        }
+        deadEventHandler_.Clear();
+
+        foreach(var kv in buffedEventHandler_)
+        {
+            eventSystem_.OnChessBuffed -= kv.Value;
+        }
+        buffedEventHandler_.Clear();
+
+        foreach(var kv in placedEventHandler_)
+        {
+            eventSystem_.OnChessPlaced -= kv.Value;
+        }
+        placedEventHandler_.Clear();
+
+        eventSystem_.ClearAll();
     }
 }

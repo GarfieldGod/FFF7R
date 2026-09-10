@@ -1,9 +1,12 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.VisualBasic;
 using Test;
+using Effect;
 
-public class ChessPad
+public class ChessPad : IEnumerable<List<PadGrid>>
 {
     public Int2D Size => size_;
     public int Height => padGrids_.Count;
@@ -12,6 +15,8 @@ public class ChessPad
 
     private readonly Int2D size_;
     private List<List<PadGrid>> padGrids_ = new List<List<PadGrid>> { };
+
+    public EventSystem eventSystem;
 
     public ChessPad(int x, int y)
     {
@@ -38,10 +43,9 @@ public class ChessPad
         padGrids_ = Utils.DeepCopy(chessPad.GridMap);
     }
 
-    public ChessPad DeepCopy()
+    public bool IsInBoard(Int2D pos)
     {
-        var result = new ChessPad(Utils.DeepCopy(GridMap));
-        return result;
+        return pos.x >= 0 && pos.x < Size.x && pos.y >= 0 && pos.y < Size.y;
     }
 
     public PadGrid this[int x, int y]
@@ -51,6 +55,9 @@ public class ChessPad
             return padGrids_[x][y];
         }
     }
+
+    public IEnumerator<List<PadGrid>> GetEnumerator() => padGrids_.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public PadGrid this[Int2D pos]
     {
@@ -222,69 +229,82 @@ public class ChessPad
         }
     }
 
-    public bool AddBuff(Int2D pos, Buff buff, PlayerType playerType, bool CheckIfFirstBuffed = true)
-    {
-        PadGrid padGrid = padGrids_[pos.x][pos.y];
-        padGrid.AddBuff(buff);
-        if (CheckIfFirstBuffed) CheckFirstBuffed(padGrid);
-        return false;
-    }
-
     public void RestPos(Int2D pos)
     {
         RemoveBuffs(pos);
         padGrids_[pos.x][pos.y].Reset();
     }
 
-    public void CheckFirstBuffed(PadGrid padGrid) { 
-        if (!padGrid.Empty)
-        {   
-            int deBuffValue = padGrid.DeBuffValue;
-            int buffValue = padGrid.BuffValue;
-            bool neverBuffed = padGrid.NeverBuffed;
-            bool neverDeBuffed = padGrid.NeverDeBuffed;
-            if(buffValue != 0) padGrid.NeverBuffed = false;
-            if(deBuffValue != 0) padGrid.NeverDeBuffed = false;
-
-            ChessProperty property = padGrid.Chess;
-            if (property.CardEffects == null) return;
-            if (property.CardEffects.Item2 == EffectCondition.First_Buffed && buffValue > 0 && neverBuffed)
-            {
-                Log.TestLine("First_Buffed", TextColor.PURPLE);
-                // EffectTrigger(padGrid.Position);
-            } else if (property.CardEffects.Item2 == EffectCondition.First_DeBuffed && deBuffValue < 0 && neverDeBuffed){ 
-                Log.TestLine("First_DeBuffed", TextColor.PURPLE);
-                // EffectTrigger(padGrid.Position);
-            }
-        }
-    }
-
-    public void CheckDead()
+    public bool AddBuff(Int2D pos, Buff buff, bool CheckIfFirstBuffed = true)
     {
-        bool hasDead = false;
-        foreach (var line in padGrids_)
-        {
-            foreach (var padGrid in line)
-            {
-                if (!padGrid.Empty && padGrid.Level <= 0)
-                {
-                    hasDead = true;
-                    // Log.TestLine("Dead: " + padGrid.GetID() + " Name: " + padGrid.GetChess().Name, TextColor.PURPLE);
-                    DeadEffect(padGrid);
-                    RestPos(padGrid.Position);
-                }
-            }
-        }
-        if (hasDead) CheckDead();
+        PadGrid padGrid = padGrids_[pos.x][pos.y];
+        padGrid.AddBuff(buff);
+        if (CheckIfFirstBuffed) CheckFirstBuffed(padGrid);
+        CheckOnBuffed(padGrid, buff.value);
+        return false;
     }
 
-    public void DeadEffect(PadGrid padGrid) {
-        ChessProperty property = padGrid.Chess;
-        if (property.CardEffects == null) return;
-        if (property.CardEffects.Item2 == EffectCondition.ON_SELF_DEAD)
+    public void CheckBuffEvent(PadGrid padGrid, int buffValue)
+    {
+        CheckFirstBuffed(padGrid);
+        CheckOnBuffed(padGrid, buffValue);
+        InvokeBuffEvent(padGrid, buffValue);
+    }
+
+    public void InvokeBuffEvent(PadGrid padGrid, int buffValue)
+    {
+        if (padGrid.Status == PosStatus.OCCUPIED_PLAYER || padGrid.Status == PosStatus.OCCUPIED_RIVAL)
         {
-            // Log.TestLine(padGrid.GetID() + " ON_SELF_DEAD", TextColor.PURPLE);
-            // EffectTrigger(padGrid.Position);
+            PlayerType gridOwner = padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
+            eventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, gridOwner, padGrid.Position));
+        }
+    }
+
+    public void CheckOnBuffed(PadGrid padGrid, int buffValue)
+    {
+        if (!padGrid.Empty && padGrid.Chess.CardEffect != null)
+        {
+            ChessProperty property = padGrid.Chess;
+
+            if (property.CardEffect.Condition == EffectCondition.OnBuffed && buffValue > 0)
+            {
+                Log.TestLine("OnBuffed", TextColor.PURPLE);
+                EffectOperationHelper.TriggerEffect(this, padGrid.Position);
+            }
+            if (property.CardEffect.Condition == EffectCondition.OnDeBuffed && buffValue < 0)
+            {
+                Log.TestLine("OnBuffed", TextColor.PURPLE);
+                EffectOperationHelper.TriggerEffect(this, padGrid.Position);
+            }
+            if (property.CardEffect.Condition == EffectCondition.OnBuffedOrDeBuffed && buffValue != 0)
+            {
+                Log.TestLine("OnBuffed", TextColor.PURPLE);
+                EffectOperationHelper.TriggerEffect(this, padGrid.Position);
+            }
+        }
+    }
+
+    public void CheckFirstBuffed(PadGrid padGrid) {
+        if (!padGrid.Empty && padGrid.Chess.CardEffect != null)
+        {
+            ChessProperty property = padGrid.Chess;
+
+            bool triggerFirstBuffed = property.CardEffect.Condition == EffectCondition.OnFirstBuffed && padGrid.BuffValue > 0 && padGrid.NeverBuffed;
+            if (triggerFirstBuffed)
+            {
+                Log.TestLine("OnFirstBuffed", TextColor.PURPLE);
+                padGrid.NeverBuffed = false;
+                EffectOperationHelper.TriggerEffect(this, padGrid.Position);
+            }
+            if(padGrid.BuffValue != 0) padGrid.NeverBuffed = false;
+
+            bool triggerFirstDeBuffed = property.CardEffect.Condition == EffectCondition.OnFirstDeBuffed && padGrid.DeBuffValue < 0 && padGrid.NeverDeBuffed;
+            if (triggerFirstDeBuffed){
+                Log.TestLine("OnFirstDeBuffed", TextColor.PURPLE);
+                padGrid.NeverDeBuffed = false;
+                EffectOperationHelper.TriggerEffect(this, padGrid.Position);
+            }
+            if(padGrid.DeBuffValue != 0) padGrid.NeverDeBuffed = false;
         }
     }
 

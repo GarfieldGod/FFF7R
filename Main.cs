@@ -33,3 +33,13 @@
 //     }
 // }
 // #endif
+
+using Test;
+
+class Program
+{
+    static void Main()
+    {
+        SystemTest.Run();
+    }
+}

@@ -1,3 +1,5 @@
+using Effect;
+
 public enum TextColor {
     NONE,
     RED,
@@ -92,7 +94,7 @@ public static class Utils
         new List<int> { 0, 0, 0, 0, 0 },
         new List<int> { 0, 0, 0, 0, 0 },
     };
-    public static List<List<List<int>>> DeepCopy3DList(List<List<List<int>>> original)
+    public static List<List<List<int>>> DeepCopy(List<List<List<int>>> original)
     {
         List<List<List<int>>> result = original
         .Select(outerList => outerList
@@ -101,8 +103,9 @@ public static class Utils
         .ToList();
         return result;
     }
-    public static List<List<int>> DeepCopy2DList(List<List<int>> original)
+    public static List<List<int>> DeepCopy(List<List<int>> original)
     {
+        if (original == null) return null;
         List<List<int>> result = original.Select(innerList => new List<int>(innerList)).ToList();
         return result;
     }
@@ -116,7 +119,7 @@ public static class Utils
         {
             return null;
         }
-        List<List<int>> result = DeepCopy2DList(ListA);
+        List<List<int>> result = DeepCopy(ListA);
         for (int i = 0; i < result.Count; i++)
         {
             for (int j = 0; j < result[0].Count; j++)
@@ -141,7 +144,7 @@ public static class Utils
                 var thirdLevelCopiedList = new List<Buff>();
                 foreach (var buff in thirdLevelList)
                 {
-                    var copiedBuff = new Buff(buff.source, buff.value, buff.scope, buff.type);
+                    var copiedBuff = new Buff(buff);
                     thirdLevelCopiedList.Add(copiedBuff);
                 }
                 secondLevelCopiedList.Add(thirdLevelCopiedList);
@@ -241,6 +244,16 @@ public static class Utils
             newList.Add(newLine);
         }
         return newList;
+    }
+    public static Dictionary<Int2D, int> ReverseEffectOffset(Dictionary<Int2D, int> dict)
+    {
+        var newDict = new Dictionary<Int2D, int>();
+        foreach (var kvp in dict)
+        {
+            Int2D newKey = new Int2D(kvp.Key.x, -kvp.Key.y);
+            newDict[newKey] = kvp.Value;
+        }
+        return newDict;
     }
     public static PosStatus Reverse(PosStatus posStatus)
     {

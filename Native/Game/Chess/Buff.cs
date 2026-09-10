@@ -1,27 +1,31 @@
 using System.Collections;
 using System.Collections.Generic;
+using Effect;
 
 public struct Buff
 {
     public int value;
-    public Int2D source;
-    public EffectScope scope;
-    public PlayerType type;
+    public Int2D owner;       // 抽有者位置，用于卡牌死亡时RemoveBuffs清理的标识（一次性buff绑定到被施加者位置）
+    public Int2D source;      // 真正的施加者位置（用于判断buff是否来自其他卡牌）
+    public EffectTarget dstType;    // buff作用对象类型
+    public PlayerType srcType;      // buff施加者类型
 
-    public Buff(Int2D source, int value, EffectScope scope, PlayerType type)
+    public Buff(Int2D owner, Int2D source, int value, EffectTarget dstType, PlayerType srcType)
     {
-        this.value = value;
-        this.scope = scope;
+        this.owner = owner;
         this.source = source;
-        this.type = type;
+        this.value = value;
+        this.dstType = dstType;
+        this.srcType = srcType;
     }
 
     public Buff(Buff buff)
     {
-        value = buff.value;
-        scope = buff.scope;
+        owner = buff.owner;
         source = buff.source;
-        type = buff.type;
+        value = buff.value;
+        dstType = buff.dstType;
+        srcType = buff.srcType;
     }
 }
 
@@ -61,7 +65,7 @@ public class BuffList: IEnumerable<Buff>
 
     public void Remove(Int2D src)
     {
-        buffList_.RemoveAll(buff => buff.source == src);
+        buffList_.RemoveAll(buff => buff.owner == src);
     }
 
     public void RemoveAt(int index)
@@ -86,12 +90,12 @@ public class BuffList: IEnumerable<Buff>
 
         foreach (var buff in buffList_)
         {
-            bool validScope = buff.scope switch
+            bool validScope = buff.dstType switch
             {
-                EffectScope.DOTOALL => true,
-                EffectScope.Self => true,
-                EffectScope.FRIEND_ONLY => buff.type == posOwner,
-                EffectScope.ENEMY_ONLY => buff.type != posOwner,
+                EffectTarget.FriendAndEnemy => true,
+                EffectTarget.Self => true,
+                EffectTarget.FriendOnly => buff.srcType == posOwner,
+                EffectTarget.EnemyOnly => buff.srcType != posOwner,
                 _ => false
             };
             if (!validScope) continue;
