@@ -1,50 +1,50 @@
 namespace Effect
 {
     public enum EffectCondition {
-        OnPlayed,
+        OnPlayed,                   // 配置时
 
-        OnSelfDead,
+        OnSelfDead,                 // 被消灭时
 
-        OnPosition,
+        OnPosition,                 // 此卡片配置中
 
-        OnFirstBuffed,
-        OnFirstDeBuffed,
-        OnFirstBuffedOrDeBuffed,
+        OnFirstBuffed,              // 首次被强化时
+        OnFirstDeBuffed,            // 首次被弱化时
+        OnFirstBuffedOrDeBuffed,    // 首次被强化或弱化时
 
-        OnBuffed,
-        OnDeBuffed,
-        OnBuffedOrDeBuffed,
+        OnBuffed,                   // 被强化时 
+        OnDeBuffed,                 // 被弱化时
+        OnBuffedOrDeBuffed,         // 被强化或弱化时
 
-        OnFriendDead,
-        OnEnemyDead,
-        OnFriendOrEnemyDead,
+        OnFriendDead,               // 我方卡片被消灭时
+        OnEnemyDead,                // 对方卡片被消灭时
+        OnFriendOrEnemyDead,        // 我方·对方卡片被消灭时
 
-        BuffedFriendNum,
-        BuffedEnemyNum,
-        BuffedFriendOrEnemyNum,
-        DeBuffedFriendNum,
-        DeBuffedEnemyNum,
-        DeBuffedFriendOrEnemyNum,
+        BuffedFriendNum,            // 我方被强化数量
+        BuffedEnemyNum,             // 对方被强化数量
+        BuffedFriendOrEnemyNum,     // 我方·对方被强化数量
+        DeBuffedFriendNum,          // 我方被弱化数量
+        DeBuffedEnemyNum,           // 对方被弱化数量
+        DeBuffedFriendOrEnemyNum,   // 我方·对方被弱化数量
 
-        OnFriendPlayed,
-        OnEnemyPlayed,
-        OnFriendOrEnemyPlayed,
+        OnFriendPlayed,             // 我方卡片被配置时
+        OnEnemyPlayed,              // 对方卡片被配置时
+        OnFriendOrEnemyPlayed,      // 我方·对方卡片被配置时
 
-        OnPowerFirstReach,
+        OnPowerFirstReach,          // 威力首次达到
 
-        OnTurnEnd,
+        OnTurnEnd,                  // 回合结束时
 
-        OnLineWin
+        OnLineWin                   // 行胜利时
     }
 
     public enum EffectTarget {
-        FriendOnly,
-        EnemyOnly,
-        FriendAndEnemy,
-        Self,
-        Hand,
-        FieldSlot,
-        ScoreCounter
+        FriendOnly,             // 我方
+        EnemyOnly,              // 对手
+        FriendAndEnemy,         // 我方·对手
+        Self,                   // 自身
+        Hand,                   // 手牌
+        FieldSlot,              // 阵地
+        ScoreCounter            // 积分
     }
 
     public enum EffectOperation
@@ -57,15 +57,16 @@ namespace Effect
         SpawnCardOnFieldSlot,   // 在阵地生成卡片
         SpawnFieldSlots,        // 生成阵地
         AddScore,               // 增加积分
-        TransferScore
+        TransferScore           // 转移分数
     }
 
     public enum EffectValueType {
-        Const,
-        AsKilledOne,
-        LineRivalScore,
-        CountBased,
-        FieldSlotLevel
+        Const,                  // 常数
+        CardCode,               // 卡片代码
+        AsKilledOne,            // 依据被消灭的卡片
+        LineRivalScore,         // 依据对手的行分数
+        CountBased,             // 依据数量
+        FieldSlotLevel          // 依据阵地等级
     }
 
     public enum PosStatus {

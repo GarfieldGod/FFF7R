@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Card Marker Editor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a1a; color: #ccc;
+    font-family: 'Segoe UI', sans-serif;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  .toolbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; background: #222;
+    border-bottom: 1px solid #333; flex-shrink: 0;
+  }
+  .toolbar h1 { font-size: 16px; color: #fff; margin-right: auto; }
+  .btn {
+    padding: 6px 14px; border: 1px solid #444;
+    background: #2a2a2a; color: #ccc; border-radius: 4px;
+    cursor: pointer; font-size: 13px;
+  }
+  .btn:hover { background: #3a3a3a; }
+  .btn-primary { background: #2d7d46; color: #fff; font-weight: bold; border-color: #2d7d46; }
+  .btn-primary:hover { background: #359454; }
+  .info { font-size: 12px; color: #888; }
+  .main { display: flex; flex: 1; overflow: hidden; }
+
+  .entry-list {
+    width: 170px; background: #1e1e2e;
+    border-right: 1px solid #333; overflow-y: auto; flex-shrink: 0;
+  }
+  .entry-list .header {
+    padding: 6px 10px; font-size: 11px; color: #888;
+    border-bottom: 1px solid #2a2a2a; background: #252530;
+  }
+  .entry-item {
+    padding: 6px 10px; cursor: pointer; font-size: 12px;
+    border-bottom: 1px solid #2a2a2a; transition: background 0.1s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .entry-item:hover { background: #2a2a35; }
+  .entry-item.active { background: #3a3a5e; color: #fff; }
+
+  .file-list {
+    width: 190px; background: #222;
+    border-right: 1px solid #333; overflow-y: auto; flex-shrink: 0;
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #1a1a1a; }
+  ::-webkit-scrollbar-thumb { background: #3a3a4a; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4a5a; }
+  .file-list .header {
+    padding: 6px 10px; font-size: 11px; color: #888;
+    border-bottom: 1px solid #2a2a2a; background: #252530;
+  }
+  .file-item {
+    padding: 5px 10px; cursor: pointer; font-size: 11px;
+    border-bottom: 1px solid #2a2a2a; transition: background 0.1s;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .file-item:hover { background: #2e2e2e; }
+  .file-item.active { background: #3a3a5e; color: #fff; }
+
+  .preview-area {
+    flex: 1; display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .preview-top {
+    flex: 1; display: flex; gap: 32px; padding: 20px;
+    align-items: center; justify-content: center;
+    overflow: auto;
+  }
+  .preview-bottom {
+    flex-shrink: 0; display: flex; justify-content: center;
+    padding: 10px; border-top: 1px solid #2a2a2a;
+  }
+  .nav-btns { display: flex; gap: 24px; }
+
+  .img-preview { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .img-frame {
+    position: relative;
+    width: 320px; height: 320px;
+    min-width: 100px; min-height: 100px;
+    border: 1px dashed #444; border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    background: #1a1a1a; overflow: hidden;
+  }
+  .img-frame img {
+    max-width: 100%; max-height: 100%; image-rendering: pixelated;
+    border-radius: 3px;
+  }
+  .img-placeholder { font-size: 60px; color: #444; user-select: none; }
+  .img-preview .label { font-size: 12px; color: #888; min-height: 16px; }
+
+  .rsz {
+    position: absolute; z-index: 10;
+    background: #5a5a7a; opacity: 0.0; transition: opacity 0.15s;
+  }
+  .img-frame:hover .rsz, .rsz.active { opacity: 0.9; }
+  .rsz-t { top: -4px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; border-top: 2px solid #8a8aaa; }
+  .rsz-b { bottom: -4px; left: 8px; right: 8px; height: 6px; cursor: ns-resize; border-bottom: 2px solid #8a8aaa; }
+  .rsz-l { left: -4px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize; border-left: 2px solid #8a8aaa; }
+  .rsz-r { right: -4px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize; border-right: 2px solid #8a8aaa; }
+  .rsz-tl { top: -6px; left: -6px; width: 14px; height: 14px; cursor: nwse-resize; border-top: 2px solid #aaaacc; border-left: 2px solid #aaaacc; }
+  .rsz-tr { top: -6px; right: -6px; width: 14px; height: 14px; cursor: nesw-resize; border-top: 2px solid #aaaacc; border-right: 2px solid #aaaacc; }
+  .rsz-bl { bottom: -6px; left: -6px; width: 14px; height: 14px; cursor: nesw-resize; border-bottom: 2px solid #aaaacc; border-left: 2px solid #aaaacc; }
+  .rsz-br { bottom: -6px; right: -6px; width: 14px; height: 14px; cursor: nwse-resize; border-bottom: 2px solid #aaaacc; border-right: 2px solid #aaaacc; }
+
+  .fields {
+    display: flex; flex-direction: column; gap: 8px;
+    background: #1e1e2e; padding: 14px; border-radius: 6px;
+    width: 280px; flex-shrink: 0;
+    align-self: center;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .fields h3 { font-size: 13px; color: #aaa; margin-bottom: 4px; }
+  .field-row { display: flex; align-items: center; gap: 8px; }
+  .field-row label { font-size: 11px; color: #888; width: 85px; text-align: right; flex-shrink: 0; }
+  .field-row input, .field-row select {
+    flex: 1; padding: 4px 8px; background: #2a2a2a; border: 1px solid #3a3a3a;
+    color: #ccc; border-radius: 3px; font-size: 12px; min-width: 0;
+  }
+  .field-row input:focus, .field-row select:focus { border-color: #5566aa; }
+  .field-row input[type="number"] { width: 60px; }
+  .field-row textarea {
+    flex: 1; padding: 4px 8px; background: #2a2a2a; border: 1px solid #3a3a3a;
+    color: #ccc; border-radius: 3px; font-size: 12px; min-height: 48px; resize: vertical;
+  }
+  .field-row input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; flex: none; }
+  #effectFields, #effectAltFields { transition: opacity 0.15s; }
+
+  .grid-area {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    flex-shrink: 0;
+  }
+  .grid-label { font-size: 12px; color: #aaa; font-weight: bold; }
+  .grid-main {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .grid-stack { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .grid-container { background: #000; padding: 3px; border-radius: 4px; }
+  .cell {
+    border: none; cursor: pointer; border-radius: 2px;
+    transition: transform 0.08s ease; outline: none;
+  }
+  .cell:active { transform: scale(0.9); }
+  .s-empty { background: #2a2a2a; }
+  .s-orange { background: #CC7700; }
+  .s-orange-red { background: #CC7700; box-shadow: inset 0 0 0 4px #FF0000; }
+  .s-red-only { background: #2a2a2a; box-shadow: inset 0 0 0 4px #FF0000; }
+  .s-center { background: #FFFFFF; cursor: default; }
+
+  .legend {
+    display: flex; flex-direction: column; gap: 8px;
+    font-size: 11px; color: #888;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-box { width: 16px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+
+  .grid-size-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #888; }
+  .grid-size-row input { width: 40px; padding: 2px 4px; background: #2a2a2a; border: 1px solid #3a3a3a; color: #ccc; border-radius: 3px; font-size: 11px; }
+
+  #folderInput, #jsonInput { display: none; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Card Marker Editor</h1>
+  <button class="btn" onclick="document.getElementById('folderInput').click()">选择参考图片文件夹</button>
+  <button class="btn" onclick="document.getElementById('jsonInput').click()">读取JSON</button>
+  <button class="btn btn-primary" onclick="exportJSON()">导出JSON</button>
+  <span class="info" id="info"></span>
+  <input type="file" id="folderInput" webkitdirectory multiple accept="image/*">
+  <input type="file" id="jsonInput" accept=".json">
+</div>
+
+<div class="main">
+  <div class="entry-list" id="entryList"><div class="header">条目列表</div></div>
+  <div class="file-list" id="fileList" style="display:none"><div class="header">图片列表</div></div>
+  <div class="preview-area" id="previewArea"></div>
+</div>
+
+<script>
+  const stateClasses = ['s-empty', 's-orange', 's-orange-red', 's-red-only'];
+
+  const CONDITIONS = [
+    {v:'OnPlayed', l:'配置时'},
+    {v:'OnSelfDead', l:'被消灭时'},
+    {v:'OnPosition', l:'此卡片配置中'},
+    {v:'OnFirstBuffed', l:'首次被强化时'},
+    {v:'OnFirstDeBuffed', l:'首次被弱化时'},
+    {v:'OnFirstBuffedOrDeBuffed', l:'首次被强化或弱化时'},
+    {v:'OnBuffed', l:'被强化时'},
+    {v:'OnDeBuffed', l:'被弱化时'},
+    {v:'OnBuffedOrDeBuffed', l:'被强化或弱化时'},
+    {v:'OnFriendDead', l:'我方卡片被消灭时'},
+    {v:'OnEnemyDead', l:'对方卡片被消灭时'},
+    {v:'OnFriendOrEnemyDead', l:'我方·对方卡片被消灭时'},
+    {v:'BuffedFriendNum', l:'我方被强化数量'},
+    {v:'BuffedEnemyNum', l:'对方被强化数量'},
+    {v:'BuffedFriendOrEnemyNum', l:'我方·对方被强化数量'},
+    {v:'DeBuffedFriendNum', l:'我方被弱化数量'},
+    {v:'DeBuffedEnemyNum', l:'对方被弱化数量'},
+    {v:'DeBuffedFriendOrEnemyNum', l:'我方·对方被弱化数量'},
+    {v:'OnFriendPlayed', l:'我方卡片被配置时'},
+    {v:'OnEnemyPlayed', l:'对方卡片被配置时'},
+    {v:'OnFriendOrEnemyPlayed', l:'我方·对方卡片被配置时'},
+    {v:'OnPowerFirstReach', l:'威力首次达到'},
+    {v:'OnTurnEnd', l:'回合结束时'},
+    {v:'OnLineWin', l:'行胜利时'}
+  ];
+  const TARGETS = [
+    {v:'FriendOnly', l:'我方'},
+    {v:'EnemyOnly', l:'对手'},
+    {v:'FriendAndEnemy', l:'我方·对手'},
+    {v:'Self', l:'自身'},
+    {v:'Hand', l:'手牌'},
+    {v:'FieldSlot', l:'阵地'},
+    {v:'ScoreCounter', l:'积分'}
+  ];
+  const OPERATIONS = [
+    {v:'PowerUp', l:'威力提升'},
+    {v:'PowerDown', l:'威力降低'},
+    {v:'DestroyCard', l:'消灭卡片'},
+    {v:'AddCardToHand', l:'手牌增加卡牌'},
+    {v:'IncreaseFieldLevel', l:'阵地等级提升'},
+    {v:'SpawnCardOnFieldSlot', l:'在阵地生成卡片'},
+    {v:'SpawnFieldSlots', l:'生成阵地'},
+    {v:'AddScore', l:'增加积分'},
+    {v:'TransferScore', l:'转移分数'}
+  ];
+  const VALUETYPES = [
+    {v:'Const', l:'常数'},
+    {v:'CardCode', l:'卡片代码'},
+    {v:'AsKilledOne', l:'依据被消灭的卡片'},
+    {v:'LineRivalScore', l:'依据对手的行分数'},
+    {v:'CountBased', l:'依据数量'},
+    {v:'FieldSlotLevel', l:'依据阵地等级'}
+  ];
+
+  let gridRows = 5;
+  let gridCols = 5;
+  let entries = [ newEntry() ];
+  let entryIndex = 0;
+  let allFiles = [];
+  let imgW = 320, imgH = 320;
+  let imgIndex = -1;
+  let cellStates = [];
+
+  function newEntry() {
+    return {
+      CardCode: '', Name: '', Level: '', Cost: '',
+      HasCardEffect: true,
+      HasCardEffectAlt: false,
+      PosEffect: createGrid(gridRows, gridCols),
+      CardEffect: {
+        Condition: '', Target: '', Operation: '',
+        ValueType: '', Value: '', PowerThreshold: '',
+        CardCodeList: [],
+        Scope: createGrid(gridRows, gridCols)
+      },
+      CardEffectAlt: {
+        Condition: '', Target: '', Operation: '',
+        ValueType: '', Value: '', PowerThreshold: '',
+        CardCodeList: [],
+        Scope: createGrid(gridRows, gridCols)
+      },
+      Description: ''
+    };
+  }
+
+  function createGrid(rows, cols) {
+    return Array.from({length: rows}, () => Array(cols).fill(0));
+  }
+
+  function centerR() { return Math.floor(gridRows / 2); }
+  function centerC() { return Math.floor(gridCols / 2); }
+
+  document.getElementById('folderInput').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files).filter(f =>
+      f.type.startsWith('image/') || /\.(jpg|jpeg|png|bmp|gif)$/i.test(f.name)
+    );
+    if (!files.length) { alert('文件夹中没有找到图片'); return; }
+    files.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN', {numeric: true}));
+    allFiles = files;
+    imgIndex = -1;
+    document.getElementById('fileList').style.display = '';
+    renderFileList();
+    if (!entries[entryIndex].CardCode) {
+      entries[entryIndex].CardCode = extractCardNum(files[0].name);
+      syncFieldsFromEntry();
+    }
+    syncImgToEntry();
+    renderPreview();
+  });
+
+  document.getElementById('jsonInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = JSON.parse(ev.target.result);
+        for (const d of data) {
+          const grid = d.PosEffect || (d.CardEffect && d.CardEffect.Scope);
+          if (Array.isArray(grid) && grid.length > 0) {
+            gridRows = grid.length;
+            gridCols = grid[0].length;
+            break;
+          }
+        }
+        entries = data.map(d => {
+          const ce = d.CardEffect || {};
+          const ceAlt = d.CardEffectAlt || {};
+          return {
+            CardCode: d.CardCode || '',
+            Name: d.Name || '',
+            Level: d.Level !== undefined ? d.Level : '',
+            Cost: d.Cost !== undefined ? d.Cost : '',
+            HasCardEffect: d.HasCardEffect !== undefined ? d.HasCardEffect : (d.CardEffect !== null && d.CardEffect !== undefined),
+            HasCardEffectAlt: d.HasCardEffectAlt !== undefined ? d.HasCardEffectAlt : (d.CardEffectAlt !== null && d.CardEffectAlt !== undefined),
+            PosEffect: d.PosEffect || createGrid(gridRows, gridCols),
+            CardEffect: {
+              Condition: ce.Condition || '', Target: ce.Target || '',
+              Operation: ce.Operation || '', ValueType: ce.ValueType || '',
+              Value: ce.Value !== undefined ? ce.Value : '',
+              PowerThreshold: ce.PowerThreshold !== undefined ? ce.PowerThreshold : '',
+              CardCodeList: ce.CardCodeList || [],
+              Scope: ce.Scope || createGrid(gridRows, gridCols)
+            },
+            CardEffectAlt: {
+              Condition: ceAlt.Condition || '', Target: ceAlt.Target || '',
+              Operation: ceAlt.Operation || '', ValueType: ceAlt.ValueType || '',
+              Value: ceAlt.Value !== undefined ? ceAlt.Value : '',
+              PowerThreshold: ceAlt.PowerThreshold !== undefined ? ceAlt.PowerThreshold : '',
+              CardCodeList: ceAlt.CardCodeList || [],
+              Scope: ceAlt.Scope || createGrid(gridRows, gridCols)
+            },
+            Description: d.Description || ''
+          };
+        });
+        if (!entries.length) entries = [ newEntry() ];
+        entryIndex = 0;
+        if (allFiles.length > 0 && entries[0].CardCode) {
+          const num = entries[0].CardCode.replace('Card', '');
+          const found = allFiles.findIndex(f => f.name.startsWith(num));
+          if (found >= 0) imgIndex = found;
+        }
+        document.getElementById('info').textContent = `已加载JSON: ${entries.length} 条 (${gridRows}x${gridCols})`;
+        loadEntryToGrid();
+      } catch (err) { alert('JSON解析失败: ' + err.message); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  function renderEntryList() {
+    const list = document.getElementById('entryList');
+    list.innerHTML = '<div class="header">条目列表</div>';
+    entries.forEach((e, i) => {
+      const div = document.createElement('div');
+      div.className = 'entry-item' + (i === entryIndex ? ' active' : '');
+      let label = `#${i+1} ${e.CardCode || '?'}`;
+      if (e.Name) label += ` : ${e.Name}`;
+      div.textContent = label;
+      div.onclick = () => { saveFieldsToEntry(); entryIndex = i; syncImgToEntry(); loadEntryToGrid(); };
+      list.appendChild(div);
+    });
+  }
+
+  function syncImgToEntry() {
+    if (allFiles.length === 0) return;
+    const num = entries[entryIndex].CardCode.replace('Card', '');
+    const found = allFiles.findIndex(f => f.name.startsWith(num));
+    if (found >= 0) imgIndex = found;
+  }
+
+  function renderFileList() {
+    const list = document.getElementById('fileList');
+    if (!allFiles.length) { list.style.display = 'none'; return; }
+    list.style.display = '';
+    list.innerHTML = '<div class="header">图片列表</div>';
+    allFiles.forEach((file, i) => {
+      const div = document.createElement('div');
+      div.className = 'file-item' + (i === imgIndex ? ' active' : '');
+      div.textContent = file.name;
+      div.onclick = () => {
+        saveFieldsToEntry();
+        imgIndex = i;
+        entries[entryIndex].CardCode = extractCardNum(file.name);
+        syncFieldsFromEntry();
+        renderPreview();
+      };
+      list.appendChild(div);
+    });
+  }
+
+  function loadEntryToGrid() {
+    const e = entries[entryIndex];
+    cellStates = gridToStates(e.PosEffect, e.CardEffect.Scope);
+    renderPreview();
+  }
+
+  function gridToStates(posGrid, scopeGrid) {
+    const cr = centerR(), cc = centerC();
+    const states = [];
+    for (let r = 0; r < gridRows; r++) {
+      states.push([]);
+      for (let c = 0; c < gridCols; c++) {
+        if (r === cr && c === cc) { states[r].push(4); continue; }
+        const o = (posGrid[r] && posGrid[r][c]) ? 1 : 0;
+        const rd = (scopeGrid[r] && scopeGrid[r][c]) ? 1 : 0;
+        states[r].push(o && rd ? 2 : o ? 1 : rd ? 3 : 0);
+      }
+    }
+    return states;
+  }
+
+  function statesToPosEffect() {
+    const cr = centerR(), cc = centerC();
+    const grid = createGrid(gridRows, gridCols);
+    const e = entries[entryIndex];
+    const op = e.CardEffect ? e.CardEffect.Operation : '';
+    const useValue = op === 'IncreaseFieldLevel';
+    const val = useValue && e.CardEffect.Value !== '' && e.CardEffect.Value !== undefined ? e.CardEffect.Value : 1;
+    for (let r = 0; r < gridRows; r++) {
+      for (let c = 0; c < gridCols; c++) {
+        if (r === cr && c === cc) { grid[r][c] = 0; continue; }
+        const s = cellStates[r][c];
+        grid[r][c] = (s === 1 || s === 2) ? val : 0;
+      }
+    }
+    return grid;
+  }
+
+  function statesToScope() {
+    const cr = centerR(), cc = centerC();
+    const grid = createGrid(gridRows, gridCols);
+    for (let r = 0; r < gridRows; r++) {
+      for (let c = 0; c < gridCols; c++) {
+        if (r === cr && c === cc) { grid[r][c] = 0; continue; }
+        const s = cellStates[r][c];
+        grid[r][c] = (s === 2 || s === 3) ? 1 : 0;
+      }
+    }
+    return grid;
+  }
+
+  function saveFieldsToEntry() {
+    if (entryIndex < 0 || entryIndex >= entries.length) return;
+    const e = entries[entryIndex];
+    const get = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const chk = id => { const el = document.getElementById(id); return el ? el.checked : false; };
+    e.CardCode = get('f_cardcode');
+    e.Name = get('f_name');
+    e.Level = get('f_level') !== '' ? Number(get('f_level')) : '';
+    e.Cost = get('f_cost') !== '' ? Number(get('f_cost')) : '';
+    e.HasCardEffect = chk('f_haseffect');
+    e.CardEffect.Condition = get('f_condition');
+    e.CardEffect.Target = get('f_target');
+    e.CardEffect.Operation = get('f_operation');
+    e.CardEffect.ValueType = get('f_valuetype');
+    e.CardEffect.Value = get('f_value') !== '' ? Number(get('f_value')) : '';
+    e.CardEffect.PowerThreshold = get('f_powerthreshold') !== '' ? Number(get('f_powerthreshold')) : '';
+    e.CardEffect.CardCodeList = get('f_codelist') ? get('f_codelist').split(',').map(s => s.trim()).filter(s => s) : [];
+    e.CardEffect.Scope = statesToScope();
+    e.PosEffect = statesToPosEffect();
+    // Alt effect
+    e.HasCardEffectAlt = chk('f_haseffect_alt');
+    if (e.HasCardEffectAlt) {
+      e.CardEffectAlt.Condition = get('f_condition_alt');
+      e.CardEffectAlt.Target = get('f_target_alt');
+      e.CardEffectAlt.Operation = get('f_operation_alt');
+      e.CardEffectAlt.ValueType = get('f_valuetype_alt');
+      e.CardEffectAlt.Value = get('f_value_alt') !== '' ? Number(get('f_value_alt')) : '';
+      e.CardEffectAlt.PowerThreshold = get('f_powerthreshold_alt') !== '' ? Number(get('f_powerthreshold_alt')) : '';
+      e.CardEffectAlt.CardCodeList = get('f_codelist_alt') ? get('f_codelist_alt').split(',').map(s => s.trim()).filter(s => s) : [];
+      e.CardEffectAlt.Scope = statesToScope();
+    }
+    e.Description = get('f_description');
+  }
+
+  function syncFieldsFromEntry() {
+    const e = entries[entryIndex];
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val !== undefined && val !== null ? val : ''; };
+    const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val; };
+    set('f_cardcode', e.CardCode);
+    set('f_name', e.Name);
+    set('f_level', e.Level);
+    set('f_cost', e.Cost);
+    setChk('f_haseffect', e.HasCardEffect);
+    set('f_condition', e.CardEffect.Condition);
+    set('f_target', e.CardEffect.Target);
+    set('f_operation', e.CardEffect.Operation);
+    set('f_valuetype', e.CardEffect.ValueType);
+    set('f_value', e.CardEffect.Value);
+    set('f_powerthreshold', e.CardEffect.PowerThreshold);
+    set('f_codelist', (e.CardEffect.CardCodeList || []).join(', '));
+    setChk('f_haseffect_alt', e.HasCardEffectAlt);
+    set('f_condition_alt', e.CardEffectAlt.Condition);
+    set('f_target_alt', e.CardEffectAlt.Target);
+    set('f_operation_alt', e.CardEffectAlt.Operation);
+    set('f_valuetype_alt', e.CardEffectAlt.ValueType);
+    set('f_value_alt', e.CardEffectAlt.Value);
+    set('f_powerthreshold_alt', e.CardEffectAlt.PowerThreshold);
+    set('f_codelist_alt', (e.CardEffectAlt.CardCodeList || []).join(', '));
+    set('f_description', e.Description);
+  }
+
+  function renderPreview() {
+    const area = document.getElementById('previewArea');
+    const e = entries[entryIndex];
+
+    let imgFrameHtml = '';
+    const HS = `<div class="rsz rsz-t" data-dir="t"></div><div class="rsz rsz-b" data-dir="b"></div><div class="rsz rsz-l" data-dir="l"></div><div class="rsz rsz-r" data-dir="r"></div><div class="rsz rsz-tl" data-dir="tl"></div><div class="rsz rsz-tr" data-dir="tr"></div><div class="rsz rsz-bl" data-dir="bl"></div><div class="rsz rsz-br" data-dir="br"></div>`;
+    const frameStyle = `style="width:${imgW}px;height:${imgH}px"`;
+    if (allFiles.length > 0 && imgIndex >= 0) {
+      const file = allFiles[imgIndex];
+      const url = URL.createObjectURL(file);
+      imgFrameHtml = `<div class="img-frame" ${frameStyle}><img src="${url}">${HS}</div><span class="label">${file.name}</span>`;
+    } else {
+      imgFrameHtml = `<div class="img-frame" ${frameStyle}><span class="img-placeholder">?</span>${HS}</div><span class="label"></span>`;
+    }
+
+    const sel = (id, opts, val) => `<select id="${id}"><option value=""></option>${opts.map(o => `<option value="${o.v}"${o.v===val?' selected':''}>${o.l}</option>`).join('')}</select>`;
+    const cellSize = gridCols > 7 ? 30 : gridCols > 5 ? 34 : 40;
+
+    area.innerHTML = `
+      <div class="preview-top">
+        <div class="img-preview">${imgFrameHtml}</div>
+        <div class="fields">
+          <h3>卡牌信息</h3>
+          <div class="field-row"><label>Code</label><input type="text" id="f_cardcode" value="${e.CardCode||''}"></div>
+          <div class="field-row"><label>名称</label><input type="text" id="f_name" value="${e.Name||''}"></div>
+          <div class="field-row"><label>威力</label><input type="number" id="f_level" value="${e.Level!==''?e.Level:''}"></div>
+          <div class="field-row"><label>场地等级要求</label><input type="number" id="f_cost" value="${e.Cost!==''?e.Cost:''}"></div>
+          <h3 style="display:flex;align-items:center;gap:8px">特效<input type="checkbox" id="f_haseffect" ${e.HasCardEffect?'checked':''} onchange="saveFieldsToEntry();updateEffectVisibility()" style="width:18px;height:18px;cursor:pointer"></h3>
+          <div id="effectFields">
+          <div class="field-row"><label>触发条件</label>${sel('f_condition', CONDITIONS, e.CardEffect.Condition).replace('<select', '<select onchange="updatePowerThresholdVisibility()"')}</div>
+          <div class="field-row"><label>目标</label>${sel('f_target', TARGETS, e.CardEffect.Target)}</div>
+          <div class="field-row"><label>操作</label>${sel('f_operation', OPERATIONS, e.CardEffect.Operation).replace('<select', '<select onchange="updateCardCodeListVisibility()"')}</div>
+          <div class="field-row" id="f_valuetype_row"><label>值类型</label>${sel('f_valuetype', VALUETYPES, e.CardEffect.ValueType).replace('<select', '<select onchange="saveFieldsToEntry();updateCardCodeListVisibility()"')}</div>
+          <div class="field-row" id="f_value_row"><label>数值</label><input type="number" id="f_value" value="${e.CardEffect.Value!==''?e.CardEffect.Value:''}"></div>
+          <div class="field-row" id="f_powerthreshold_row"><label>威力阈值</label><input type="number" id="f_powerthreshold" value="${e.CardEffect.PowerThreshold!==''?e.CardEffect.PowerThreshold:''}"></div>
+          <div class="field-row" id="f_codelist_row"><label>卡牌列表</label><input type="text" id="f_codelist" value="${(e.CardEffect.CardCodeList||[]).join(', ')}" placeholder="Card001, Card002"></div>
+          </div>
+          <h3 style="display:flex;align-items:center;gap:8px">额外特效<input type="checkbox" id="f_haseffect_alt" ${e.HasCardEffectAlt?'checked':''} onchange="saveFieldsToEntry();updateEffectAltVisibility()" style="width:18px;height:18px;cursor:pointer"></h3>
+          <div id="effectAltFields">
+          <div class="field-row"><label>触发条件</label>${sel('f_condition_alt', CONDITIONS, e.CardEffectAlt.Condition).replace('<select', '<select onchange="updatePowerThresholdAltVisibility()"')}</div>
+          <div class="field-row"><label>目标</label>${sel('f_target_alt', TARGETS, e.CardEffectAlt.Target)}</div>
+          <div class="field-row"><label>操作</label>${sel('f_operation_alt', OPERATIONS, e.CardEffectAlt.Operation).replace('<select', '<select onchange="updateCardCodeListAltVisibility()"')}</div>
+          <div class="field-row" id="f_valuetype_alt_row"><label>值类型</label>${sel('f_valuetype_alt', VALUETYPES, e.CardEffectAlt.ValueType).replace('<select', '<select onchange="saveFieldsToEntry();updateCardCodeListAltVisibility()"')}</div>
+          <div class="field-row" id="f_value_alt_row"><label>数值</label><input type="number" id="f_value_alt" value="${e.CardEffectAlt.Value!==''?e.CardEffectAlt.Value:''}"></div>
+          <div class="field-row" id="f_powerthreshold_alt_row"><label>威力阈值</label><input type="number" id="f_powerthreshold_alt" value="${e.CardEffectAlt.PowerThreshold!==''?e.CardEffectAlt.PowerThreshold:''}"></div>
+          <div class="field-row" id="f_codelist_alt_row"><label>卡牌列表</label><input type="text" id="f_codelist_alt" value="${(e.CardEffectAlt.CardCodeList||[]).join(', ')}" placeholder="Card001, Card002"></div>
+          </div>
+          <h3>描述</h3>
+          <div class="field-row"><textarea id="f_description">${e.Description||''}</textarea></div>
+        </div>
+        <div class="grid-area">
+          <div class="grid-main">
+            <div class="grid-stack">
+              <div class="grid-label">作用范围</div>
+              <div class="grid-container">
+                <div class="grid" id="mainGrid" style="display:grid;grid-template-columns:repeat(${gridCols},${cellSize}px);grid-template-rows:repeat(${gridRows},${cellSize}px);gap:3px;"></div>
+              </div>
+              <div class="grid-size-row">
+                <label>行</label><input type="number" id="f_rows" value="${gridRows}" min="1" max="15" style="width:40px" onchange="changeGridSize()">
+                <label>列</label><input type="number" id="f_cols" value="${gridCols}" min="1" max="15" style="width:40px" onchange="changeGridSize()">
+              </div>
+            </div>
+            <div class="legend">
+              <div class="legend-item"><div class="legend-box s-empty"></div>空</div>
+              <div class="legend-item"><div class="legend-box s-orange"></div>场地作用方格</div>
+              <div class="legend-item"><div class="legend-box s-orange-red"></div>橙+红</div>
+              <div class="legend-item"><div class="legend-box s-red-only"></div>特效作用方格</div>
+              <div class="legend-item"><div class="legend-box s-center"></div>自身位置</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-bottom">
+        <div class="nav-btns">
+          <button class="btn" onclick="prevEntry()">上一个</button>
+          <button class="btn" onclick="nextEntry()">下一个</button>
+        </div>
+      </div>
+    `;
+    renderGrid();
+    syncFieldsFromEntry();
+    updateEffectVisibility();
+    updateEffectAltVisibility();
+    updatePowerThresholdVisibility();
+    updatePowerThresholdAltVisibility();
+    updateCardCodeListVisibility();
+    updateCardCodeListAltVisibility();
+    renderEntryList();
+    renderFileList();
+    updateInfo();
+  }
+
+  function updateEffectVisibility() {
+    const box = document.getElementById('effectFields');
+    const entry = entries[entryIndex];
+    if (!box) return;
+    if (entry.HasCardEffect) {
+      box.style.visibility = '';
+      box.style.height = '';
+      box.style.overflow = '';
+    } else {
+      box.style.visibility = 'hidden';
+      box.style.height = '0';
+      box.style.overflow = 'hidden';
+    }
+    if (!entry.HasCardEffect) {
+      for (let r = 0; r < gridRows; r++) {
+        for (let c = 0; c < gridCols; c++) {
+          const s = cellStates[r][c];
+          if (s === 2) cellStates[r][c] = 1;
+          else if (s === 3) cellStates[r][c] = 0;
+        }
+      }
+    }
+    renderGrid();
+  }
+
+  function updatePowerThresholdVisibility() {
+    const row = document.getElementById('f_powerthreshold_row');
+    const cond = document.getElementById('f_condition');
+    if (!row || !cond) return;
+    row.style.display = (cond.value === 'OnPowerFirstReach') ? '' : 'none';
+  }
+  function updatePowerThresholdAltVisibility() {
+    const row = document.getElementById('f_powerthreshold_alt_row');
+    const cond = document.getElementById('f_condition_alt');
+    if (!row || !cond) return;
+    row.style.display = (cond.value === 'OnPowerFirstReach') ? '' : 'none';
+  }
+  function updateCardCodeListVisibility() {
+    const row = document.getElementById('f_codelist_row');
+    const vtRow = document.getElementById('f_valuetype_row');
+    const valRow = document.getElementById('f_value_row');
+    const op = document.getElementById('f_operation');
+    const vt = document.getElementById('f_valuetype');
+    if (!row || !op) return;
+    const opVal = op.value;
+    const isAdd = (opVal === 'AddCardToHand');
+    const isDestroy = (opVal === 'DestroyCard');
+    const isSpawn = (opVal === 'SpawnCardOnFieldSlot');
+    const hideVT = isAdd || isDestroy;
+    const hideVal = isAdd || isDestroy || (vt && vt.value === 'AsKilledOne');
+    // CardCodeList row: show for AddCardToHand or SpawnCardOnFieldSlot
+    row.style.display = (isAdd || isSpawn) ? '' : 'none';
+    if (vtRow) vtRow.style.display = hideVT ? 'none' : '';
+    if (valRow) valRow.style.display = hideVal ? 'none' : '';
+    if (isAdd && vt) vt.value = 'CardCode';
+  }
+  function updateCardCodeListAltVisibility() {
+    const row = document.getElementById('f_codelist_alt_row');
+    const vtRow = document.getElementById('f_valuetype_alt_row');
+    const valRow = document.getElementById('f_value_alt_row');
+    const op = document.getElementById('f_operation_alt');
+    const vt = document.getElementById('f_valuetype_alt');
+    if (!row || !op) return;
+    const opVal = op.value;
+    const isAdd = (opVal === 'AddCardToHand');
+    const isDestroy = (opVal === 'DestroyCard');
+    const isSpawn = (opVal === 'SpawnCardOnFieldSlot');
+    const hideVT = isAdd || isDestroy;
+    const hideVal = isAdd || isDestroy || (vt && vt.value === 'AsKilledOne');
+    row.style.display = (isAdd || isSpawn) ? '' : 'none';
+    if (vtRow) vtRow.style.display = hideVT ? 'none' : '';
+    if (valRow) valRow.style.display = hideVal ? 'none' : '';
+    if (isAdd && vt) vt.value = 'CardCode';
+  }
+
+  function updateEffectAltVisibility() {
+    const box = document.getElementById('effectAltFields');
+    const entry = entries[entryIndex];
+    if (!box) return;
+    if (entry.HasCardEffectAlt) {
+      box.style.visibility = '';
+      box.style.height = '';
+      box.style.overflow = '';
+    } else {
+      box.style.visibility = 'hidden';
+      box.style.height = '0';
+      box.style.overflow = 'hidden';
+    }
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('mainGrid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const cr = centerR(), cc = centerC();
+    const hasEffect = entries[entryIndex].HasCardEffect;
+    for (let r = 0; r < gridRows; r++) {
+      for (let c = 0; c < gridCols; c++) {
+        const cell = document.createElement('button');
+        if (r === cr && c === cc) {
+          cell.className = 'cell s-center';
+        } else {
+          let displayState = cellStates[r][c];
+          if (!hasEffect) {
+            if (displayState === 2) displayState = 1;
+            else if (displayState === 3) displayState = 0;
+          }
+          cell.className = 'cell ' + stateClasses[displayState];
+          cell.addEventListener('click', () => {
+            if (hasEffect) {
+              cellStates[r][c] = (cellStates[r][c] + 1) % stateClasses.length;
+            } else {
+              const cur = cellStates[r][c];
+              cellStates[r][c] = (cur === 1 || cur === 2) ? 0 : 1;
+            }
+            const ds = hasEffect ? cellStates[r][c] : (cellStates[r][c] === 1 || cellStates[r][c] === 2 ? 1 : 0);
+            cell.className = 'cell ' + stateClasses[ds];
+            saveFieldsToEntry();
+          });
+        }
+        grid.appendChild(cell);
+      }
+    }
+  }
+
+  function changeGridSize() {
+    const newRows = parseInt(document.getElementById('f_rows').value) || 5;
+    const newCols = parseInt(document.getElementById('f_cols').value) || 5;
+    gridRows = Math.max(1, Math.min(15, newRows));
+    gridCols = Math.max(1, Math.min(15, newCols));
+    const cr = centerR(), cc = centerC();
+    // Resize main states
+    const newStates = [];
+    for (let r = 0; r < gridRows; r++) {
+      newStates.push([]);
+      for (let c = 0; c < gridCols; c++) {
+        if (r === cr && c === cc) { newStates[r].push(4); continue; }
+        const old = (cellStates[r] && cellStates[r][c] !== undefined) ? cellStates[r][c] : 0;
+        newStates[r].push(old === 4 ? 0 : old);
+      }
+    }
+    cellStates = newStates;
+    saveFieldsToEntry();
+    renderPreview();
+  }
+
+  function updateInfo() {
+    const e = entries[entryIndex];
+    let info = `条目 ${entryIndex+1}/${entries.length}`;
+    if (allFiles.length > 0) info += ` | 图片 ${imgIndex>=0?imgIndex+1:0}/${allFiles.length}`;
+    if (e.CardCode) info += ` | ${e.CardCode}`;
+    document.getElementById('info').textContent = info;
+  }
+
+  function nextEntry() {
+    saveFieldsToEntry();
+    if (entryIndex === entries.length - 1) {
+      entries.push(newEntry());
+      entryIndex++;
+      if (allFiles.length > 0 && imgIndex < allFiles.length - 1) {
+        imgIndex++;
+        entries[entryIndex].CardCode = extractCardNum(allFiles[imgIndex].name);
+      }
+      cellStates = emptyStates();
+      renderPreview();
+    } else {
+      entryIndex++;
+      syncImgToEntry();
+      loadEntryToGrid();
+    }
+  }
+
+  function prevEntry() {
+    saveFieldsToEntry();
+    if (entryIndex > 0) {
+      entryIndex--;
+      syncImgToEntry();
+      loadEntryToGrid();
+    }
+  }
+
+  function emptyStates() {
+    const cr = centerR(), cc = centerC();
+    const s = [];
+    for (let r = 0; r < gridRows; r++) {
+      s.push([]);
+      for (let c = 0; c < gridCols; c++) s[r].push((r===cr&&c===cc) ? 4 : 0);
+    }
+    return s;
+  }
+
+  function extractCardNum(filename) {
+    const m = filename.match(/^(\d{1,3})/);
+    return m ? 'Card' + m[1].padStart(3, '0') : '';
+  }
+
+  function isAllZero(grid) {
+    if (!grid) return true;
+    return grid.every(row => Array.isArray(row) && row.every(v => v === 0));
+  }
+
+  function exportJSON() {
+    saveFieldsToEntry();
+    let json = '[\n';
+    entries.forEach((e, i) => {
+      // For IncreaseFieldLevel, replace 1s in PosEffect with Value
+      let posEffect = e.PosEffect;
+      if (e.CardEffect && e.CardEffect.Operation === 'IncreaseFieldLevel'
+        && e.CardEffect.Value !== '' && e.CardEffect.Value !== undefined) {
+        posEffect = posEffect.map(row => row.map(v => v !== 0 ? e.CardEffect.Value : 0));
+      }
+      json += '  {\n';
+      json += `    "CardCode": "${e.CardCode}",\n`;
+      json += `    "Name": "${e.Name}",\n`;
+      json += `    "Level": ${e.Level !== '' ? e.Level : 0},\n`;
+      json += `    "Cost": ${e.Cost !== '' ? e.Cost : 0},\n`;
+      json += '    "PosEffect": [\n';
+      posEffect.forEach((row, ri) => {
+        json += '      ' + JSON.stringify(row) + (ri < posEffect.length-1 ? ',' : '') + '\n';
+      });
+      json += '    ],\n';
+      if (!e.HasCardEffect) {
+        json += '    "CardEffect": null,\n';
+      } else {
+        json += '    "CardEffect": {\n';
+        json += `      "Condition": "${e.CardEffect.Condition}",\n`;
+        json += `      "Target": "${e.CardEffect.Target}",\n`;
+        json += `      "Operation": "${e.CardEffect.Operation}",\n`;
+        json += `      "ValueType": "${e.CardEffect.ValueType}",\n`;
+        json += `      "Value": ${e.CardEffect.Value !== '' ? e.CardEffect.Value : 0},\n`;
+        if (e.CardEffect.Condition === 'OnPowerFirstReach') {
+          json += `      "PowerThreshold": ${e.CardEffect.PowerThreshold !== '' ? e.CardEffect.PowerThreshold : 0},\n`;
+        }
+        if (e.CardEffect.Operation === 'AddCardToHand') {
+          json += `      "CardCodeList": ${JSON.stringify(e.CardEffect.CardCodeList || [])},\n`;
+        }
+        if (isAllZero(e.CardEffect.Scope)) {
+          json += '      "Scope": null\n';
+        } else {
+          json += '      "Scope": [\n';
+          e.CardEffect.Scope.forEach((row, ri) => {
+            json += '        ' + JSON.stringify(row) + (ri < gridRows-1 ? ',' : '') + '\n';
+          });
+          json += '      ]\n';
+        }
+        json += '    },\n';
+      }
+      if (e.HasCardEffectAlt) {
+        json += '    "CardEffectAlt": {\n';
+        json += `      "Condition": "${e.CardEffectAlt.Condition}",\n`;
+        json += `      "Target": "${e.CardEffectAlt.Target}",\n`;
+        json += `      "Operation": "${e.CardEffectAlt.Operation}",\n`;
+        json += `      "ValueType": "${e.CardEffectAlt.ValueType}",\n`;
+        json += `      "Value": ${e.CardEffectAlt.Value !== '' ? e.CardEffectAlt.Value : 0},\n`;
+        if (e.CardEffectAlt.Condition === 'OnPowerFirstReach') {
+          json += `      "PowerThreshold": ${e.CardEffectAlt.PowerThreshold !== '' ? e.CardEffectAlt.PowerThreshold : 0},\n`;
+        }
+        if (e.CardEffectAlt.Operation === 'AddCardToHand') {
+          json += `      "CardCodeList": ${JSON.stringify(e.CardEffectAlt.CardCodeList || [])},\n`;
+        }
+        if (isAllZero(e.CardEffectAlt.Scope)) {
+          json += '      "Scope": null\n';
+        } else {
+          json += '      "Scope": [\n';
+          e.CardEffectAlt.Scope.forEach((row, ri) => {
+            json += '        ' + JSON.stringify(row) + (ri < gridRows-1 ? ',' : '') + '\n';
+          });
+          json += '      ]\n';
+        }
+        json += '    },\n';
+      }
+      json += `    "Description": "${e.Description}"\n`;
+      json += '  }' + (i < entries.length - 1 ? ',' : '') + '\n';
+    });
+    json += ']\n';
+    const blob = new Blob([json], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'cards.json'; a.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('info').textContent = `已导出 ${entries.length} 条`;
+  }
+
+  // 8-way resize on img-frame
+  let rszState = null;
+  document.addEventListener('mousedown', function(e) {
+    const h = e.target.closest('.rsz');
+    if (!h) return;
+    e.preventDefault(); e.stopPropagation();
+    h.classList.add('active');
+    const frame = h.closest('.img-frame');
+    if (!frame) return;
+    const dir = h.dataset.dir;
+    const r = frame.getBoundingClientRect();
+    rszState = {
+      frame, dir,
+      startX: e.clientX, startY: e.clientY,
+      startW: r.width, startH: r.height,
+      startLeft: r.left, startTop: r.top
+    };
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!rszState) return;
+    const { frame, dir, startX, startY, startW, startH, startLeft, startTop } = rszState;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    const MIN = 100, MAX = 900;
+    let newW = startW, newH = startH;
+    if (dir.includes('r')) newW = Math.max(MIN, Math.min(MAX, startW + dx));
+    if (dir.includes('l')) newW = Math.max(MIN, Math.min(MAX, startW - dx));
+    if (dir.includes('b')) newH = Math.max(MIN, Math.min(MAX, startH + dy));
+    if (dir.includes('t')) newH = Math.max(MIN, Math.min(MAX, startH - dy));
+    frame.style.width = newW + 'px';
+    frame.style.height = newH + 'px';
+    imgW = newW; imgH = newH;
+  });
+  document.addEventListener('mouseup', function() {
+    document.querySelectorAll('.rsz.active').forEach(h => h.classList.remove('active'));
+    rszState = null;
+  });
+
+  document.addEventListener('keydown', e => {
+    const tag = e.target.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { nextEntry(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { prevEntry(); e.preventDefault(); }
+  });
+
+  cellStates = emptyStates();
+  renderEntryList();
+  renderPreview();
+</script>
+</body>
+</html>

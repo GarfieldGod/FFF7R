@@ -1,0 +1,3551 @@
+[
+  {
+    "CardCode": "Card001",
+    "Name": "Security Officer",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card002",
+    "Name": "Riot Trooper",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card003",
+    "Name": "Grenadier",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card004",
+    "Name": "J-Unit Sweeper",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card005",
+    "Name": "Queen Bee",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card006",
+    "Name": "Toxirat",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card007",
+    "Name": "Levrikon",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card008",
+    "Name": "Grasslands Wolf",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card009",
+    "Name": "Mu",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card010",
+    "Name": "Mandragora",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "配置时，手牌增加“曼德拉草的伙伴”。"
+  },
+  {
+    "CardCode": "Card011",
+    "Name": "Elphadunk",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card012",
+    "Name": "Cactuar",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card013",
+    "Name": "Crystalline Crab",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card014",
+    "Name": "Quetzalcoatl",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card015",
+    "Name": "Zu",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card016",
+    "Name": "Devil Rider",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [1,0,0,0,0],
+      [1,1,0,0,0],
+      [1,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card017",
+    "Name": "Screamer",
+    "Level": 1,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,1,1,0],
+      [0,1,0,1,0],
+      [0,1,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card018",
+    "Name": "Flan",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,0,0],
+      [0,1,0,0,0],
+      [0,1,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card019",
+    "Name": "Crawler",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,1,0,0],
+      [0,0,0,0,0],
+      [0,1,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card020",
+    "Name": "Archdragon",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,0,0],
+      [0,0,0,1,0],
+      [0,1,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card021",
+    "Name": "Ogre",
+    "Level": 5,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card022",
+    "Name": "Deathwheel",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,1]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card023",
+    "Name": "Fleetwing",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [1,0,0,0,0],
+      [0,1,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,0,0],
+      [1,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card024",
+    "Name": "Zemzelett",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card025",
+    "Name": "Ignilisk",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card026",
+    "Name": "Capparwire",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card027",
+    "Name": "Mindflayer",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,1,0],
+        [0,0,0,0,0],
+        [0,0,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "精神吸取者此卡片配置中，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card028",
+    "Name": "Scrutineye",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card029",
+    "Name": "Hell Rider II",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,1,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "地狱骑士V R 2配置时，特殊效果方格对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card030",
+    "Name": "Flametrooper",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,1,0,0],
+      [0,1,0,0,0],
+      [0,1,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,0,0,0],
+        [0,1,0,0,0],
+        [0,1,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方·对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card031",
+    "Name": "Spearhawk",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card032",
+    "Name": "Sea Devil",
+    "Level": 1,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFriendPlayed",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "从手牌配置我方卡片时，此卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card033",
+    "Name": "Shoalopod",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升4。"
+  },
+  {
+    "CardCode": "Card034",
+    "Name": "Crown Lance",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低2。"
+  },
+  {
+    "CardCode": "Card035",
+    "Name": "Tonberry King",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFriendDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "我方卡片消失时，此卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card036",
+    "Name": "Sandhog Pie",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card037",
+    "Name": "Bloatfloat",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方·对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card038",
+    "Name": "Bagnadrana",
+    "Level": 2,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnEnemyPlayed",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "从手牌配置对手卡片时，此卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card039",
+    "Name": "Cockatrice",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "蛇鸡兽配置时，消灭特殊效果方格我方·对手卡片。"
+  },
+  {
+    "CardCode": "Card040",
+    "Name": "Heatseeker",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "消失时，手牌增加“冠帽搜索者的伙伴”。"
+  },
+  {
+    "CardCode": "Card041",
+    "Name": "Bomb",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方·对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card042",
+    "Name": "Thug",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0]
+    ],
+    "CardEffect": null,
+    "Description": "没有特殊技能的普通卡片。"
+  },
+  {
+    "CardCode": "Card043",
+    "Name": "Death Claw",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnEnemyDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "对手卡片消失时，此卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card044",
+    "Name": "Landworm",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnEnemyDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "对手卡片消失时，此卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card045",
+    "Name": "Sandspitter",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,1,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,1,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card046",
+    "Name": "Chimera",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "DeBuffedEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "根据正在弱化中的对手卡片数量，威力提升2。"
+  },
+  {
+    "CardCode": "Card047",
+    "Name": "Joker",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFriendOrEnemyDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "我方·对手卡片消失时，此卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card048",
+    "Name": "Amphidex",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card049",
+    "Name": "Frightflower",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [1,0,1,0,1],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [1,0,1,0,1]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方·对手卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card050",
+    "Name": "Gagighandi",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格对手卡片的威力降低2。"
+  },
+  {
+    "CardCode": "Card051",
+    "Name": "Insectoid Chimera",
+    "Level": 2,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": null
+    },
+    "Description": "可覆盖配置我方卡片。"
+  },
+  {
+    "CardCode": "Card052",
+    "Name": "Gigantoad",
+    "Level": 3,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": null
+    },
+    "Description": "可覆盖配置并消灭我方卡片的卡片。"
+  },
+  {
+    "CardCode": "Card053",
+    "Name": "Maloceros",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnLineWin",
+      "Target": "ScoreCounter",
+      "Operation": "AddScore",
+      "ValueType": "Const",
+      "Value": 10,
+      "Scope": null
+    },
+    "Description": "列获胜时，获得10点积分奖励。"
+  },
+  {
+    "CardCode": "Card054",
+    "Name": "Grandhorn",
+    "Level": 3,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": null
+    },
+    "Description": "可覆盖配置并消灭我方卡片的卡片。"
+  },
+  {
+    "CardCode": "Card055",
+    "Name": "Great Malboro",
+    "Level": 3,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,1,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 6,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低6。"
+  },
+  {
+    "CardCode": "Card056",
+    "Name": "Grangalan",
+    "Level": 3,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,1,0,1,0],
+      [0,1,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "配置时，将「巨岩巨兽幼体」加入手牌。"
+  },
+  {
+    "CardCode": "Card057",
+    "Name": "Amalgam",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "消失时，手牌增加“未知生命体：复活”。"
+  },
+  {
+    "CardCode": "Card058",
+    "Name": "Skeeskee",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFriendDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "我方卡片消失时，此卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card059",
+    "Name": "Griffon",
+    "Level": 1,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "可覆盖配置我方卡片，使特殊效果方格我方卡片提升和消灭卡片相同程度的威力。"
+  },
+  {
+    "CardCode": "Card060",
+    "Name": "Basilisk",
+    "Level": 2,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，消灭特殊效果方格对手卡片。"
+  },
+  {
+    "CardCode": "Card061",
+    "Name": "Reapertail",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstDeBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "首次受到弱化时，特殊效果方格对手卡片的威力降低2。"
+  },
+  {
+    "CardCode": "Card062",
+    "Name": "Jabberwock",
+    "Level": 6,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,0,0],
+        [0,1,0,0,0],
+        [0,1,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card063",
+    "Name": "Desert Sahagin",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstDeBuffed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片首次受到弱化时，特殊效果方格我方卡片的威力提升4。"
+  },
+  {
+    "CardCode": "Card064",
+    "Name": "Cavestalker",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstDeBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "隐密步伐者此卡片首次受到弱化时，特殊效果方格对手卡片的威力降低2。"
+  },
+  {
+    "CardCode": "Card065",
+    "Name": "Stone Golem",
+    "Level": 4,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card066",
+    "Name": "Two Face",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnBuffed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "CardEffectAlt": {
+      "Condition": "OnDeBuffed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "强化此卡片时，特殊效果方格我方·对手卡片的威力提升4，弱化此卡片时，我方·对手卡片的威力降低4"
+  },
+  {
+    "CardCode": "Card067",
+    "Name": "Gi Specter",
+    "Level": 2,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "可覆盖配置我方卡片，使特殊效果方格我方·对手卡片降低和消灭卡片相同程度的威力。"
+  },
+  {
+    "CardCode": "Card068",
+    "Name": "Valron",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "DeBuffedFriendNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "根据其他正在弱化中的我方卡片数量，威力提升2。"
+  },
+  {
+    "CardCode": "Card069",
+    "Name": "Disgorgon",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,2,0],
+      [0,0,0,0,0],
+      [0,0,0,2,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "IncreaseFieldLevel",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "配置时，阵地等级提升2。"
+  },
+  {
+    "CardCode": "Card070",
+    "Name": "Dragon",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,1,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card071",
+    "Name": "Twin Brain",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,2,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,2,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "IncreaseFieldLevel",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "配置时，阵地等级提升2。"
+  },
+  {
+    "CardCode": "Card072",
+    "Name": "Black Bat",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,1,0,1,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card073",
+    "Name": "Bahba Velamyu",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card074",
+    "Name": "Rictus",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "DeBuffedFriendOrEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "根据正在弱化中的其他我方·对手卡片数量，威力提升1。"
+  },
+  {
+    "CardCode": "Card075",
+    "Name": "Adjudicator",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedFriendOrEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 1,
+      "Scope": null
+    },
+    "CardEffectAlt": {
+      "Condition": "DeBuffedFriendOrEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "根据正在强化或弱化中的其他我方·对手卡片数量，威力提升1。"
+  },
+  {
+    "CardCode": "Card076",
+    "Name": "Yin & Yang",
+    "Level": 3,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "可覆盖配置我方卡片，使特殊效果方格我方卡片提升和消灭卡片相同程度的威力。"
+  },
+  {
+    "CardCode": "Card077",
+    "Name": "Diabolic Variant",
+    "Level": 2,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "可覆盖配置，特殊效果方格我方·对手卡片的威力降低被覆盖卡片的威力数值。"
+  },
+  {
+    "CardCode": "Card078",
+    "Name": "Special Forces Operator",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card079",
+    "Name": "2-C SOLDIER Operator",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card080",
+    "Name": "Kelzmelzer",
+    "Level": 3,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "可覆盖配置我方卡片，使特殊效果方格我方·对手卡片降低和消灭卡片相同程度的威力。"
+  },
+  {
+    "CardCode": "Card081",
+    "Name": "Panthera Protector",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,1,1,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格我方卡片的威力提升4。"
+  },
+  {
+    "CardCode": "Card082",
+    "Name": "Hecteyes",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [1,0,1,0,1],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [1,0,1,0,1]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card083",
+    "Name": "Floating Death",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card084",
+    "Name": "Ironclad",
+    "Level": 1,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 3,
+      "Scope": null
+    },
+    "Description": "根据正在强化中的对手卡片数量，威力提升3。"
+  },
+  {
+    "CardCode": "Card085",
+    "Name": "Moss-Grown Adamantoise",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,3,3,3,0],
+      [0,0,0,0,0],
+      [0,3,3,3,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "IncreaseFieldLevel",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": null
+    },
+    "Description": "配置时，阵地等级提升3。"
+  },
+  {
+    "CardCode": "Card086",
+    "Name": "Cloud",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPowerFirstReach",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "PowerThreshold": 7,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片威力首次达到7时，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card087",
+    "Name": "Barret",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,1],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 8,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格对手卡片的威力降低8。"
+  },
+  {
+    "CardCode": "Card088",
+    "Name": "Tifa",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnLineWin",
+      "Target": "ScoreCounter",
+      "Operation": "AddScore",
+      "ValueType": "Const",
+      "Value": 5,
+      "Scope": null
+    },
+    "Description": "列获胜时，获得5点积分奖励。"
+  },
+  {
+    "CardCode": "Card089",
+    "Name": "Aerith",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card090",
+    "Name": "Red XIII",
+    "Level": 3,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstDeBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [1,0,1,0,1],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [1,0,1,0,1]
+      ]
+    },
+    "Description": "首次受到弱化时，特殊效果方格对手卡片的威力降低2。"
+  },
+  {
+    "CardCode": "Card091",
+    "Name": "Yuffie",
+    "Level": 1,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "可覆盖配置，特殊效果方格我方·对手卡片的威力降低被覆盖卡片的威力数值。"
+  },
+  {
+    "CardCode": "Card092",
+    "Name": "Cait Sith",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "配置时，将「莫古力」加入手牌。"
+  },
+  {
+    "CardCode": "Card093",
+    "Name": "Cid",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "配置时，将「小布郎号」加入手牌。"
+  },
+  {
+    "CardCode": "Card094",
+    "Name": "Vincent",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "消失时，将「加利安魔兽」加入手牌。"
+  },
+  {
+    "CardCode": "Card095",
+    "Name": "Ifrit",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedFriendNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "根据正在强化中的其他我方卡片数量，威力提升2。"
+  },
+  {
+    "CardCode": "Card096",
+    "Name": "Shiva",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "SpawnCardOnFieldSlot",
+      "ValueType": "FieldSlotLevel",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "配置时，对应我方闲置阵地等级，出现“钻石星尘”(威力2/4/6)。"
+  },
+  {
+    "CardCode": "Card097",
+    "Name": "Ramuh",
+    "Level": 3,
+    "Cost": 3,
+    "PosEffect": [
+      [1,0,0,0,1],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [1,0,0,0,1]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [1,0,0,0,1],
+        [0,1,0,1,0],
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [1,0,0,0,1]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card098",
+    "Name": "Titan",
+    "Level": 5,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,2,0,0],
+      [0,0,0,2,0],
+      [0,0,2,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "IncreaseFieldLevel",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "配置时，阵地等级提升2。"
+  },
+  {
+    "CardCode": "Card099",
+    "Name": "Kujata",
+    "Level": 6,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,1,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 5,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,1,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "首次受到强化时，特殊效果方格对手卡片的威力降低5。"
+  },
+  {
+    "CardCode": "Card100",
+    "Name": "Odin",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "根据正在强化中的对手卡片数量，威力提升2。"
+  },
+  {
+    "CardCode": "Card101",
+    "Name": "Phoenix",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 5,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格我方卡片的威力提升5。"
+  },
+  {
+    "CardCode": "Card102",
+    "Name": "Leviathan",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [1,0,0,0,1],
+      [0,0,0,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [1,0,1,0,1],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [1,0,1,0,1]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格对手卡片的威力降低3。"
+  },
+  {
+    "CardCode": "Card103",
+    "Name": "Alexander",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "DeBuffedFriendNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 3,
+      "Scope": null
+    },
+    "Description": "根据其他正在弱化中的我方卡片数量，威力提升3。"
+  },
+  {
+    "CardCode": "Card104",
+    "Name": "Bahamut",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,1],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 5,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格对手卡片的威力降低5。"
+  },
+  {
+    "CardCode": "Card105",
+    "Name": "Bahamut Arisen",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "SpawnCardOnFieldSlot",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "Scope": null
+    },
+    "Description": "配置时，在我方空阵地生成「元素精灵」（消失时会进行强化的卡片）。"
+  },
+  {
+    "CardCode": "Card106",
+    "Name": "Gilgamesh",
+    "Level": 3,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,0,0,0,1]
+      ]
+    },
+    "Description": "可覆盖配置，特殊效果方格我方·对手卡片的威力降低被覆盖卡片的威力数值。"
+  },
+  {
+    "CardCode": "Card107",
+    "Name": "Chocobo & Moogle",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedFriendNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "根据正在强化中的其他我方卡片数量，威力提升1。"
+  },
+  {
+    "CardCode": "Card108",
+    "Name": "Fat Chocobo",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [1,0,0,0,1],
+      [0,1,0,1,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "配置时，在其周围生成大量阵地。"
+  },
+  {
+    "CardCode": "Card109",
+    "Name": "Posh Chocobo",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnLineWin",
+      "Target": "ScoreCounter",
+      "Operation": "AddScore",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": null
+    },
+    "Description": "列获胜时，积分奖励加3点。"
+  },
+  {
+    "CardCode": "Card110",
+    "Name": "Moogle Trio",
+    "Level": 1,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "配置时，将「莫古力法师」和「莫古力诗人」加入手牌。"
+  },
+  {
+    "CardCode": "Card111",
+    "Name": "Magic Pot",
+    "Level": 1,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card112",
+    "Name": "Materia Guardian",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstDeBuffed",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 6,
+      "Scope": [
+        [1,1,0,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,1,0,1,1]
+      ]
+    },
+    "Description": "首次受到弱化时，特殊效果方格对手卡片的威力降低6。"
+  },
+  {
+    "CardCode": "Card113",
+    "Name": "Midgardsormr",
+    "Level": 6,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFriendOrEnemyDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "我方·对手卡片消失时，此卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card114",
+    "Name": "Mythril Golem",
+    "Level": 8,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": null,
+    "Description": "以如同秘银般坚硬的压倒性力量为傲的卡片。"
+  },
+  {
+    "CardCode": "Card115",
+    "Name": "Terror of the Deep",
+    "Level": 2,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,1,1,0],
+      [0,1,0,1,0],
+      [0,1,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "摆尾龙鱼此卡片配置中，特殊效果方格我方·对手卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card116",
+    "Name": "Grasptropod",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [1,0,0,0,1],
+        [1,1,0,0,1],
+        [0,0,0,0,0],
+        [1,1,0,0,1],
+        [1,0,0,0,1]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格我方·对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card117",
+    "Name": "Custom Valkyrie",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "特装型螺旋飞行重炮配置时，特殊效果方格我方·对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card118",
+    "Name": "Gigatrice",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,1,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,1,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "配置时，消灭特殊效果方格的我方·对手卡片。"
+  },
+  {
+    "CardCode": "Card119",
+    "Name": "Dyne",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,1,0],
+      [0,0,0,0,1],
+      [0,0,0,0,0],
+      [0,0,0,0,1],
+      [0,0,0,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 5,
+      "Scope": [
+        [0,0,0,1,0],
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,1],
+        [0,0,0,1,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低5。"
+  },
+  {
+    "CardCode": "Card120",
+    "Name": "Anuran Suppressor",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnEnemyDead",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": null
+    },
+    "Description": "对手卡片消失时，此卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card121",
+    "Name": "Specimen H1024",
+    "Level": 6,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [1,0,1,0,1],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [1,0,1,0,1]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card122",
+    "Name": "Crimson Mare Mk. II",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstDeBuffed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 5,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,1,0,1,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "首次受到弱化时，特殊效果方格我方·对手卡片的威力降低5。"
+  },
+  {
+    "CardCode": "Card123",
+    "Name": "Gi Nattak",
+    "Level": 1,
+    "Cost": 0,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "AsKilledOne",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "可覆盖配置，特殊效果方格我方卡片的威力提升被覆盖卡片的威力数值。"
+  },
+  {
+    "CardCode": "Card124",
+    "Name": "Forgotten Specimen",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,1,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 3,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,0,0,0],
+        [0,1,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升3。"
+  },
+  {
+    "CardCode": "Card125",
+    "Name": "Don Corneo & Abzu",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "Hand",
+      "Operation": "AddCardToHand",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "CardCodeList": [],
+      "Scope": null
+    },
+    "Description": "古留根尾&阿勃祖配置时，手牌增加“古留仙人掌怪”及“提灯怪老大”卡片。"
+  },
+  {
+    "CardCode": "Card126",
+    "Name": "Red Dragon",
+    "Level": 6,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,1],
+      [0,0,0,1,0],
+      [0,0,1,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,1],
+        [0,0,0,1,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低4。"
+  },
+  {
+    "CardCode": "Card127",
+    "Name": "Demon Gate",
+    "Level": 5,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,1,0,1,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnSelfDead",
+      "Target": "EnemyOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 9,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,0,1,0],
+        [0,1,0,1,0],
+        [0,1,0,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "消失时，特殊效果方格对手卡片的威力降低9。"
+  },
+  {
+    "CardCode": "Card128",
+    "Name": "Reno",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,0,0,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card129",
+    "Name": "Rude",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,1,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card130",
+    "Name": "Elena",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 99,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格我方·对手卡片的威力降低99。"
+  },
+  {
+    "CardCode": "Card131",
+    "Name": "Tseng",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnFirstBuffed",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片首次受到强化时，特殊效果方格我方卡片的威力提升4。"
+  },
+  {
+    "CardCode": "Card132",
+    "Name": "Rufus",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,1,0,1,0],
+      [0,1,0,1,0],
+      [0,0,0,0,0],
+      [0,1,0,1,0],
+      [0,1,0,1,0]
+    ],
+    "CardEffect": null,
+    "Description": "配置时，在其周围生成大量阵地。"
+  },
+  {
+    "CardCode": "Card133",
+    "Name": "Roche",
+    "Level": 5,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendOnly",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [1,0,1,0,1],
+        [0,1,1,1,0],
+        [1,1,0,1,1],
+        [0,1,1,1,0],
+        [1,0,1,0,1]
+      ]
+    },
+    "Description": "罗榭配置时，特殊效果方格我方卡片的威力降低1。"
+  },
+  {
+    "CardCode": "Card134",
+    "Name": "J-Squad",
+    "Level": 2,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FieldSlot",
+      "Operation": "SpawnCardOnFieldSlot",
+      "ValueType": "CardCode",
+      "Value": 0,
+      "Scope": null
+    },
+    "Description": "配置时，在我方空阵地生成「热血乔尼」（配置中会进行强化的卡片）。"
+  },
+  {
+    "CardCode": "Card135",
+    "Name": "Chocobo Jockey",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnLineWin",
+      "Target": "ScoreCounter",
+      "Operation": "AddScore",
+      "ValueType": "Const",
+      "Value": 10,
+      "Scope": null
+    },
+    "Description": "列获胜时，获得10点积分奖励。"
+  },
+  {
+    "CardCode": "Card136",
+    "Name": "Space Ranger",
+    "Level": 2,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,1,0,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "根据正在强化中的对手卡片数量，威力提升1。"
+  },
+  {
+    "CardCode": "Card137",
+    "Name": "Haunted Hotel",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendOnly",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,0,1,1],
+        [0,0,0,0,0],
+        [0,0,0,1,1],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card138",
+    "Name": "Skywheel",
+    "Level": 2,
+    "Cost": 3,
+    "PosEffect": [
+      [0,1,0,1,0],
+      [1,0,0,0,1],
+      [0,0,0,0,0],
+      [1,0,0,0,1],
+      [0,1,0,1,0]
+    ],
+    "CardEffect": null,
+    "Description": "如同夜空中的摩天轮般扩张阵地的卡片。"
+  },
+  {
+    "CardCode": "Card139",
+    "Name": "Loveless",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card140",
+    "Name": "Saucer Squad",
+    "Level": 3,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,1,0]
+    ],
+    "CardEffect": null,
+    "Description": "以可爱力量让盘面热闹起来的卡片。"
+  },
+  {
+    "CardCode": "Card141",
+    "Name": "Dio",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "BuffedFriendOrEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 1,
+      "Scope": null
+    },
+    "Description": "根据其他正在强化中的我方·对手卡片数量，威力提升1。"
+  },
+  {
+    "CardCode": "Card142",
+    "Name": "Ultimate Party Animal",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnTurnEnd",
+      "Target": "ScoreCounter",
+      "Operation": "TransferScore",
+      "ValueType": "LineRivalScore",
+      "Value": 0,
+      "Scope": null
+    },
+    "Description": "回合结束时若此卡片配置中，将各列败方的积分加给胜方。"
+  },
+  {
+    "CardCode": "Card143",
+    "Name": "Sephiroth",
+    "Level": 4,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "EnemyOnly",
+      "Operation": "DestroyCard",
+      "ValueType": "Const",
+      "Value": 0,
+      "Scope": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+      ]
+    },
+    "Description": "配置时，消灭特殊效果方格的对手卡片。"
+  },
+  {
+    "CardCode": "Card144",
+    "Name": "Emerald Witch",
+    "Level": 2,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,0,0],
+      [0,1,0,1,0],
+      [0,0,1,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,1,0,1,0],
+        [1,0,0,0,1],
+        [0,1,0,1,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card145",
+    "Name": "Shadowblood Queen",
+    "Level": 3,
+    "Cost": 3,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0],
+      [0,0,1,1,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "DeBuffedFriendOrEnemyNum",
+      "Target": "Self",
+      "Operation": "PowerUp",
+      "ValueType": "CountBased",
+      "Value": 3,
+      "Scope": null
+    },
+    "Description": "根据其他正在弱化中的我方·对手卡片数量，威力提升3。"
+  }
+]

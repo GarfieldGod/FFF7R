@@ -39,7 +39,7 @@ You should use the `AddStep` method inside the `void InitSteps()` method to defi
 
 * `playerType`: Indicates who performed the input on the chessboard. It can be either `PlayerType.PLAYER` or `PlayerType.RIVAL`.
 * `index`: Specifies which grid on the chessboard you want to input to. The range is based on the size of the chessboard.
-* `cardCode`: Specifies which card you want to input. For more information, see `Json/ChessProperties.json`.
+* `cardCode`: Specifies which card you want to input. For more information, see `Data\CardProperties`.
 * `expectPad1`: Represents the expected grid levels on the chessboard. It should have the same meaning as the corresponding effects in FF7Rb.
 * `expectPad2`: Represents the expected card levels on the chessboard. It should have the same meaning as the corresponding effects in FF7Rb.
 
@@ -49,7 +49,7 @@ Create an instance of your test case class and call the `Run()` method to execut
 
 ### Notes
 
-* Ensure that the `cardCode` matches one of the valid codes defined in `Json/ChessProperties.json`.
+* Ensure that the `cardCode` matches one of the valid codes defined in `Data\CardProperties`.
 * Ensure that your input is valid. Note that if the `PlayerType` is `RIVAL`, the `GridEffect` and `CardEffect` caused by the input will be reversed.
 
 ## Console Game

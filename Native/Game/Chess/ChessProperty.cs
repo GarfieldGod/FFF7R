@@ -7,6 +7,8 @@ public class ChessProperty {
     public int Cost;
     public List<List<int>> PosEffect;
     public CardEffectEntry CardEffect;
+    public CardEffectEntry CardEffectAlt;
+    public bool SpecialEffect = false;
     public string Description;
 
     public Dictionary<Int2D, int> PosOffsetDict;
@@ -19,6 +21,7 @@ public class ChessProperty {
         Cost = chessProperty.Cost;
         PosEffect = chessProperty.PosEffect;
         CardEffect = chessProperty.CardEffect;
+        CardEffectAlt = chessProperty.CardEffectAlt;
         Description = chessProperty.Description;
 
         PosOffsetDict = chessProperty.PosOffsetDict;
