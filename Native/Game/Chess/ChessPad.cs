@@ -235,20 +235,19 @@ public class ChessPad : IEnumerable<List<PadGrid>>
         padGrids_[pos.x][pos.y].Reset();
     }
 
-    public bool AddBuff(Int2D pos, Buff buff, bool CheckIfFirstBuffed = true)
+    public bool AddBuff(Int2D pos, Buff buff, bool DoSelfPowerBuff = false)
     {
         PadGrid padGrid = padGrids_[pos.x][pos.y];
         padGrid.AddBuff(buff);
-        if (CheckIfFirstBuffed) CheckFirstBuffed(padGrid);
-        CheckOnBuffed(padGrid, buff.value);
+        CheckBuffEvent(padGrid, buff.value, DoSelfPowerBuff);
         return false;
     }
 
-    public void CheckBuffEvent(PadGrid padGrid, int buffValue)
+    public void CheckBuffEvent(PadGrid padGrid, int buffValue, bool DoSelfPowerBuff = false)
     {
-        CheckFirstBuffed(padGrid);
+        if (!DoSelfPowerBuff) CheckFirstBuffed(padGrid);
         CheckOnBuffed(padGrid, buffValue);
-        InvokeBuffEvent(padGrid, buffValue);
+        if (!DoSelfPowerBuff) InvokeBuffEvent(padGrid, buffValue);
     }
 
     public void InvokeBuffEvent(PadGrid padGrid, int buffValue)

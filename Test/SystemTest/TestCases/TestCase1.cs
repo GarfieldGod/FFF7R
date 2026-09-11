@@ -1,7 +1,3 @@
-// ChessPad Index:
-// 00 01 02 03 04
-// 05 06 07 08 09
-// 10 11 12 13 14
 // TODO
 // Add Success or Failed for Step
 // Add PadIndex convert for Rival Step
@@ -71,7 +67,7 @@ namespace Test
                 }
             );
             // Step 4
-            AddStep(PlayerType.RIVAL, "Card009", new Int2D(1, 4),
+            AddStep(PlayerType.RIVAL, "CardTest4", new Int2D(1, 4),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E1,  EE },
                 new List<int> { F2,  F1,  F1,  E1,  EE },
@@ -175,7 +171,7 @@ namespace Test
                 }
             );
             // Step 12
-            AddStep(PlayerType.RIVAL, "Card041", new Int2D(1, 3),
+            AddStep(PlayerType.RIVAL, "CardTest5", new Int2D(1, 3),
                 new List<List<int>>{
                 new List<int> { FF,  FF,  FF,  E2,  EE },
                 new List<int> { F3,  FF,  E2,  EE,  E3 },

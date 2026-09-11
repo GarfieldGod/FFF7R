@@ -29,14 +29,18 @@ namespace Effect {
                 int newLevel = pastLevel;
                 if (playerType == PlayerType.PLAYER)
                 {
-                    if (pastLevel > (int)PosStatus.EMPTY)
-                    {
-                        newLevel -= (int)PosStatus.EMPTY;
-                    }
-                    else
+                    if (pastLevel <= (int)PosStatus.EMPTY)
                     {
                         newLevel = pastLevel % 10;
                         newLevel += target.Value;
+                    }
+                    else // 夺取棋子
+                    {
+                        newLevel -= (int)PosStatus.EMPTY;
+                        if (target.Value > 1 && target.Value > newLevel % 10)
+                        {
+                            newLevel += target.Value - 1;
+                        }
                     }
                 }
                 else if (playerType == PlayerType.RIVAL)
@@ -45,9 +49,13 @@ namespace Effect {
                     {
                         newLevel += target.Value;
                     }
-                    else
+                    else // 夺取棋子
                     {
                         newLevel += (int)PosStatus.EMPTY;
+                        if (target.Value > 1 && target.Value > newLevel % 10)
+                        {
+                            newLevel += target.Value - 1;
+                        }
                     }
                 }
                 if (newLevel > (int)PosStatus.LEVEL_THREE_PLAYER && playerType == PlayerType.PLAYER)

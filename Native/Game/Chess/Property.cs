@@ -124,7 +124,7 @@ public static class Property
             }
             chess.Init();
             ChessPropertiesDict_.Add(chess.CardCode, chess);
-            Log.TestLine($"Load chess property: {chess.CardCode}");
+            // Log.TestLine($"Load chess property: {chess.CardCode}");
         }
     }
 }

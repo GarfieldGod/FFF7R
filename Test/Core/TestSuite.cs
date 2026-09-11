@@ -21,6 +21,7 @@ namespace Test
             {
                 if (!testCase.Run()) {
                     ret = false;
+                    return ret;
                 }
             }
             return ret;

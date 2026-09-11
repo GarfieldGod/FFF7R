@@ -9,6 +9,7 @@ namespace Test
         {
             TestSuite test = new TestSuite();
             test.Add(new TestCase1());
+            test.Add(new TestCase2());
             Assert.True(test.Run(), "系统测试失败");
         }
     }

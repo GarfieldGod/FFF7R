@@ -12,11 +12,13 @@ public class ChessPadManager
     {
         chessPad_ = chessPad;
         eventSystem_ = new EventSystem();
+        chessPad_.eventSystem = eventSystem_;
     }
 
     public bool Input(Input input)
     {
         if(!CheckInput(input)) return false;
+        eventSystem_.RaiseChessPlaced(input);
 
         PadGrid padGrid = chessPad_[input.pos.x, input.pos.y];
         padGrid.Chess = input.chess;
@@ -25,7 +27,6 @@ public class ChessPadManager
         DoSelfPower(input, chessPad_);
         DoCardEffect(input, chessPad_);
 
-        eventSystem_.RaiseChessPlaced(input);
         return true;
     }
 
@@ -77,7 +78,7 @@ public class ChessPadManager
     {
         int power = input.chess.Level;
         Buff selfLevelBuff = new Buff(input.pos, input.pos, power, EffectTarget.Self, input.playerType);
-        chessPad.AddBuff(input.pos, selfLevelBuff, false);
+        chessPad.AddBuff(input.pos, selfLevelBuff, true);
     }
 
     public void DoCardEffect(Input input, ChessPad chessPad, bool preview = false)
@@ -191,24 +192,24 @@ public class ChessPadManager
         EventHandler<EventSystem.ChessBuffedEventArgs> handler = (sender, buffedOne) =>
         {
             int value = buffedOne.Value;
+            bool positive = value > 0;
             PlayerType owner = buffedOne.Owner;
+            PlayerType self = input.playerType;
+            bool friend = owner == self;
             Int2D pos = buffedOne.Position;
             if (input.pos == pos) return;
 
-            if (condition == EffectCondition.OnFriendOrEnemyDead)
+            bool match = 
+                (condition == EffectCondition.BuffedFriendNum && positive && friend) ||
+                (condition == EffectCondition.BuffedEnemyNum && positive && !friend) ||
+                (condition == EffectCondition.DeBuffedFriendNum && !positive && friend) ||
+                (condition == EffectCondition.DeBuffedEnemyNum && !positive && !friend) ||
+                (condition == EffectCondition.BuffedFriendOrEnemyNum && positive) ||
+                (condition == EffectCondition.DeBuffedFriendOrEnemyNum && !positive);
+
+            if (match)
             {
-                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
-            }
-            else if (condition == EffectCondition.OnFriendDead && 
-                (buffedOne.Owner == PlayerType.PLAYER && input.playerType == PlayerType.PLAYER || 
-                buffedOne.Owner == PlayerType.RIVAL && input.playerType == PlayerType.RIVAL))
-            {
-                EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
-            }
-            else if (condition == EffectCondition.OnEnemyDead &&
-                (buffedOne.Owner == PlayerType.PLAYER && input.playerType == PlayerType.RIVAL || 
-                buffedOne.Owner == PlayerType.RIVAL && input.playerType == PlayerType.PLAYER))
-            {
+                Log.TestLine($"match {condition} catch: {input.pos} src: {buffedOne.Position}");
                 EffectOperationHelper.TriggerEffect(chessPad_, input.pos);
             }
         };
@@ -301,6 +302,7 @@ public class ChessPadManager
         }
         placedEventHandler_.Clear();
 
+        chessPad_.eventSystem = null;
         eventSystem_.ClearAll();
     }
 }

@@ -8,16 +8,19 @@ public class EventSystem
 
     public void RaiseChessPlaced(Input input)
     {
+        Log.TestLine("OnChessPlaced were Invoked");
         OnChessPlaced?.Invoke(this, input);
     }
 
     public void RaiseChessDead(ChessDeadEventArgs e)
     {
+        Log.TestLine("OnChessDead were Invoked");
         OnChessDead?.Invoke(this, e);
     }
 
     public void RaiseChessBuffed(ChessBuffedEventArgs e)
     {
+        Log.TestLine("OnChessBuffed were Invoked");
         OnChessBuffed?.Invoke(this, e);
     }
 

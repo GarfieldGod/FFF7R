@@ -57,6 +57,7 @@ namespace Effect
             EffectTarget targetType = input.chess.CardEffect.Target; // buff的作用者类型
             EffectOperation operation = input.chess.CardEffect.Operation; // buff操作类型
             int effectValue = input.chess.CardEffect.Value; // buff值
+            if (targetType == EffectTarget.Self) targets[input.pos] = effectValue;
 
             foreach (var target in targets)
             {

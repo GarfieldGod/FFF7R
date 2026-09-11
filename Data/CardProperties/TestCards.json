@@ -114,5 +114,61 @@
             ]
         },
         "Description": ""
+    },
+    {
+        "CardCode": "CardTest4",
+        "Name": "Mu",
+        "Level": 1,
+        "Cost": 2,
+        "PosEffect": [
+        [0,0,0,0,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+        ],
+        "CardEffect": {
+        "Condition": "OnPosition",
+        "Target": "FriendOnly",
+        "Operation": "PowerUp",
+        "ValueType": "Const",
+        "Value": 1,
+        "Scope": [
+            [0,0,0,0,0],
+            [0,0,0,0,0],
+            [0,0,0,0,0],
+            [0,0,1,0,0],
+            [0,0,0,0,0]
+        ]
+        },
+        "Description": "此卡片配置中，特殊效果方格我方卡片的威力提升1。"
+    },
+    {
+        "CardCode": "CardTest5",
+        "Name": "Bomb",
+        "Level": 2,
+        "Cost": 2,
+        "PosEffect": [
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,1,0,1,0],
+        [0,0,1,0,0],
+        [0,0,0,0,0]
+        ],
+        "CardEffect": {
+        "Condition": "OnSelfDead",
+        "Target": "FriendAndEnemy",
+        "Operation": "PowerDown",
+        "ValueType": "Const",
+        "Value": 4,
+        "Scope": [
+            [0,0,0,0,0],
+            [0,1,1,1,0],
+            [0,1,0,1,0],
+            [0,1,1,1,0],
+            [0,0,0,0,0]
+        ]
+        },
+        "Description": "消失时，特殊效果方格我方·对手卡片的威力降低4。"
     }
 ]
