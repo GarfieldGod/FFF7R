@@ -1,5 +1,4 @@
-namespace Test
-{
+namespace FFF7RCore.Test {
     public class TestGame : Game
     {
         public bool TestResult => testResult_;

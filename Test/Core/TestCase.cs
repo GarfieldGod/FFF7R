@@ -1,4 +1,4 @@
-namespace Test {
+namespace FFF7RCore.Test {
     public abstract class TestCase
     {
         public List<string> CoveredCards => steps_.Select(x => x.input.chess.CardCode).ToList();

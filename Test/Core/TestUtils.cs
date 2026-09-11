@@ -1,5 +1,4 @@
-namespace Test
-{
+namespace FFF7RCore.Test {
     public struct Step
     {
         public Input input;

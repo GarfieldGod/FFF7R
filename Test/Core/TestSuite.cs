@@ -1,7 +1,6 @@
-using System.Text;
+namespace FFF7RCore.Test {
+    using System.Text;
 
-namespace Test
-{
     public class TestSuite
     {
         public bool InterruptedByFailure { get; set; }

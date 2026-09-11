@@ -1,4 +1,4 @@
-namespace Effect 
+namespace FFF7RCore.Effect 
 {
     static class CardEffect {
         // 效果在棋盘中的实际位置

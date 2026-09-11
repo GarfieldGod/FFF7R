@@ -1,4 +1,4 @@
-namespace Effect 
+namespace FFF7RCore.Effect 
 {
     public static class EffectsParser {
         // 计算以效果图为中心，有效果的相对位置

@@ -1,10 +1,9 @@
-using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
+namespace FFF7RCore.Test {
+    using Xunit;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
 
-namespace Test
-{
     public class SystemTest
     {
         [Fact]

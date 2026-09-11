@@ -1,8 +1,4 @@
-// TODO
-// Add Success or Failed for Step
-// Add PadIndex convert for Rival Step
-namespace Test
-{
+namespace FFF7RCore.Test {
     public class TestCase1 : TestCase
     {
         public override void ConfigureOptions()
@@ -10,12 +6,14 @@ namespace Test
             IgnoreTurnLimit = true;
             Description = "Test Case 1";
         }
+
         public override ChessPad InitChessPad()
         {
             ChessPad initChessPad = new ChessPad(3, 5);
             initChessPad.InitStandard();
             return initChessPad;
         }
+
         public override void InitSteps()
         {
             // Step 0

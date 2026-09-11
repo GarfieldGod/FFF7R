@@ -1,4 +1,4 @@
-namespace Effect {
+namespace FFF7RCore.Effect {
     static class PosEffect {
         public static Dictionary<Int2D, int> ParsePosEffectsInPosition(Input input, Int2D padSize) {
             return EffectsParser.ParseEffectsInPosition(input, padSize, EffectType.Grid);

@@ -1,5 +1,4 @@
-namespace Effect
-{
+namespace FFF7RCore.Effect {
     public class CardEffectEntry
     {
         public EffectCondition Condition;      // 触发条件

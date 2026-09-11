@@ -1,4 +1,4 @@
-namespace Effect
+namespace FFF7RCore.Effect
 {
     public static class EffectOperationHelper
     {

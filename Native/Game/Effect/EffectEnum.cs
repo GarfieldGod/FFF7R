@@ -1,5 +1,4 @@
-namespace Effect
-{
+namespace FFF7RCore.Effect {
     public enum EffectCondition {
         OnPlayed,                   // 配置时
 
