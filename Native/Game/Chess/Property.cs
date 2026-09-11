@@ -9,7 +9,8 @@ public static class Property
     // 👉热更新下载之后的本地缓存路径，如果文件存在优先读这个（热更后的json）
     private static string HotfixChessJsonCachePath;
     // 新：存放多CardJson的目录相对路径
-    private const string CardPropertiesFolderName = @"Data\CardProperties";
+    private const string DataRootDirName = "Data";
+    private const string CardPropertiesDirName = "CardProperties";
 
     private static Dictionary<string, ChessProperty> ChessPropertiesDict_ = new Dictionary<string, ChessProperty>();
 
@@ -50,6 +51,7 @@ public static class Property
             {
                 // 热更不存在 → 扫描 Data\CardProperties 目录下全部 *.json
                 string cardPropFolder;
+                string CardPropertiesFolderName = Path.Combine(DataRootDirName, CardPropertiesDirName);
 #if UNITY_ENGINE
                 string streamingAssetsBase = UnityEngine.Application.streamingAssetsPath;
                 cardPropFolder = Path.Combine(streamingAssetsBase, CardPropertiesFolderName);
