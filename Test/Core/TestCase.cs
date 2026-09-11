@@ -1,12 +1,19 @@
 namespace Test {
     public abstract class TestCase
     {
+        public List<string> CoveredCards => steps_.Select(x => x.input.chess.CardCode).ToList();
+        public int FailedStep => result_ ? -1 : stepIndex_;
+        public string Description;
+
         protected TestGame testGame_;
         protected List<Step> steps_ = new List<Step>();
         protected bool IgnoreTurnLimit = false;
+        protected int stepIndex_ = 0;
+        protected bool result_;
 
         public TestCase()
         {
+            ConfigureOptions();
             InitSteps();
 
             var gameConfig = InitGameConfig();
@@ -22,23 +29,26 @@ namespace Test {
             testGame_.Init(true);
             testGame_.Start(steps_[0].input.playerType);
 
-            int stepIndex = 0;
-            while (testGame_.Status != GameStatus.GAME_OVER && stepIndex < steps_.Count)
+            while (testGame_.Status != GameStatus.GAME_OVER && stepIndex_ < steps_.Count)
             {
-                var step = steps_[stepIndex];
+                Log.TestLine($"\n----------------[{this} step {stepIndex_}]----------------");
+                var step = steps_[stepIndex_];
+                Log.TestLine($"\n------------DebugInfo------------", TextColor.PURPLE);
                 bool ret = testGame_.Input(step.input);
 
-                TestUtils.ShowStepInfo(step, stepIndex);
+                TestUtils.ShowStepInfo(step, stepIndex_);
                 Log.TestLine("Input ret: " + ret);
                 TestUtils.ShowGameInfo(testGame_);
 
                 if (!CheckResult(step))
                 {
+                    result_ = false;
                     return false;
                 }
 
-                stepIndex++;
+                stepIndex_++;
             }
+            result_ = true;
             return true;
         }
 
@@ -69,6 +79,7 @@ namespace Test {
             ));
         }
 
+        public virtual void ConfigureOptions() { Description = "No description."; }
         public abstract void InitSteps();
         protected readonly int O = 10;
         protected readonly int F1 = 1;

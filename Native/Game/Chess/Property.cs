@@ -19,6 +19,16 @@ public static class Property
         HotfixChessJsonCachePath = hotfixJsonFullPath;
     }
 
+    public static List<string> GetAllCardCode()
+    {
+        List<string> CardCodeList = new List<string>();
+        foreach (var item in ChessPropertiesDict_)
+        {
+            CardCodeList.Add(item.Key);
+        }
+        return CardCodeList;
+    }
+
     public static ChessProperty GetChessProperty(string cardCode)
     {
         if (string.IsNullOrEmpty(cardCode))

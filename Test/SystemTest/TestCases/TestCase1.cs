@@ -5,6 +5,11 @@ namespace Test
 {
     public class TestCase1 : TestCase
     {
+        public override void ConfigureOptions()
+        {
+            IgnoreTurnLimit = true;
+            Description = "Test Case 1";
+        }
         public override ChessPad InitChessPad()
         {
             ChessPad initChessPad = new ChessPad(3, 5);
@@ -13,7 +18,6 @@ namespace Test
         }
         public override void InitSteps()
         {
-            IgnoreTurnLimit = true;
             // Step 0
             AddStep(PlayerType.PLAYER, "CardTest1", new Int2D(0, 0),
                 new List<List<int>>{
