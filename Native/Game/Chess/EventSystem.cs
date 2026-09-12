@@ -9,19 +9,25 @@ namespace FFF7RCore {
 
         public void RaiseChessPlaced(Input input)
         {
-            Log.TestLine("OnChessPlaced were Invoked");
+            Log.Test($"OnChessPlaced", TextColor.YELLOW);
+            Log.Test(" were Invoked");
+            Log.TestLine($" ({input})", TextColor.BLACK);
             OnChessPlaced?.Invoke(this, input);
         }
 
         public void RaiseChessDead(ChessDeadEventArgs e)
         {
-            Log.TestLine("OnChessDead were Invoked");
+            Log.Test($"OnChessDead", TextColor.YELLOW);
+            Log.Test(" were Invoked");
+            Log.TestLine($" (Owner: {e.Owner} CardCode: {e.Chess.CardCode} Name: {e.Chess.Name})", TextColor.BLACK);
             OnChessDead?.Invoke(this, e);
         }
 
         public void RaiseChessBuffed(ChessBuffedEventArgs e)
         {
-            Log.TestLine("OnChessBuffed were Invoked");
+            Log.Test($"OnChessBuffed", TextColor.YELLOW);
+            Log.Test(" were Invoked");
+            Log.TestLine($" (Owner: {e.Owner} Pos: {e.Position} Value: {e.Value})", TextColor.BLACK);
             OnChessBuffed?.Invoke(this, e);
         }
 

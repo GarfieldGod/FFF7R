@@ -32,8 +32,8 @@ namespace FFF7RCore.Test {
         // {
         //     Log.Clear();
         //     Log.TestLine("-----------------TEST START-----------------");
-        //     player_.ChessInHand = new List<Chess> { new Chess(Property.GetChessProperty("CardTest1")) };
-        //     rival_.ChessInHand = new List<Chess> { new Chess(Property.GetChessProperty("CardTest1")) };
+        //     player_.ChessInHand = new List<Chess> { new Chess(Property.GetChessProperty("PosFriend4Up1")) };
+        //     rival_.ChessInHand = new List<Chess> { new Chess(Property.GetChessProperty("PosFriend4Up1")) };
         //     while (gameStatus_ == GameStatus.GAMING)
         //     {
         //         base.RunGameTurns(TimeEveryTurn);

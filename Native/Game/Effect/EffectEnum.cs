@@ -54,7 +54,6 @@ namespace FFF7RCore.Effect {
         AddCardToHand,          // 手牌增加卡牌
         IncreaseFieldLevel,     // 阵地等级提升
         SpawnCardOnFieldSlot,   // 在阵地生成卡片
-        SpawnFieldSlots,        // 生成阵地
         AddScore,               // 增加积分
         TransferScore           // 转移分数
     }

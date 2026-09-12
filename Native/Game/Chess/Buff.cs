@@ -10,14 +10,16 @@ namespace FFF7RCore {
         public Int2D source;      // 真正的施加者位置（用于判断buff是否来自其他卡牌）
         public EffectTarget dstType;    // buff作用对象类型
         public PlayerType srcType;      // buff施加者类型
+        public string mark;
 
-        public Buff(Int2D owner, Int2D source, int value, EffectTarget dstType, PlayerType srcType)
+        public Buff(Int2D owner, Int2D source, int value, EffectTarget dstType, PlayerType srcType, string mark = null)
         {
             this.owner = owner;
             this.source = source;
             this.value = value;
             this.dstType = dstType;
             this.srcType = srcType;
+            this.mark = mark;
         }
 
         public Buff(Buff buff)
@@ -27,6 +29,12 @@ namespace FFF7RCore {
             value = buff.value;
             dstType = buff.dstType;
             srcType = buff.srcType;
+            mark = buff.mark;
+        }
+
+        public override string ToString()
+        {
+            return $"Buff: value: {value} owner: {owner} source: {source} dstType: {dstType} srcType: {srcType} mark: {mark}";
         }
     }
 
@@ -67,6 +75,11 @@ namespace FFF7RCore {
         public void Remove(Int2D src)
         {
             buffList_.RemoveAll(buff => buff.owner == src);
+        }
+
+        public int RemoveAll(Predicate<Buff> match)
+        {
+            return buffList_.RemoveAll(match);
         }
 
         public void RemoveAt(int index)

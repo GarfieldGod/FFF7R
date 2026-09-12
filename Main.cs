@@ -16,8 +16,8 @@
 //         GameConfig GameConfig = new GameConfig(
 //             1,
 //             new List<string>{
-//                 "CardTest0", "CardTest0", "CardTest0", "CardTest0",
-//                 "CardTest1", "CardTest1", "CardTest1", "CardTest1",
+//                 "PosAll4Down1", "PosAll4Down1", "PosAll4Down1", "PosAll4Down1",
+//                 "PosFriend4Up1", "PosFriend4Up1", "PosFriend4Up1", "PosFriend4Up1",
 //                 "Card006", "Card006", "Card006", "Card006",
 //                 "Card009", "Card009", "Card009",
 //             },

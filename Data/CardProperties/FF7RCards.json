@@ -3292,9 +3292,94 @@
       "Operation": "SpawnCardOnFieldSlot",
       "ValueType": "CardCode",
       "Value": 0,
+      "CardCodeList": ["Card134_1", "Card134_2", "Card134_3"],
       "Scope": null
     },
     "Description": "配置时，在我方空阵地生成「热血乔尼」（配置中会进行强化的卡片）。"
+  },
+  {
+    "CardCode": "Card134_1",
+    "Name": "Hype Johnny I",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升1。"
+  },
+  {
+    "CardCode": "Card134_2",
+    "Name": "Hype Johnny II",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 2,
+      "Scope": [
+        [0,0,1,0,0],
+        [0,0,0,0,0],
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,1,0,0]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升2。"
+  },
+  {
+    "CardCode": "Card134_3",
+    "Name": "Hype Johnny III",
+    "Level": 1,
+    "Cost": 1,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPosition",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerUp",
+      "ValueType": "Const",
+      "Value": 4,
+      "Scope": [
+        [1,0,0,0,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,0,0,0,1]
+      ]
+    },
+    "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升4。"
   },
   {
     "CardCode": "Card135",

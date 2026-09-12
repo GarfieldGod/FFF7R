@@ -1,4 +1,5 @@
 namespace FFF7RCore {
+    using System.Runtime.CompilerServices;
     public enum TextColor {
         NONE,
         RED,
@@ -12,16 +13,23 @@ namespace FFF7RCore {
     public class Log {
         public static void TestLine(string info, TextColor color = TextColor.NONE, bool ifHightLight = false)
         {
-            string textColor = GetColorText(color, ifHightLight);
-    #if UNITY_ENGINE
-            Debug.Log(textColor + info);
-    #else
             Test(info, color, ifHightLight);
             Test("\n");
-        #endif
         }
 
-        public static void Test (string info, TextColor color = TextColor.NONE, bool ifHightLight = false) {
+        // public static void Debug(string info, TextColor color = TextColor.NONE, bool ifHightLight = false,
+        //     [CallerMemberName] string callerMethod = "",
+        //     [CallerFilePath] string callerFile = "",
+        //     [CallerLineNumber] int callerLine = 0)
+        // {
+        //     string timeStamp = DateTime.Now.ToString("HH:mm:ss.fff");
+        //     string fileName = $"{callerFile}:{callerLine}";
+        //     string logContent = $"[{timeStamp}] [{callerMethod}] | {info}";
+        //     Test(logContent, color, ifHightLight);
+        //     Test("\n");
+        // }
+
+        public static void Test(string info, TextColor color = TextColor.NONE, bool ifHightLight = false) {
             string textColor = GetColorText(color, ifHightLight);
         #if UNITY_ENGINE
             Debug.Log(textColor + info);

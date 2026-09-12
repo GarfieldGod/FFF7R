@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>TestCaseEditor</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    min-height: 100vh;
+  }
+  .navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: #16213e;
+    border-bottom: 2px solid #0f3460;
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
+  .navbar h1 {
+    font-size: 18px;
+    margin: 0;
+    color: #e0e0e0;
+  }
+  .navbar button {
+    padding: 6px 16px;
+    font-size: 14px;
+    background: #2d7d46;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .navbar button:hover { background: #359454; }
+  .nav-actions { display: flex; gap: 8px; }
+  .nav-actions .btn-secondary {
+    background: #0f3460;
+  }
+  .nav-actions .btn-secondary:hover { background: #1a4a8e; }
+
+  .main {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Step list sidebar */
+  .step-list {
+    width: 200px;
+    background: #16213e;
+    border-right: 2px solid #0f3460;
+    padding: 8px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    background: #1a1a4e;
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .step-item:hover { background: #2a2a6e; }
+  .step-item.active {
+    background: #3a3a8e;
+    border-color: #4a6ace;
+    color: #fff;
+  }
+  .step-index { font-weight: bold; }
+  .step-del {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: transparent;
+    color: #e74c3c;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  .step-del:hover { background: rgba(231,76,60,0.2); }
+  .step-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: #1a3a1a;
+    border: 1px dashed #2ecc71;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #2ecc71;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .step-add:hover { background: #2a5a2a; }
+
+  .content-wrap {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+  }
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 6px;
+    width: 100%;
+    max-width: 1000px;
+  }
+  .cell {
+    aspect-ratio: 1 / 1.35;
+    border: 2px solid #0f3460;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .cell.gray { background: #2a2a3e; }
+  .cell.green { background: #1a3a1a; }
+  .cell.red { background: #3a1a1a; }
+  .cell:hover { border-color: #4a6a8a; }
+
+  /* +/- button top-left, circular */
+  .pm-btn {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 32px;
+    height: 32px;
+    border: 2px solid #0f3460;
+    background: #1a1a4e;
+    color: #e0e0e0;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.15s;
+  }
+  .pm-btn:hover { background: #2a2a6e; }
+  .pm-btn.visible { display: flex; }
+
+  /* Content area */
+  .content-area {
+    position: absolute;
+    top: 42px;
+    left: 6px;
+    right: 6px;
+    bottom: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* + mode: number input top-right circle, text input bottom center */
+  .num-input {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 36px;
+    height: 36px;
+    background: #1a1a4e;
+    border: 2px solid #0f3460;
+    color: #e0e0e0;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 13px;
+    padding: 0;
+    z-index: 5;
+    -moz-appearance: textfield;
+  }
+  .num-input::-webkit-inner-spin-button,
+  .num-input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .text-input {
+    position: absolute;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 28px;
+    background: #1a1a4e;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 13px;
+    padding: 2px;
+  }
+  .cell-coord {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 1px 6px;
+    font-size: 10px;
+    color: #888;
+    cursor: pointer;
+    user-select: none;
+    z-index: 6;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    background: transparent;
+  }
+  .cell-coord:hover {
+    color: #ccc;
+    border-color: #4a6a8a;
+  }
+  .cell.highlight { border-color: #fff; }
+
+  /* - mode: center dot button */
+  .dot-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    transition: transform 0.15s;
+  }
+  .dot-btn:hover { transform: scale(1.1); }
+  .dot-btn.green { border-color: #2ecc71; }
+  .dot-btn.red { border-color: #e74c3c; }
+  .dot-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .dot-dot.green { background: #2ecc71; }
+  .dot-dot.red { background: #e74c3c; }
+
+  /* 编辑器布局：左边面板 + 右边矩阵 */
+  .editor-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: 1600px;
+  }
+  .input-panel {
+    background: #16213e;
+    border: 2px solid #0f3460;
+    border-radius: 10px;
+    padding: 14px;
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .input-panel .field { display: flex; flex-direction: column; gap: 4px; }
+  .input-panel label {
+    font-size: 13px;
+    color: #b0b0c0;
+  }
+  .input-panel select,
+  .input-panel input {
+    width: 100%;
+    padding: 6px 8px;
+    background: #1a1a4e;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+  .input-panel button {
+    padding: 8px;
+    background: #2d7d46;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .input-panel button:hover { background: #359454; }
+  .global-panel {
+    background: #16213e;
+    border: 2px solid #0f3460;
+    border-radius: 10px;
+    padding: 14px;
+    width: 220px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .global-panel .field { display: flex; flex-direction: column; gap: 4px; }
+  .global-panel label {
+    font-size: 13px;
+    color: #b0b0c0;
+  }
+  .global-panel input[type="text"] {
+    width: 100%;
+    padding: 6px 8px;
+    background: #1a1a4e;
+    border: 1px solid #0f3460;
+    color: #e0e0e0;
+    border-radius: 4px;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+  .global-panel .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .global-panel input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+  .global-panel input.invalid {
+    border-color: #e74c3c;
+    background: #3a1a1a;
+  }
+  .autocomplete-list {
+    position: absolute;
+    bottom: 50px;
+    left: 5%;
+    right: 5%;
+    max-height: 120px;
+    overflow-y: auto;
+    background: #0a0a1e;
+    border: 1px solid #0f3460;
+    border-radius: 4px;
+    z-index: 20;
+    display: none;
+  }
+  .autocomplete-item {
+    padding: 4px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    color: #b0b0c0;
+    border-bottom: 1px solid #1a1a2e;
+  }
+  .autocomplete-item:hover { background: #1a1a4e; color: #fff; }
+  .autocomplete-item .item-code { color: #2ecc71; }
+  .autocomplete-item .item-name { color: #aaa; margin-left: 6px; }
+  .grid-wrap { flex: 1; display: flex; justify-content: center; }
+
+  .toast {
+    position: fixed;
+    top: 64px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #e74c3c;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <h1>Test Case Editor</h1>
+  <div class="nav-actions">
+    <button class="btn-secondary" onclick="document.getElementById('cardFileInput').click()">读取卡牌组</button>
+    <button class="btn-secondary" onclick="document.getElementById('csFileInput').click()">导入用例</button>
+    <button onclick="exportCS()">导出用例</button>
+  </div>
+</div>
+<input type="file" id="fileInput" accept=".json,application/json" style="display:none">
+<input type="file" id="csFileInput" accept=".cs,text/plain" style="display:none">
+<input type="file" id="cardFileInput" accept=".json,application/json" style="display:none">
+<div class="toast" id="toast"></div>
+<div class="main">
+  <div class="step-list" id="stepList"></div>
+  <div class="content-wrap">
+    <div class="editor-layout">
+      <div style="display:flex;flex-direction:column;gap:12px;flex-shrink:0">
+        <div class="input-panel">
+          <div class="field">
+            <label>输入者</label>
+            <select id="inputPlayer" onchange="savePanel()">
+              <option value="Player">Player</option>
+              <option value="Rival">Rival</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>卡牌</label>
+            <input type="text" id="inputCard" oninput="savePanel()">
+          </div>
+          <div class="field">
+            <label>坐标</label>
+            <input type="text" id="inputCoord" placeholder="(x, y)" oninput="savePanel()">
+          </div>
+          <button onclick="generateFromDiff()">生成</button>
+        </div>
+        <div class="global-panel">
+          <div class="field">
+            <label>测试名称</label>
+            <input type="text" id="globalName" value="DefaultTestCase" oninput="saveGlobal()">
+          </div>
+          <div class="checkbox-field">
+            <input type="checkbox" id="globalIgnore" checked onchange="saveGlobal()">
+            <label for="globalIgnore">是否忽略输入者限制</label>
+          </div>
+          <div class="field">
+            <label>描述</label>
+            <input type="text" id="globalDesc" value="This is a description." oninput="saveGlobal()">
+          </div>
+        </div>
+      </div>
+      <div class="grid-wrap">
+        <div class="grid-container" id="grid"></div>
+      </div>
+      <div class="input-panel">
+        <h3 style="font-size:15px;margin:0;color:#e0e0e0">如何使用</h3>
+        <div style="font-size:12px;line-height:1.6;color:#b0b0c0">
+          <p style="margin-bottom:8px"><b>1. 创建Step</b><br>点击左侧列表底部的 <b>+</b> 按钮新增一个矩阵状态，新状态继承上一个状态。</p>
+          <p style="margin-bottom:8px"><b>2. 编辑矩阵</b><br>点击矩形切换背景色（灰/绿/红），左上角 <b>+/−</b> 按钮切换模式。<br>− 模式：点击圆点切换点数（1~3）。<br>+ 模式：右上角输入数字，下方输入卡牌名。</p>
+          <p style="margin-bottom:8px"><b>3. 自动生成</b><br>点击 <b>生成</b> 按钮，自动对比上一个状态，填充输入者、卡牌和坐标。绿色→Player，红色→Rival。</p>
+          <p style="margin-bottom:8px"><b>4. 手动填写</b><br>也可直接在面板中输入，或点击矩阵下方坐标标签快速填入坐标。</p>
+          <p style="margin-bottom:8px"><b>5. 导出</b><br><b>导出JSON</b>：保存矩阵数据为 .json。<br><b>导出用例</b>：生成 C# 测试用例 .cs 文件。</p>
+          <p><b>6. 导入</b><br><b>导入JSON</b>/<b>导入用例</b>：从已有文件恢复所有矩阵状态。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const ROWS = 3, COLS = 5;
+
+  // 卡牌数据库：[{code, name}]
+  const cardDB = [];
+
+  // 初始化一个默认状态的矩阵
+  function makeDefaultCells() {
+    const arr = [];
+    for (let r = 0; r < ROWS; r++) {
+      arr.push([]);
+      for (let c = 0; c < COLS; c++) {
+        let color = 0;
+        if (c === 0) color = 1;       // green
+        else if (c === COLS - 1) color = 2; // red
+        arr[r].push({ color, pm: 1, dotState: 0, num: '', text: '' });
+      }
+    }
+    return arr;
+  }
+
+  // 默认面板数据
+  function makeDefaultPanel() {
+    return { player: 'Player', card: '', coord: '' };
+  }
+
+  // 所有step的状态列表，每个元素 { cells, panel }
+  const steps = [{ cells: makeDefaultCells(), panel: makeDefaultPanel() }];
+  let currentStep = 0;
+
+  // 全局测试配置（所有step共享）
+  const globalConfig = { name: 'DefaultTestCase', ignoreTurnLimit: true, description: 'This is a description.' };
+
+  // 当前激活的cells引用，指向 steps[currentStep].cells
+  function cells() { return steps[currentStep].cells; }
+
+  // 检查测试名称合法性：纯英文字母，不能为"TestCase"
+  function validateName(name) {
+    if (!name || name === 'TestCase') return false;
+    return /^[A-Za-z]+$/.test(name);
+  }
+
+  // 保存全局配置
+  function saveGlobal() {
+    globalConfig.name = document.getElementById('globalName').value;
+    globalConfig.ignoreTurnLimit = document.getElementById('globalIgnore').checked;
+    globalConfig.description = document.getElementById('globalDesc').value;
+    const input = document.getElementById('globalName');
+    if (validateName(globalConfig.name)) {
+      input.classList.remove('invalid');
+    } else {
+      input.classList.add('invalid');
+    }
+  }
+
+  // 加载全局配置到输入框
+  function loadGlobal() {
+    document.getElementById('globalName').value = globalConfig.name;
+    document.getElementById('globalIgnore').checked = globalConfig.ignoreTurnLimit;
+    document.getElementById('globalDesc').value = globalConfig.description;
+  }
+
+  function renderStepList() {
+    const list = document.getElementById('stepList');
+    list.innerHTML = '';
+    steps.forEach((s, i) => {
+      const item = document.createElement('div');
+      item.className = 'step-item' + (i === currentStep ? ' active' : '');
+      const idx = document.createElement('span');
+      idx.className = 'step-index';
+      idx.textContent = '#' + i;
+      item.appendChild(idx);
+      const del = document.createElement('button');
+      del.className = 'step-del';
+      del.textContent = '×';
+      del.onclick = (e) => { e.stopPropagation(); deleteStep(i); };
+      item.appendChild(del);
+      item.onclick = () => selectStep(i);
+      list.appendChild(item);
+    });
+    // 末尾的加号按钮
+    const addBtn = document.createElement('div');
+    addBtn.className = 'step-add';
+    addBtn.textContent = '+';
+    addBtn.onclick = () => addStep();
+    list.appendChild(addBtn);
+  }
+
+  function addStep() {
+    const last = steps[steps.length - 1];
+    const copyCells = last.cells.map(row => row.map(cell => ({ ...cell })));
+    const copyPanel = { ...last.panel };
+    steps.push({ cells: copyCells, panel: copyPanel });
+    currentStep = steps.length - 1;
+    renderStepList();
+    loadPanel();
+    renderGrid();
+  }
+
+  function deleteStep(i) {
+    if (steps.length <= 1) return; // 至少保留一个
+    steps.splice(i, 1);
+    if (currentStep >= steps.length) currentStep = steps.length - 1;
+    renderStepList();
+    loadPanel();
+    renderGrid();
+  }
+
+  function selectStep(i) {
+    currentStep = i;
+    renderStepList();
+    loadPanel();
+    renderGrid();
+  }
+
+  // 从当前step加载面板数据到输入框
+  function loadPanel() {
+    const p = steps[currentStep].panel;
+    document.getElementById('inputPlayer').value = p.player;
+    document.getElementById('inputCard').value = p.card;
+    document.getElementById('inputCoord').value = p.coord;
+  }
+
+  // 将输入框数据保存到当前step的面板
+  function savePanel() {
+    const p = steps[currentStep].panel;
+    p.player = document.getElementById('inputPlayer').value;
+    p.card = document.getElementById('inputCard').value;
+    p.coord = document.getElementById('inputCoord').value;
+    renderGrid();
+  }
+
+  // 解析坐标输入框中的值 [x,y]，x=行，y=列
+  function parseCoordHighlight() {
+    const v = document.getElementById('inputCoord').value.trim();
+    const m = v.match(/^\[\s*(\d+)\s*,\s*(\d+)\s*\]$/);
+    if (!m) return null;
+    const x = Number(m[1]);
+    const y = Number(m[2]);
+    if (x < 0 || x >= ROWS || y < 0 || y >= COLS) return null;
+    return { x, y };
+  }
+
+  function renderGrid() {
+    const grid = document.getElementById('grid');
+    grid.innerHTML = '';
+    const c = cells();
+    const hl = parseCoordHighlight();
+    for (let r = 0; r < ROWS; r++) {
+      for (let col = 0; col < COLS; col++) {
+        const cell = c[r][col];
+        const div = document.createElement('div');
+        let cls = 'cell ' + ['gray','green','red'][cell.color];
+        if (hl && hl.x === r && hl.y === col) cls += ' highlight';
+        div.className = cls;
+        div.onclick = (e) => {
+          if (e.target === div || e.target.classList.contains('content-area'))
+            cycleColor(r, col);
+        };
+
+        // +/- button (top-left, circular)
+        const pm = document.createElement('div');
+        pm.className = 'pm-btn' + (cell.color !== 0 ? ' visible' : '');
+        pm.textContent = cell.pm === 0 ? '+' : '−';
+        pm.onclick = (e) => { e.stopPropagation(); cyclePM(r, col); };
+        div.appendChild(pm);
+
+        // Number input (top-right circle) — only in + mode
+        if (cell.color !== 0 && cell.pm === 0) {
+          const numInput = document.createElement('input');
+          numInput.type = 'number';
+          numInput.className = 'num-input';
+          numInput.value = cell.num;
+          numInput.onmousedown = (e) => e.stopPropagation();
+          numInput.oninput = (e) => { c[r][col].num = e.target.value; };
+          div.appendChild(numInput);
+        }
+
+        // Content area
+        const content = document.createElement('div');
+        content.className = 'content-area';
+
+        if (cell.color !== 0 && cell.pm === 0) {
+          const textInput = document.createElement('input');
+          textInput.type = 'text';
+          textInput.className = 'text-input';
+          textInput.value = cell.text;
+          textInput.onmousedown = (e) => e.stopPropagation();
+          textInput.oninput = (e) => { c[r][col].text = e.target.value; };
+          content.appendChild(textInput);
+
+          // 自动联想下拉
+          const acList = document.createElement('div');
+          acList.className = 'autocomplete-list';
+          content.appendChild(acList);
+
+          textInput.oninput = (e) => {
+            c[r][col].text = e.target.value;
+            updateAutocomplete(e.target, acList, r, col, c);
+          };
+          textInput.onfocus = (e) => {
+            if (cardDB.length > 0) updateAutocomplete(e.target, acList, r, col, c);
+          };
+          textInput.onblur = () => {
+            setTimeout(() => { acList.style.display = 'none'; }, 200);
+          };
+        } else if (cell.color !== 0 && cell.pm === 1) {
+          const dotBtn = document.createElement('div');
+          dotBtn.className = 'dot-btn ' + ['green','red'][cell.color - 1];
+          dotBtn.onclick = (e) => { e.stopPropagation(); cycleDot(r, col); };
+          for (let i = 0; i <= cell.dotState; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot-dot ' + ['green','red'][cell.color - 1];
+            dotBtn.appendChild(dot);
+          }
+          content.appendChild(dotBtn);
+        }
+
+        div.appendChild(content);
+
+        // 坐标标注
+        const coord = document.createElement('div');
+        coord.className = 'cell-coord';
+        coord.textContent = '[' + r + ',' + col + ']';
+        coord.onclick = (e) => {
+          e.stopPropagation();
+          document.getElementById('inputCoord').value = '[' + r + ',' + col + ']';
+          // 如果矩形有效（+号且为红/绿色），则同步输入者和卡牌
+          if (cell.pm === 0 && cell.color !== 0) {
+            document.getElementById('inputPlayer').value = cell.color === 1 ? 'Player' : 'Rival';
+            document.getElementById('inputCard').value = cell.text || '';
+          }
+          savePanel();
+        };
+        div.appendChild(coord);
+
+        grid.appendChild(div);
+      }
+    }
+  }
+
+  function cycleColor(r, col) {
+    const c = cells();
+    c[r][col].color = (c[r][col].color + 1) % 3;
+    renderGrid();
+  }
+
+  function cyclePM(r, col) {
+    const c = cells();
+    c[r][col].pm = (c[r][col].pm + 1) % 2;
+    renderGrid();
+  }
+
+  function cycleDot(r, col) {
+    const c = cells();
+    c[r][col].dotState = (c[r][col].dotState + 1) % 3;
+    renderGrid();
+  }
+
+  // 更新自动联想下拉列表
+  function updateAutocomplete(input, acList, r, col, c) {
+    const val = input.value.trim().toLowerCase();
+    let matches;
+    if (val === '') {
+      matches = cardDB.slice(0, 20);
+    } else {
+      matches = cardDB.filter(card =>
+        card.code.toLowerCase().includes(val) || card.name.toLowerCase().includes(val)
+      ).slice(0, 20);
+    }
+    acList.innerHTML = '';
+    if (matches.length === 0) {
+      acList.style.display = 'none';
+      return;
+    }
+    matches.forEach(card => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = '<span class="item-code">' + card.code + '</span><span class="item-name">' + card.name + '</span>';
+      item.onmousedown = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        input.value = card.code;
+        c[r][col].text = card.code;
+      };
+      item.onclick = (e) => { 
+        e.stopPropagation(); 
+        acList.style.display = 'none';
+      };
+      acList.appendChild(item);
+    });
+    acList.style.display = 'block';
+  }
+
+  // 读取卡牌组JSON文件
+  document.getElementById('cardFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) { showMessage('卡牌组格式错误：应为数组'); return; }
+        cardDB.length = 0;
+        data.forEach(card => {
+          if (card.CardCode && card.Name) {
+            cardDB.push({ code: card.CardCode, name: card.Name });
+          }
+        });
+        showMessage('已读取 ' + cardDB.length + ' 张卡牌', true);
+      } catch (err) {
+        showMessage('解析失败: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // 将一个step的cells转换为两个二维数组
+  function cellsToArrays(cellState) {
+    const arr1 = [];
+    const arr2 = [];
+    for (let r = 0; r < ROWS; r++) {
+      const row1 = [];
+      const row2 = [];
+      for (let c = 0; c < COLS; c++) {
+        const cell = cellState[r][c];
+        let v1 = 10;
+        let v2 = 0;
+        if (cell.color === 0) {
+          v1 = 10;
+          v2 = 0;
+        } else if (cell.color === 1) {
+          if (cell.pm === 1) {
+            v1 = 1 + cell.dotState;
+          } else {
+            v1 = 14;
+            v2 = cell.num !== '' ? Number(cell.num) : 0;
+          }
+        } else if (cell.color === 2) {
+          if (cell.pm === 1) {
+            v1 = 11 + cell.dotState;
+          } else {
+            v1 = 15;
+            v2 = cell.num !== '' ? Number(cell.num) : 0;
+          }
+        }
+        row1.push(v1);
+        row2.push(v2);
+      }
+      arr1.push(row1);
+      arr2.push(row2);
+    }
+    return { arr1, arr2 };
+  }
+
+  function exportJSON() {
+    let out = '[\n';
+    steps.forEach((s, i) => {
+      const { arr1, arr2 } = cellsToArrays(s.cells);
+      out += '  {\n';
+      out += '    "step": ' + i + ',\n';
+      out += '    "player": ' + JSON.stringify(s.panel.player) + ',\n';
+      out += '    "card": ' + JSON.stringify(s.panel.card) + ',\n';
+      out += '    "coord": ' + JSON.stringify(s.panel.coord) + ',\n';
+      out += '    "array1": [\n';
+      out += arr1.map(r => '      ' + JSON.stringify(r)).join(',\n');
+      out += '\n    ],\n';
+      out += '    "array2": [\n';
+      out += arr2.map(r => '      ' + JSON.stringify(r)).join(',\n');
+      out += '\n    ]\n';
+      out += '  }';
+      if (i < steps.length - 1) out += ',';
+      out += '\n';
+    });
+    out += ']';
+    const blob = new Blob([out], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'testcase.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // 将两个二维数组还原为 cells 状态
+  function arraysToCells(arr1, arr2) {
+    const result = [];
+    for (let r = 0; r < ROWS; r++) {
+      result.push([]);
+      for (let c = 0; c < COLS; c++) {
+        const v1 = arr1[r][c];
+        const v2 = arr2[r][c];
+        let cell;
+        if (v1 === 10) {
+          cell = { color: 0, pm: 1, dotState: 0, num: '', text: '' };
+        } else if (v1 >= 1 && v1 <= 3) {
+          cell = { color: 1, pm: 1, dotState: v1 - 1, num: '', text: '' };
+        } else if (v1 === 14) {
+          cell = { color: 1, pm: 0, dotState: 0, num: String(v2), text: '' };
+        } else if (v1 >= 11 && v1 <= 13) {
+          cell = { color: 2, pm: 1, dotState: v1 - 11, num: '', text: '' };
+        } else if (v1 === 15) {
+          cell = { color: 2, pm: 0, dotState: 0, num: String(v2), text: '' };
+        } else {
+          cell = { color: 0, pm: 1, dotState: 0, num: '', text: '' };
+        }
+        result[r].push(cell);
+      }
+    }
+    return result;
+  }
+
+  document.getElementById('fileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) { alert('JSON格式错误：应为数组'); return; }
+        steps.length = 0;
+        data.forEach(item => {
+          if (!item.array1 || !item.array2) return;
+          const panel = {
+            player: item.player || 'Player',
+            card: item.card || '',
+            coord: item.coord || ''
+          };
+          steps.push({ cells: arraysToCells(item.array1, item.array2), panel });
+        });
+        if (steps.length === 0) steps.push({ cells: makeDefaultCells(), panel: makeDefaultPanel() });
+        currentStep = 0;
+        renderStepList();
+        renderGrid();
+        loadPanel();
+      } catch (err) {
+        alert('解析失败: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  // 数值 -> C#常量名
+  const NUM_TO_CS = {10:'O', 1:'F1', 2:'F2', 3:'F3', 11:'E1', 12:'E2', 13:'E3', 14:'FF', 15:'EE'};
+  // C#常量名 -> 数值
+  const CS_TO_NUM = {O:10, F1:1, F2:2, F3:3, E1:11, E2:12, E3:13, FF:14, EE:15};
+
+  function exportCS() {
+    if (!validateName(globalConfig.name)) {
+      showMessage('测试名称不合法');
+      return;
+    }
+    let out = 'namespace FFF7RCore.Test {\n';
+    out += '    public class ' + globalConfig.name + ' : TestCase\n';
+    out += '    {\n';
+    out += '        public override void ConfigureOptions()\n';
+    out += '        {\n';
+    out += '            IgnoreTurnLimit = ' + (globalConfig.ignoreTurnLimit ? 'true' : 'false') + ';\n';
+    out += '            Description = "' + globalConfig.description + '";\n';
+    out += '        }\n\n';
+    out += '        public override ChessPad InitChessPad()\n';
+    out += '        {\n';
+    out += '            ChessPad initChessPad = new ChessPad(3, 5);\n';
+    out += '            initChessPad.InitStandard();\n';
+    out += '            return initChessPad;\n';
+    out += '        }\n\n';
+    out += '        public override void InitSteps()\n';
+    out += '        {\n';
+    steps.forEach((s, i) => {
+      const { arr1, arr2 } = cellsToArrays(s.cells);
+      const p = s.panel;
+      const playerType = p.player === 'Rival' ? 'PlayerType.RIVAL' : 'PlayerType.PLAYER';
+      // 解析坐标 [x,y]
+      let x = 0, y = 0;
+      const m = (p.coord || '').match(/^\[\s*(\d+)\s*,\s*(\d+)\s*\]$/);
+      if (m) { x = Number(m[1]); y = Number(m[2]); }
+      out += '            // Step ' + i + '\n';
+      out += '            AddStep(' + playerType + ', "' + (p.card || '') + '", new Int2D(' + x + ', ' + y + '),\n';
+      // array1
+      out += '                new List<List<int>>{\n';
+      arr1.forEach(row => {
+        out += '                new List<int> { ' + row.map(v => NUM_TO_CS[v] || String(v)).join(', ') + ' },\n';
+      });
+      out += '                },\n';
+      // array2
+      out += '                new List<List<int>>{\n';
+      arr2.forEach(row => {
+        out += '                new List<int> { ' + row.join(', ') + ' },\n';
+      });
+      out += '                }\n';
+      out += '            );\n';
+    });
+    out += '        }\n';
+    out += '    }\n';
+    out += '}';
+    const blob = new Blob([out], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = globalConfig.name + '.cs';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // 解析C#用例文件
+  document.getElementById('csFileInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const text = ev.target.result;
+        // 解析全局配置
+        const nameMatch = text.match(/public\s+class\s+(\w+)\s*:\s*TestCase/);
+        if (nameMatch) globalConfig.name = nameMatch[1];
+        const ignoreMatch = text.match(/IgnoreTurnLimit\s*=\s*(true|false)/);
+        if (ignoreMatch) globalConfig.ignoreTurnLimit = ignoreMatch[1] === 'true';
+        const descMatch = text.match(/Description\s*=\s*"([^"]*)"/);
+        if (descMatch) globalConfig.description = descMatch[1];
+        loadGlobal();
+        // 提取所有 AddStep(...) 调用
+        const stepRegex = /AddStep\(([\s\S]*?)\n\s*\);\s*\n/g;
+        let match;
+        const newSteps = [];
+        while ((match = stepRegex.exec(text)) !== null) {
+          const block = match[1];
+          // PlayerType
+          let player = 'Player';
+          const ptMatch = block.match(/PlayerType\.(PLAYER|RIVAL)/);
+          if (ptMatch) player = ptMatch[1] === 'RIVAL' ? 'Rival' : 'Player';
+          // 卡牌
+          let card = '';
+          const cardMatch = block.match(/"([^"]*)"/);
+          if (cardMatch) card = cardMatch[1];
+          // Int2D(x, y)
+          let coord = '';
+          const intMatch = block.match(/new\s+Int2D\s*\(\s*(\d+)\s*,\s*(\d+)\s*\)/);
+          if (intMatch) coord = '[' + intMatch[1] + ',' + intMatch[2] + ']';
+          // 提取所有 new List<int> { ... } 行（每个AddStep有6行：前3为array1，后3为array2）
+          const rowMatches = block.match(/new\s+List<int>\s*\{([^}]*)\}/g);
+          if (!rowMatches || rowMatches.length < ROWS * 2) continue;
+          function extractNums(rowStr) {
+            const content = rowStr.match(/\{([^}]*)\}/)[1];
+            return content.split(',').map(s => {
+              s = s.trim();
+              if (CS_TO_NUM[s] !== undefined) return CS_TO_NUM[s];
+              return Number(s);
+            });
+          }
+          const allRows = rowMatches.map(extractNums);
+          const arr1 = allRows.slice(0, ROWS);
+          const arr2 = allRows.slice(ROWS, ROWS * 2);
+          const panel = { player, card, coord };
+          newSteps.push({ cells: arraysToCells(arr1, arr2), panel });
+        }
+        if (newSteps.length === 0) { alert('未找到有效的AddStep'); return; }
+        // 继承卡牌名：每个step的text取上一个step对应位置的text，再将当前step指定坐标的text设为当前卡牌名
+        for (let i = 0; i < newSteps.length; i++) {
+          const s = newSteps[i];
+          if (i > 0) {
+            const prev = newSteps[i - 1].cells;
+            for (let r = 0; r < ROWS; r++) {
+              for (let c = 0; c < COLS; c++) {
+                s.cells[r][c].text = prev[r][c].text;
+              }
+            }
+          }
+          // 设置当前step指定坐标的卡牌名
+          const cm = (s.panel.coord || '').match(/^\[\s*(\d+)\s*,\s*(\d+)\s*\]$/);
+          if (cm) {
+            const cx = Number(cm[1]);
+            const cy = Number(cm[2]);
+            if (cx >= 0 && cx < ROWS && cy >= 0 && cy < COLS) {
+              s.cells[cx][cy].text = s.panel.card || '';
+            }
+          }
+        }
+        steps.length = 0;
+        newSteps.forEach(s => steps.push(s));
+        currentStep = 0;
+        renderStepList();
+        loadPanel();
+        renderGrid();
+      } catch (err) {
+        alert('解析失败: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  renderStepList();
+  renderGrid();
+  loadPanel();
+
+  // 显示1秒的提示消息
+  function showMessage(msg, isSuccess = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+
+    if (isSuccess) {
+      toast.style.background = '#27ae60';
+    } else {
+      toast.style.background = '#e74c3c';
+    }
+
+    toast.style.display = 'block';
+    setTimeout(() => {
+      toast.style.display = 'none';
+      toast.style.background = '';
+    }, 1500);
+  }
+
+  // 由当前状态与上一个状态的差分自动填充面板
+  function generateFromDiff() {
+    // 第一个step与默认初始状态对比；其他step与上一个step对比
+    const prevCells = currentStep === 0 ? makeDefaultCells() : steps[currentStep - 1].cells;
+    const currCells = steps[currentStep].cells;
+    const changes = [];
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const p = prevCells[r][c];
+        const cu = currCells[r][c];
+        // 从-号(pm=1)变为+号(pm=0)
+        if (p.pm === 1 && cu.pm === 0) {
+          changes.push({ r, c, cell: cu });
+        }
+      }
+    }
+    if (changes.length === 0) {
+      showMessage('无法生成：未检测到-号变+号的矩阵');
+      return;
+    }
+    const found = changes[0];
+    let player = '';
+    if (found.cell.color === 1) player = 'Player';
+    else if (found.cell.color === 2) player = 'Rival';
+    if (!player) {
+      showMessage('无法生成：矩阵颜色无法确定输入者');
+      return;
+    }
+    document.getElementById('inputPlayer').value = player;
+    document.getElementById('inputCard').value = found.cell.text || '';
+    document.getElementById('inputCoord').value = '[' + found.r + ',' + found.c + ']';
+    savePanel();
+  }
+</script>
+
+</body>
+</html>

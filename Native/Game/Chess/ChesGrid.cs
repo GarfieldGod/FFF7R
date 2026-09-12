@@ -6,12 +6,16 @@ namespace FFF7RCore {
         public Int2D Position => pos_;
         public int Level => buffs_.Compute();
         public bool Empty => property_ == null;
+        public int LastPowerSnapshot => deathPowerSnapshot_;
+        public bool OnBuffed => Level > property_.Level;
+        public bool OnDeBuffed => Level < property_.Level;
 
         private PosStatus posStatus_ = PosStatus.EMPTY;
         private PosStatus posStatusBackUp_ = PosStatus.EMPTY;
         private ChessProperty property_ = null;
         private BuffList buffs_;
         private Int2D pos_ = new Int2D(-1, -1);
+        private int deathPowerSnapshot_ = 0;
 
         private bool neverBuffed_ = true;
         private bool neverDeBuffed_ = true;
@@ -113,23 +117,24 @@ namespace FFF7RCore {
             buffs_.Add(buff);
         }
 
-        public void Reset()
+        public void RemoveBuff(Int2D src)
         {
-            Log.TestLine("Reset: Level: " + Level.ToString() + " posStatusBackUp_: " + posStatusBackUp_ + " Pos: " + pos_, TextColor.PURPLE);
-            Log.TestLine("  BuffCount before Reset: " + buffs_.Count, TextColor.PURPLE);
-            foreach (var b in buffs_)
-            {
-                Log.TestLine("    buff: value=" + b.value + " owner=" + b.owner + " source=" + b.source + " dstType=" + b.dstType, TextColor.PURPLE);
-            }
+            buffs_.Remove(src);
+        }
+
+        public void Recover()
+        {
             neverBuffed_ = true;
             neverDeBuffed_ = true;
             property_ = null;
+            deathPowerSnapshot_ = Level;
             posStatus_ = posStatusBackUp_;
         }
 
-        public void ChessDead()
+        public void Reset()
         {
-            Reset();
+            Recover();
+            RemoveBuff(Position);
         }
     }
 }

@@ -14,5 +14,7 @@ namespace FFF7RCore {
             this.playerType = playerType;
         }
         public readonly bool Empty => chess == null;
+
+        public override string ToString() => $"PlayerType: {playerType} Pos: {pos} Chess: {chess.CardCode}";
     }
 }

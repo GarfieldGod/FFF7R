@@ -120,14 +120,14 @@ namespace FFF7RCore {
             get 
             {
                 List<List<BuffList>> result = new List<List<BuffList>>();
-                for (int x = 0; x < padGrids_.Count; x++)
+                foreach (var line in padGrids_)
                 {
-                    var line = new List<BuffList>();
-                    for (int y = 0; y < padGrids_[0].Count; y++)
+                    var retLine = new List<BuffList>();
+                    foreach (var padGrid in line)
                     {
-                        line.Add(padGrids_[x][y].BuffList);
+                        retLine.Add(padGrid.BuffList);
                     }
-                    result.Add(line);
+                    result.Add(retLine);
                 }
                 return result;
             }
@@ -148,14 +148,14 @@ namespace FFF7RCore {
             get
             {
                 List<List<bool>> result = new List<List<bool>>();
-                for (int x = 0; x < padGrids_.Count; x++)
+                foreach (var line in padGrids_)
                 {
-                    var line = new List<bool>();
-                    for (int y = 0; y < padGrids_[0].Count; y++)
+                    var retLine = new List<bool>();
+                    foreach (var padGrid in line)
                     {
-                        line.Add(padGrids_[x][y].NeverBuffed);
+                        retLine.Add(padGrid.NeverBuffed);
                     }
-                    result.Add(line);
+                    result.Add(retLine);
                 }
                 return result;
             }
@@ -181,6 +181,44 @@ namespace FFF7RCore {
             {
                 padGrids_[pos.x][pos.y].Chess = null;
             }
+        }
+
+        public (int playerBuff, int playerDeBuff, int rivalBuff, int rivalDeBuff) GetBuffedAndDeBuffedNum(List<Int2D> exclusionList = null)
+        {
+            int playerBuffed = 0, playerDeBuffed = 0, rivalBuffed = 0, rivalDeBuffed = 0;
+            foreach(var line in padGrids_)
+            {
+                foreach(var padGrid in line)
+                {
+                    if (padGrid.Empty || (exclusionList != null && exclusionList.Contains(padGrid.Position))) continue;
+
+                    if (padGrid.Status == PosStatus.OCCUPIED_PLAYER)
+                    {
+                        if (padGrid.OnBuffed) playerBuffed++;
+                        else if (padGrid.OnDeBuffed) playerDeBuffed++;
+                    } else if (padGrid.Status == PosStatus.OCCUPIED_RIVAL)
+                    {
+                        if (padGrid.OnBuffed) rivalBuffed++;
+                        else if (padGrid.OnDeBuffed) rivalDeBuffed++;
+                    }
+                }
+            }
+            return (playerBuffed, playerDeBuffed, rivalBuffed, rivalDeBuffed);
+        }
+
+        // 获取所有非空的、但未被占用的格子
+        public List<PadGrid> GetGrids(Func<PadGrid, bool> filter = null)
+        {
+            var result = new List<PadGrid>();
+            foreach(var line in padGrids_)
+            {
+                foreach(var padGrid in line)
+                {
+                    if (filter != null && !filter.Invoke(padGrid)) continue;
+                    result.Add(padGrid);
+                }
+            }
+            return result;
         }
 
         public List<List<int>> CardLevelMap
@@ -228,8 +266,8 @@ namespace FFF7RCore {
 
         public void RestPos(Int2D pos)
         {
-            RemoveBuffs(pos);
             padGrids_[pos.x][pos.y].Reset();
+            RemoveBuffs(pos);
         }
 
         public bool AddBuff(Int2D pos, Buff buff, bool DoSelfPowerBuff = false)
@@ -311,8 +349,7 @@ namespace FFF7RCore {
             {
                 for (int y = 0; y < padGrids_[x].Count; y++)
                 {
-                    var buffs = padGrids_[x][y].BuffList;
-                    buffs.Remove(pos);
+                    padGrids_[x][y].RemoveBuff(pos);
                 }
             }
             return true;

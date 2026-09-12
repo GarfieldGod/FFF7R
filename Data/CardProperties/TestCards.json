@@ -1,7 +1,7 @@
 [    
     {
-        "CardCode": "CardTest0",
-        "Name": "CardTest0",
+        "CardCode": "PosAll4Down1",
+        "Name": "PosAll4Down1",
         "Level": 1,
         "Cost": 1,
         "PosEffect": [
@@ -29,8 +29,8 @@
         "Description": ""
     },
     {
-        "CardCode": "CardTest1",
-        "Name": "CardTest1",
+        "CardCode": "PosFriend4Up1",
+        "Name": "PosFriend4Up1",
         "Level": 1,
         "Cost": 1,
         "PosEffect": [
@@ -58,37 +58,8 @@
         "Description": ""
     },
     {
-        "CardCode": "CardTest2",
-        "Name": "CardTest2",
-        "Level": 2,
-        "Cost": 1,
-        "PosEffect": [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 1, 9, 1, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        ],
-        "CardEffect": {
-            "Condition": "OnFirstDeBuffed",
-            "Target": "FriendAndEnemy",
-            "Operation": "PowerDown",
-            "ValueType": "Const",
-            "Value": 2,
-            "PowerThreshold": 0,
-            "Scope": [
-                [0, 0, 0, 0, 0, 0, 0, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0, 0],
-                [0, 0, 0, 1, 0, 1, 0, 0, 0],
-                [0, 0, 0, 0, 1, 0, 0, 0, 0],
-                [0, 0, 0, 0, 0, 0, 0, 0, 0]
-            ]
-        },
-        "Description": ""
-    },
-    {
-        "CardCode": "CardTest3",
-        "Name": "CardTest3",
+        "CardCode": "FirstDeBuffedAll4Down2",
+        "Name": "FirstDeBuffedAll4Down2",
         "Level": 2,
         "Cost": 1,
         "PosEffect": [

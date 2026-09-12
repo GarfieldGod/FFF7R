@@ -149,7 +149,10 @@ namespace FFF7RCore {
         {
             if (gameStatus_ != GameStatus.GAMING) return false;
 
-            if (!IgnoreTurnLimit && currentPlayer_ != input.playerType) return false;
+            if (!IgnoreTurnLimit && currentPlayer_ != input.playerType) {
+                Log.TestLine($"{input.playerType} is not allowed to input, this turn is {currentPlayer_}", TextColor.RED);
+                return false;
+            }
 
             return chessPadManager_.CheckInput(input);
         }
