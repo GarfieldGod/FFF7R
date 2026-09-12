@@ -274,6 +274,7 @@ namespace FFF7RCore {
         {
             PadGrid padGrid = padGrids_[pos.x][pos.y];
             padGrid.AddBuff(buff);
+            // if (!padGrid.Empty && padGrid.Level <= 0)
             CheckBuffEvent(padGrid, buff.value, DoSelfPowerBuff);
             return false;
         }

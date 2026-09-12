@@ -17,10 +17,10 @@ namespace FFF7RCore.Effect {
         }
 
         private static List<List<int>> ExecutePosEffect(Dictionary<Int2D, int> targets, List<List<int>> gridStatus, PlayerType playerType) {
-            // Log.TestLine("targets: " + targets.Count, TextColor.PURPLE);
+            Log.TestLine("targets: " + targets.Count, TextColor.PURPLE);
             foreach (var target in targets)
             {
-                // Log.TestLine("target: x: " + target.Item1.x + " y: " + target.Item1.y + " value: " + target.Item2, TextColor.PURPLE);
+                Log.TestLine("target: x: " + target.Key.x + " y: " + target.Key.y + " value: " + target.Value, TextColor.PURPLE);
                 int pastLevel = gridStatus[target.Key.x][target.Key.y];
                 if ((PosStatus)pastLevel >= PosStatus.OCCUPIED_PLAYER)
                 {
@@ -67,7 +67,7 @@ namespace FFF7RCore.Effect {
                     newLevel = (int)PosStatus.LEVEL_THREE_RIVAL;
                 }
                 gridStatus[target.Key.x][target.Key.y] = newLevel;
-                // Log.TestLine("pastLevel: " + pastLevel + " newLevel: " + newLevel, TextColor.PURPLE);
+                Log.TestLine("pastLevel: " + pastLevel + " newLevel: " + newLevel, TextColor.PURPLE);
             }
             return gridStatus;
         }

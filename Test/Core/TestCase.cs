@@ -10,6 +10,7 @@ namespace FFF7RCore.Test {
         protected bool IgnoreTurnLimit = false;
         protected int stepIndex_ = 0;
         protected bool result_;
+        protected Dictionary<int, bool> stepsRet_;
 
         public TestCase()
         {
@@ -29,6 +30,7 @@ namespace FFF7RCore.Test {
             testGame_.Init(true);
             testGame_.Start(steps_[0].input.playerType);
 
+            result_ = true;
             while (testGame_.Status != GameStatus.GAME_OVER && stepIndex_ < steps_.Count)
             {
                 Log.TestLine($"\n----------------[{this} step {stepIndex_}]----------------");
@@ -42,14 +44,16 @@ namespace FFF7RCore.Test {
 
                 if (!CheckResult(step))
                 {
+                    stepsRet_[stepIndex_] = false;
                     result_ = false;
-                    return false;
+                    // return false;
+                } else {
+                    stepsRet_[stepIndex_] = true;
                 }
 
                 stepIndex_++;
             }
-            result_ = true;
-            return true;
+            return result_;
         }
 
         public virtual GameConfig InitGameConfig()
@@ -110,7 +114,7 @@ namespace FFF7RCore.Test {
                 TestUtils.ShowErrorDiff(expect, result);
                 return false;
             }
-
+            Log.TestLine("Compare " + name + " Success!", TextColor.GREEN, true);
             return true;
         }
     }

@@ -9,6 +9,7 @@ namespace FFF7RCore {
         public int LastPowerSnapshot => deathPowerSnapshot_;
         public bool OnBuffed => Level > property_.Level;
         public bool OnDeBuffed => Level < property_.Level;
+        public bool FirstPowerReach = false;
 
         private PosStatus posStatus_ = PosStatus.EMPTY;
         private PosStatus posStatusBackUp_ = PosStatus.EMPTY;
@@ -128,7 +129,7 @@ namespace FFF7RCore {
             neverDeBuffed_ = true;
             property_ = null;
             deathPowerSnapshot_ = Level;
-            posStatus_ = posStatusBackUp_;
+            posStatus_ = posStatus_ == PosStatus.OCCUPIED_PLAYER ? PosStatus.LEVEL_ONE_PLAYER : PosStatus.LEVEL_ONE_RIVAL;
         }
 
         public void Reset()

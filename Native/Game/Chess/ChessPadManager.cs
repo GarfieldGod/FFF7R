@@ -23,10 +23,17 @@ namespace FFF7RCore {
 
             PadGrid padGrid = chessPad_[input.pos.x, input.pos.y];
             padGrid.Chess = input.chess;
+            padGrid.Status = input.playerType == PlayerType.PLAYER ? PosStatus.OCCUPIED_PLAYER : PosStatus.OCCUPIED_RIVAL;
+
+            Log.TestLine("DoSelfPower", TextColor.BLACK);
+            DoSelfPower(input, chessPad_);
+
+            Log.TestLine("DoCardEffect", TextColor.BLACK);
+            DoCardEffect(input, chessPad_);
+            Log.TestLine("DoPosEffect", TextColor.BLACK);
 
             DoPosEffect(input, chessPad_);
-            DoSelfPower(input, chessPad_);
-            DoCardEffect(input, chessPad_);
+            Log.TestLine("RaiseChessPlaced", TextColor.BLACK);
 
             eventSystem_.RaiseChessPlaced(input);
             return true;
@@ -125,7 +132,7 @@ namespace FFF7RCore {
                     if (!preview) SubscribePlacedEvent(condition, input);
                     break;
                 case EffectCondition.OnPowerFirstReach:
-                    // TODO
+                    if (!preview) SubscribeBuffedEvent(condition, input);
                     break;
                 case EffectCondition.OnTurnEnd:
                     // TODO
@@ -197,7 +204,13 @@ namespace FFF7RCore {
                 PlayerType self = input.playerType;
                 bool friend = owner == self;
                 Int2D pos = buffedOne.Position;
-                if (input.pos == pos) return;
+                if (condition != EffectCondition.OnPowerFirstReach && input.pos == pos) return;
+
+                bool firstPowerReach = 
+                    condition == EffectCondition.OnPowerFirstReach && buffedOne.Position == input.pos &&
+                    chessPad_[input.pos].Level >= input.chess.CardEffect.PowerThreshold &&
+                    chessPad_[input.pos].FirstPowerReach == false;
+                if (condition == EffectCondition.OnPowerFirstReach) Log.TestLine($"firstPowerReach: {firstPowerReach} pos: {input.pos} src: {buffedOne.Position}");
 
                 bool match = 
                     (condition == EffectCondition.BuffedFriendNum && positive && friend) ||
@@ -205,7 +218,10 @@ namespace FFF7RCore {
                     (condition == EffectCondition.DeBuffedFriendNum && !positive && friend) ||
                     (condition == EffectCondition.DeBuffedEnemyNum && !positive && !friend) ||
                     (condition == EffectCondition.BuffedFriendOrEnemyNum && positive) ||
-                    (condition == EffectCondition.DeBuffedFriendOrEnemyNum && !positive);
+                    (condition == EffectCondition.DeBuffedFriendOrEnemyNum && !positive) ||
+                    firstPowerReach;
+
+                if (firstPowerReach) chessPad_[input.pos].FirstPowerReach = true;
 
                 if (match)
                 {
