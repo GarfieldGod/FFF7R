@@ -130,6 +130,7 @@ namespace FFF7RCore {
             property_ = null;
             deathPowerSnapshot_ = Level;
             posStatus_ = posStatus_ == PosStatus.OCCUPIED_PLAYER ? PosStatus.LEVEL_ONE_PLAYER : PosStatus.LEVEL_ONE_RIVAL;
+            Log.TestLine($"Recover pos: {pos_} status: {(int)posStatus_} deathPowerSnapshot_: {deathPowerSnapshot_}");
         }
 
         public void Reset()

@@ -267,7 +267,7 @@ namespace FFF7RCore {
         public void RestPos(Int2D pos)
         {
             padGrids_[pos.x][pos.y].Reset();
-            RemoveBuffs(pos);
+            RemoveAllBuffsFromPos(pos);
         }
 
         public bool AddBuff(Int2D pos, Buff buff, bool DoSelfPowerBuff = false)
@@ -343,7 +343,7 @@ namespace FFF7RCore {
             }
         }
 
-        public bool RemoveBuffs(Int2D pos)
+        private bool RemoveAllBuffsFromPos(Int2D pos)
         {
             // Log.TestLine("---RemoveBuffs--- " + id);
             for (int x = 0; x < padGrids_.Count; x++)
@@ -367,16 +367,15 @@ namespace FFF7RCore {
             StatusMap = chessGridStatus;
         }
 
-        public void InitGridMap(int height, int lengh)
+        public void InitGridMap(int height, int length)
         {
             List<List<PadGrid>> padGrids = new List<List<PadGrid>> { };
             for (int x = 0; x < height; x++)
             {
                 List<PadGrid> line = new List<PadGrid>();
-                for (int y = 0; y < lengh; y++)
+                for (int y = 0; y < length; y++)
                 {
                     PadGrid padGrid = new PadGrid(new Int2D(x, y));
-                    // padGridsposMap_.Add(new Int2D(x, y), padGrid);
                     line.Add(padGrid);
                 }
                 padGrids.Add(line);

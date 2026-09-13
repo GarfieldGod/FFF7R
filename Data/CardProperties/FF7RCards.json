@@ -2286,10 +2286,38 @@
       "Operation": "AddCardToHand",
       "ValueType": "CardCode",
       "Value": 0,
-      "CardCodeList": [],
+      "CardCodeList": ["Card094_1"],
       "Scope": null
     },
     "Description": "消失时，将「加利安魔兽」加入手牌。"
+  },
+  {
+    "CardCode": "Card094_1",
+    "Name": "Galian Beast",
+    "Level": 4,
+    "Cost": 2,
+    "PosEffect": [
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0],
+      [0,0,0,0,0]
+    ],
+    "CardEffect": {
+      "Condition": "OnPlayed",
+      "Target": "FriendAndEnemy",
+      "Operation": "PowerDown",
+      "ValueType": "Const",
+      "Value": 1,
+      "Scope": [
+        [0,1,1,1,0],
+        [1,0,0,0,1],
+        [1,0,0,0,1],
+        [1,0,0,0,1],
+        [0,1,1,1,0]
+      ]
+    },
+    "Description": "配置时，特殊效果方格我方·对手卡片的威力降低1。"
   },
   {
     "CardCode": "Card095",

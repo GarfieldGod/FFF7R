@@ -99,7 +99,8 @@ namespace FFF7RCore.Effect
                 else if (operation == EffectOperation.PowerDown) value = -effectValue;
 
                 Buff buff = new Buff(dstOwned ? dstPos : input.pos, input.pos, value, targetType, srcType, mark);
-                Log.TestLine($"Add buff: {buff}", TextColor.BLACK);
+                Log.TestLine($"Add buff: value: {buff.value} src: {buff.source} dst: {dstPos} owner: {buff.owner} srcType: {buff.srcType} dstType: {buff.dstType} mark: {buff.mark}", 
+                    TextColor.BLACK);
                 chessPad.AddBuff(dstPos, buff);
             }
         }

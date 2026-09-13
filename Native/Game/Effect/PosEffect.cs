@@ -9,7 +9,7 @@ namespace FFF7RCore.Effect {
             if (input.chess == null || input.chess.PosEffect == null) return posStatusTemp;
 
             bool ifPlayer = input.playerType == PlayerType.PLAYER;
-            posStatusTemp[input.pos.x][input.pos.y] = ifPlayer ? (int)PosStatus.OCCUPIED_PLAYER : (int)PosStatus.OCCUPIED_RIVAL;
+            // posStatusTemp[input.pos.x][input.pos.y] = ifPlayer ? (int)PosStatus.OCCUPIED_PLAYER : (int)PosStatus.OCCUPIED_RIVAL;
 
             Dictionary<Int2D, int> targets = ParsePosEffectsInPosition(input, chessPad.Size);
 
@@ -20,7 +20,6 @@ namespace FFF7RCore.Effect {
             Log.TestLine("targets: " + targets.Count, TextColor.PURPLE);
             foreach (var target in targets)
             {
-                Log.TestLine("target: x: " + target.Key.x + " y: " + target.Key.y + " value: " + target.Value, TextColor.PURPLE);
                 int pastLevel = gridStatus[target.Key.x][target.Key.y];
                 if ((PosStatus)pastLevel >= PosStatus.OCCUPIED_PLAYER)
                 {
@@ -67,6 +66,7 @@ namespace FFF7RCore.Effect {
                     newLevel = (int)PosStatus.LEVEL_THREE_RIVAL;
                 }
                 gridStatus[target.Key.x][target.Key.y] = newLevel;
+                Log.TestLine("target: " + target.Key + " value: " + target.Value, TextColor.PURPLE);
                 Log.TestLine("pastLevel: " + pastLevel + " newLevel: " + newLevel, TextColor.PURPLE);
             }
             return gridStatus;

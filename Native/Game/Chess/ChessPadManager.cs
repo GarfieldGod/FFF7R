@@ -32,7 +32,9 @@ namespace FFF7RCore {
             DoCardEffect(input, chessPad_);
             Log.TestLine("DoPosEffect", TextColor.BLACK);
 
+            Log.TestLine($"1{chessPad_[input.pos].Status}", TextColor.BLACK);
             DoPosEffect(input, chessPad_);
+            Log.TestLine($"2{chessPad_[input.pos].Status}", TextColor.BLACK);
             Log.TestLine("RaiseChessPlaced", TextColor.BLACK);
 
             eventSystem_.RaiseChessPlaced(input);

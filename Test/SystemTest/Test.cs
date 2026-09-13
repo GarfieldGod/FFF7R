@@ -1,15 +1,13 @@
 namespace FFF7RCore.Test {
-    using Xunit;
     using System;
     using System.Collections.Generic;
     using System.Reflection;
 
     public class SystemTest
     {
-        [Fact]
-        public static void Run()
+        public static int Run()
         {
-            Assert.True(RunTest(), "系统测试失败");
+            return RunTest() ? 0 : 1;
         }
 
         public static bool RunTest()
@@ -25,19 +23,23 @@ namespace FFF7RCore.Test {
                 .ToList();
 
             // 批量实例化
-            TestSuite test = new TestSuite();
-            foreach (Type type in testCaseTypes)
+            bool testResult = false;
+            using (TestSuite test = new TestSuite())
             {
-                // 调用无参构造函数实例化
-                TestCase instance = Activator.CreateInstance(type) as TestCase;
-                if (instance != null)
+                foreach (Type type in testCaseTypes)
                 {
-                    test.Add(instance);
-                    Log.TestLine($"实例化TestCase: {type.Name}", TextColor.BLACK);
+                    // 调用无参构造函数实例化
+                    TestCase instance = Activator.CreateInstance(type) as TestCase;
+                    if (instance != null)
+                    {
+                        test.Add(instance);
+                        Log.TestLine($"实例化TestCase: {type.Name}", TextColor.BLACK);
+                    }
                 }
-            }
 
-            return test.Run();
+                testResult = test.Run();
+            };
+            return testResult;
         }
     }
 }

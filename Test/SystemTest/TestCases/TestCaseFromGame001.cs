@@ -1,10 +1,15 @@
 namespace FFF7RCore.Test {
-    public class TestCaseT : TestCase
+    public class TestCaseFromGame001 : TestCase
     {
         public override void ConfigureOptions()
-        {
+        {           
+            // IgnoreTurnLimit = false;          是否忽略该回合是谁的回合的限制
+            // StopTestCaseWhenFailed = true;    是否在测试用例失败时停止测试
+            // NoLog = false;                    是否不打印日志
+            // Description = "No description.";  用例描述
             IgnoreTurnLimit = true;
-            Description = "This is a description.";
+            Description = "这是一局从游戏中获取的用例，该局游戏中第20步发生了游戏bug，导致效果没有触发，本项目会正常完成触发，因此本用例的第20步进行了屏蔽。";
+            NoLog = true;
         }
 
         public override ChessPad InitChessPad()
@@ -287,7 +292,11 @@ namespace FFF7RCore.Test {
                 new List<int> { 1, 2, 5, 1, 1 },
                 new List<int> { 4, 6, 2, 1, 9 },
                 new List<int> { 7, 1, 1, 5, 8 },
-                }
+                },
+                true
+                // 跳过该用例
+                // 该用例失败是因为原游戏bug导致，原游戏中克劳德首次到达7级后并未触发效果，而是在2回合后触发效果
+                // 此处进行了正确的触发，导致该用例无法通过
             );
             // Step 21
             AddStep(PlayerType.PLAYER, "Card091", new Int2D(0, 2),

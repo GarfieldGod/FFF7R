@@ -1,5 +1,6 @@
 namespace FFF7RCore {
-    using System.Runtime.CompilerServices;
+    using System.Text;
+
     public enum TextColor {
         NONE,
         RED,
@@ -10,32 +11,81 @@ namespace FFF7RCore {
         BLACK,
         WHITE
     }
+
     public class Log {
-        public static void TestLine(string info, TextColor color = TextColor.NONE, bool ifHightLight = false)
+        public static bool PrintToConsole = true;
+        private static bool saveLog = false;
+        private static int maxSaveLength = 1024 * 1024;
+        private static readonly StringBuilder logPlainSb = new StringBuilder();
+        private static readonly StringBuilder logAnsiSb = new StringBuilder();
+        private static readonly object logLock = new object();
+
+        public static void SaveStart(int maxSaveLength = 1024 * 1024)
         {
-            Test(info, color, ifHightLight);
-            Test("\n");
+            lock (logLock)
+            {
+                saveLog = true;
+                Log.maxSaveLength = maxSaveLength;
+                logPlainSb.Clear();
+                logAnsiSb.Clear();
+            }
         }
 
-        // public static void Debug(string info, TextColor color = TextColor.NONE, bool ifHightLight = false,
-        //     [CallerMemberName] string callerMethod = "",
-        //     [CallerFilePath] string callerFile = "",
-        //     [CallerLineNumber] int callerLine = 0)
-        // {
-        //     string timeStamp = DateTime.Now.ToString("HH:mm:ss.fff");
-        //     string fileName = $"{callerFile}:{callerLine}";
-        //     string logContent = $"[{timeStamp}] [{callerMethod}] | {info}";
-        //     Test(logContent, color, ifHightLight);
-        //     Test("\n");
-        // }
+        public static void SaveEnd(string filePath)
+        {
+            lock (logLock)
+            {
+                saveLog = false;
+                bool hasContent = logPlainSb.Length > 0;
+                if (hasContent)
+                {
+                    string dir = Path.GetDirectoryName(filePath);
+                    if(string.IsNullOrEmpty(dir))
+                        dir = Environment.CurrentDirectory;
+                    Directory.CreateDirectory(dir);
+                    string nameNoExt = Path.GetFileNameWithoutExtension(filePath);
+                    string ext = Path.GetExtension(filePath);
+                    string ansiFilePath = Path.Combine(dir, $"{nameNoExt}_colored{ext}");
+
+                    File.WriteAllText(filePath, logPlainSb.ToString());
+                    File.WriteAllText(ansiFilePath, logAnsiSb.ToString());
+                }
+                logPlainSb.Clear();
+                logAnsiSb.Clear();
+            }
+        }
+
+        public static void TestLine(string info, TextColor color = TextColor.NONE, bool ifHightLight = false)
+        {
+            Output(info, color, ifHightLight);
+#if !UNITY_ENGINE
+            Output("\n");
+#endif
+        }
 
         public static void Test(string info, TextColor color = TextColor.NONE, bool ifHightLight = false) {
+            Output(info, color, ifHightLight);
+        }
+
+        private static void Output(string info, TextColor color = TextColor.NONE, bool ifHightLight = false) {
             string textColor = GetColorText(color, ifHightLight);
-        #if UNITY_ENGINE
-            Debug.Log(textColor + info);
-        #else
-            Console.Write(textColor + info);
-        #endif
+
+            if (PrintToConsole) {
+#if UNITY_ENGINE
+                UnityEngine.Debug.Log(info);
+#else
+                Console.Write(textColor + info);
+#endif
+            }
+
+            lock (logLock)
+            {
+                if (saveLog && logPlainSb.Length + info.Length <= maxSaveLength)
+                {
+                    logPlainSb.Append(info);
+                    logAnsiSb.Append(textColor + info);
+                }
+            }
         }
 
         public static void Clear() {

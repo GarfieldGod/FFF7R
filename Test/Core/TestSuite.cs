@@ -1,21 +1,46 @@
 namespace FFF7RCore.Test {
     using System.Text;
 
-    public class TestSuite
+    public class TestSuite : IDisposable
     {
+        public string LogOutputDir = "output";
         public bool InterruptedByFailure { get; set; }
         private List<TestCase> caseList_;
-        private Dictionary<TestCase, bool> testCaseResultList_;
+        private Dictionary<TestCase, Dictionary<Step, bool>> testCaseStepsResultDict_ = new Dictionary<TestCase, Dictionary<Step, bool>>();
         private HashSet<string> uncoveredCardList_;
         private bool testResult_ = true;
         private int coveredCardsNum_ = 0;
+        private bool disposed_ = false;
 
         public TestSuite()
         {
+            Log.SaveStart();
             caseList_ = new List<TestCase> {};
-            testCaseResultList_ = new Dictionary<TestCase, bool>();
             Property.LoadChessProperties();
             uncoveredCardList_ = new HashSet<string>(Property.GetAllCardCode());
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed_) return;
+            if (disposing)
+            {
+                string fileName = Path.Combine(LogOutputDir, 
+                    "TestResult" + DateTime.Now.ToString("_HH_mm_ss_fff") + ".log");
+                Log.SaveEnd(fileName);
+            }
+            disposed_ = true;
+        }
+
+        ~TestSuite()
+        {
+            Dispose(false);
         }
 
         public void Add(TestCase testCase)
@@ -28,11 +53,9 @@ namespace FFF7RCore.Test {
             foreach (TestCase testCase in caseList_)
             {
                 if (!testCase.Run()) {
-                    testCaseResultList_[testCase] = false;
                     testResult_ = false;
                     if (InterruptedByFailure) break;
                 } else {
-                    testCaseResultList_[testCase] = true;
                     foreach (var cardCode in testCase.CoveredCards)
                     {
                         if (uncoveredCardList_.Contains(cardCode))
@@ -42,6 +65,7 @@ namespace FFF7RCore.Test {
                         }
                     }
                 }
+                testCaseStepsResultDict_[testCase] = testCase.StepsResult;
             }
 
             PrintResult();
@@ -60,17 +84,18 @@ namespace FFF7RCore.Test {
                 Log.TestLine($"{JoinWithNewline(uncoveredCardList_, 10)}", TextColor.BLACK);
             }
             Log.TestLine($"\nTotal Count: {caseList_.Count}", TextColor.YELLOW);
-            
-            int passed = testCaseResultList_.Count(x => x.Value);
-            int failed = testCaseResultList_.Count(x => !x.Value);
+
+            int passed = testCaseStepsResultDict_.Where(kvp => kvp.Value.All(s => s.Value)).Select(kvp => kvp.Key).ToList().Count;
+            int failed = testCaseStepsResultDict_.Count - passed;
             Log.TestLine($"Passed: {passed}", TextColor.GREEN);
             Log.TestLine($"Failed: {failed}", failed == 0 ? TextColor.BLACK : TextColor.RED);
             if (failed != 0)
             {
                 Log.TestLine("\nFailed Cases: ", TextColor.RED);
-                foreach (var testCase in testCaseResultList_.Where(x => !x.Value))
+                foreach (var caseNameStepsResultPair in testCaseStepsResultDict_)
                 {
-                    Log.Test($"\t[{testCase.Key} step {testCase.Key.FailedStep}]", TextColor.RED);
+                    foreach (var stepRetPair in caseNameStepsResultPair.Value.Where(x => !x.Value))
+                        Log.Test($"\t[{caseNameStepsResultPair.Key} step {stepRetPair.Key.index}]", TextColor.RED);
                 }
             }
             Log.TestLine($"\nTest Result: {testResult_}", testResult_ ? TextColor.GREEN : TextColor.RED);

@@ -3,8 +3,13 @@ namespace FFF7RCore.Test {
     {
         public override void ConfigureOptions()
         {
+            // IgnoreTurnLimit = false;          是否忽略该回合是谁的回合的限制
+            // StopTestCaseWhenFailed = true;    是否在测试用例失败时停止测试
+            // NoLog = false;                    是否不打印日志
+            // Description = "No description.";  用例描述
             IgnoreTurnLimit = true;
             Description = "Test Case 2";
+            NoLog = true;
         }
 
         public override ChessPad InitChessPad()

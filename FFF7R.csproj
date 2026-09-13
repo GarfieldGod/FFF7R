@@ -1,33 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
-    <!-- 默认控制台模式：dotnet run 可用，Main.cs 作为唯一入口 -->
     <GenerateProgramFile>false</GenerateProgramFile>
-    <!-- 传入 TestMode=true 切换到测试模式：排除 Main.cs，启用 testhost 入口，dotnet test 可用 -->
-    <GenerateProgramFile Condition="'$(TestMode)' == 'true'">true</GenerateProgramFile>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(TestMode)' == 'true'">
-    <Compile Remove="Main.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
 
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+  <ItemGroup>
     <Content Include="Data\CardProperties\*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-
   </ItemGroup>
-
 </Project>

@@ -3,10 +3,14 @@ namespace FFF7RCore.Test {
     {
         public Input input;
         public ExpectPad expectPad;
-        public Step(Input input, ExpectPad expectPad)
+        public bool skip;
+        public int index;
+        public Step(int index, Input input, ExpectPad expectPad, bool skip = false)
         {
             this.input = input;
             this.expectPad = expectPad;
+            this.skip = skip;
+            this.index = index;
         }
     }
 

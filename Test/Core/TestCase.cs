@@ -1,16 +1,19 @@
 namespace FFF7RCore.Test {
     public abstract class TestCase
     {
-        public List<string> CoveredCards => steps_.Select(x => x.input.chess.CardCode).ToList();
-        public int FailedStep => result_ ? -1 : stepIndex_;
         public string Description;
+        public List<string> CoveredCards => steps_.Select(x => x.input.chess.CardCode).ToList();
+        public Dictionary<Step, bool> StepsResult => stepsRet_;
 
-        protected TestGame testGame_;
-        protected List<Step> steps_ = new List<Step>();
         protected bool IgnoreTurnLimit = false;
-        protected int stepIndex_ = 0;
-        protected bool result_;
-        protected Dictionary<int, bool> stepsRet_;
+        protected bool StopTestCaseWhenFailed = true;
+        protected bool NoLog = false;
+
+        private TestGame testGame_;
+        private List<Step> steps_ = new List<Step>();
+        private int stepIndex_ = 0;
+        private bool result_;
+        private Dictionary<Step, bool> stepsRet_ = new Dictionary<Step, bool>();
 
         public TestCase()
         {
@@ -23,6 +26,8 @@ namespace FFF7RCore.Test {
 
         public bool Run()
         {
+            if (NoLog) Log.PrintToConsole = false;
+
             if (IgnoreTurnLimit)
             {
                 testGame_.IgnoreTurnLimit = true;
@@ -44,15 +49,17 @@ namespace FFF7RCore.Test {
 
                 if (!CheckResult(step))
                 {
-                    stepsRet_[stepIndex_] = false;
+                    stepsRet_[step] = false;
                     result_ = false;
-                    // return false;
+                    if (StopTestCaseWhenFailed) return false;
                 } else {
-                    stepsRet_[stepIndex_] = true;
+                    stepsRet_[step] = true;
                 }
 
                 stepIndex_++;
             }
+
+            Log.PrintToConsole = true;
             return result_;
         }
 
@@ -71,15 +78,15 @@ namespace FFF7RCore.Test {
             return initChessPad;
         }
 
-        public virtual void AddStep(PlayerType playerType, string cardCode, Int2D inputPos, List<List<int>> expectPad1, List<List<int>> expectPad2 = null)
+        public virtual void AddStep(PlayerType playerType, string cardCode, Int2D inputPos, List<List<int>> expectPad1, List<List<int>> expectPad2 = null, bool skip = false)
         {
             Input input = new Input(inputPos, cardCode, playerType);
-            steps_.Add(new Step(
-                input,
+            steps_.Add(new Step(steps_.Count, input,
                 new ExpectPad(
                     expectPad1,
                     expectPad2
                 )
+                ,skip
             ));
         }
 
@@ -97,6 +104,7 @@ namespace FFF7RCore.Test {
 
         bool CheckResult(Step step) {
             bool ret = true;
+            if (step.skip) return ret;
             if (step.expectPad.PosStatus != null && 
                 !Compare(testGame_.ChessPad.StatusMap, step.expectPad.PosStatus, "PosStatus")) 
                 ret = false;
