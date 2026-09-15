@@ -2,7 +2,7 @@ namespace FFF7RCore.Effect {
     public class CardEffectEntry
     {
         public EffectCondition Condition;      // 触发条件
-    public EffectTarget Target;                // 作用对象范围
+        public EffectTarget Target;            // 作用对象范围
         public EffectOperation Operation;      // 执行操作
         public EffectValueType ValueType;      // 数值来源类型
 

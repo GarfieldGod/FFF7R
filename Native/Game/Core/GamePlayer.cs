@@ -11,7 +11,7 @@ namespace FFF7RCore {
             this.playerType = playerType;
         }
 
-        public Chess this[int index]
+        public string this[int index]
         {
             get => selector[index];
         }
@@ -31,7 +31,7 @@ namespace FFF7RCore {
             selector.Add(dispenser.Dispense());
         }
 
-        public List<Chess> ChessInHand
+        public List<string> ChessInHand
         {
             get
             {
@@ -42,44 +42,5 @@ namespace FFF7RCore {
                 selector.ChessPool = value;
             }
         }
-
-        // public ChessPad GetChessPad() {
-        //     return inputer.GetChessPad();
-        // }
-
-        // public int Select(Chess chess) {
-        //     int index = selector.GetIndex(chess);
-        //     if (index != -1) {
-        //         selector.Preview(index);
-        //     }
-        //     return index;
-        // }
-
-        // public Chess Select(int index) {
-        //     Chess selectedChess = selector.GetChess(index);
-        //     if (selectedChess != null) {
-        //         selector.Preview(index);
-        //     }
-        //     return selectedChess;
-        // }
-
-        // public void RestoreSelect() {
-        //     selector.CancelPreview();
-        // }
-
-        // public bool AddInput(Input input) {
-        //     return inputer.AddInput(input);
-        // }
-
-        // public void RestoreInput() {
-        //     RestoreSelect();
-        //     inputer.RestoreInput();
-        // }
-
-        // public void CommitInput() {
-        //     inputer.CommitInput();
-        //     selector.Commit();
-        //     GetCardFromCardPool();
-        // }
     }
 }

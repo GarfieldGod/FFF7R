@@ -54,10 +54,12 @@ namespace FFF7RCore {
         {
             public ChessProperty Chess;
             public PlayerType Owner;
-            public ChessDeadEventArgs(ChessProperty chess, PlayerType owner)
+            public Int2D Pos;
+            public ChessDeadEventArgs(ChessProperty chess, PlayerType owner, Int2D pos)
             {
                 Chess = chess;
                 Owner = owner;
+                Pos = pos;
             }
         }
 

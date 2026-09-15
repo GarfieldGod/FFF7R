@@ -1,7 +1,6 @@
-namespace FFF7RCore {
+namespace FFF7RCore.Effect {
     using System.Collections;
     using System.Collections.Generic;
-    using Effect;
 
     public struct Buff
     {

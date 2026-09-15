@@ -69,10 +69,9 @@ namespace FFF7RCore {
             gameStatus_ = skipReDispense? GameStatus.Ready : GameStatus.REDISPENSE_CHESS;
         }
 
-        protected virtual GamePlayer InitGamePlayer(PlayerType playerType, List<string> chessPool, List<Chess> chesses = null) {
+        protected virtual GamePlayer InitGamePlayer(PlayerType playerType, List<string> chessPool) {
             Dispenser dispenser = new Dispenser(chessPool);
-            chesses ??= new List<Chess>{};
-            Selector selector = new Selector(chesses);
+            Selector selector = new Selector();
             return new GamePlayer(dispenser, selector, playerType);
         }
     //----------------------------------------------------------------------------------------------------------------------------------ReDispense
@@ -111,19 +110,8 @@ namespace FFF7RCore {
             if (gameStatus_ != GameStatus.GAME_END) return;
 
             gameStatus_ = GameStatus.COMPUTE_RESULT;
-            int playerScore = 0;
-            int rivalScore = 0;
-            var ResultList = chessPad_.ScoreMap;
-            for (int i = 0; i < ResultList.Count; i++)
-            {
-                playerScore += ResultList[i][0];
-                rivalScore += ResultList[i][1];
-            }
-
-            if (playerScore > rivalScore) gameWinner = PlayerType.PLAYER;
-            else if (playerScore < rivalScore) gameWinner = PlayerType.RIVAL;
-            else gameWinner = PlayerType.Null;
-
+            var score = chessPad_.CurrentScore;
+            gameWinner = score.Winner;
             gameStatus_ = GameStatus.GAME_OVER;
         }
     //----------------------------------------------------------------------------------------------------------------------------------Preview

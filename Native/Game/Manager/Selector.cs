@@ -3,56 +3,62 @@ namespace FFF7RCore {
 
     public class Selector
     {
-        public int Count => chessList_.Count;
-        private List<Chess> chessList_;
-        private KeyValuePair<Chess, int> previewChess_ = new KeyValuePair<Chess, int>(null, -1);
+        public int Count => cardCodeList_.Count;
+        private List<string> cardCodeList_;
 
-        public Selector(List<Chess> chessList) {
-            chessList_ = chessList;
+        public Selector(List<string> cardCodeList = null) {
+            if (cardCodeList == null)
+            {
+                cardCodeList_ = new List<string>();
+            }
+            else
+            {
+                cardCodeList_ = cardCodeList;
+            }
         }
 
-        public Chess this[int index]
+        public string this[int index]
         {
             get
             {
-                if (index < 0 || index >= chessList_.Count)
+                if (index < 0 || index >= cardCodeList_.Count)
                 {
                     return null;
                 }
-                return chessList_[index];
+                return cardCodeList_[index];
             }
             set
             {
-                chessList_[index] = value;
+                cardCodeList_[index] = value;
             }
         }
 
-        public List<Chess> ChessPool {
+        public List<string> ChessPool {
             get
             {
-                return chessList_;
+                return cardCodeList_;
             }
             set
             {
-                chessList_ = value;
+                cardCodeList_ = value;
             }
         }
 
-        public bool Add(Chess chess)
+        public bool Add(string cardCode)
         {
-            if (chess == null)
+            if (string.IsNullOrWhiteSpace(cardCode))
             {
                 return false;
             }
-            chessList_.Add(chess);
+            cardCodeList_.Add(cardCode);
             return true;
         }
 
         public bool RemoveAt(int index) {
-            if (index < 0 || index >= chessList_.Count) {
+            if (index < 0 || index >= cardCodeList_.Count) {
                 return false;
             }
-            chessList_.RemoveAt(index);
+            cardCodeList_.RemoveAt(index);
             return true;
         }
 
@@ -66,8 +72,8 @@ namespace FFF7RCore {
             return result;
         }
 
-        public bool Remove(Chess chessOne) {
-            bool result = chessList_.Remove(chessOne);
+        public bool Remove(string chessOne) {
+            bool result = cardCodeList_.Remove(chessOne);
             return result;
         }
     }

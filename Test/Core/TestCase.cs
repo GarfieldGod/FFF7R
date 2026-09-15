@@ -9,7 +9,7 @@ namespace FFF7RCore.Test {
         protected bool StopTestCaseWhenFailed = true;
         protected bool NoLog = false;
 
-        private TestGame testGame_;
+        private Game testGame_;
         private List<Step> steps_ = new List<Step>();
         private int stepIndex_ = 0;
         private bool result_;
@@ -21,7 +21,7 @@ namespace FFF7RCore.Test {
             InitSteps();
 
             var gameConfig = InitGameConfig();
-            testGame_ = new TestGame(steps_, gameConfig);
+            testGame_ = new Game(gameConfig);
         }
 
         public bool Run()
@@ -51,7 +51,10 @@ namespace FFF7RCore.Test {
                 {
                     stepsRet_[step] = false;
                     result_ = false;
-                    if (StopTestCaseWhenFailed) return false;
+                    if (StopTestCaseWhenFailed) {
+                        Log.PrintToConsole = true;
+                        return false;
+                    }
                 } else {
                     stepsRet_[step] = true;
                 }

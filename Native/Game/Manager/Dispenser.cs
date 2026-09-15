@@ -4,15 +4,15 @@ namespace FFF7RCore {
 
     public class Dispenser
     {
-        public List<Chess> ChessPool => chessPool_;
+        public List<string> ChessPool => chessPool_;
         public int Count => chessPool_.Count;
-        private List<Chess> chessPool_;
+        private List<string> chessPool_;
 
-        public Dispenser(List<Chess> chessPool){
+        public Dispenser(List<string> chessPool){
             chessPool_ = chessPool;
         }
 
-        public Chess this[int index]
+        public string this[int index]
         {
             get
             {
@@ -28,23 +28,13 @@ namespace FFF7RCore {
             }
         }
 
-        public Dispenser(List<string> chessName){
-            List<Chess> chessPool = new List<Chess>{};
-            foreach(string name in chessName) {
-                ChessProperty chessProperty = Property.GetChessProperty(name);
-                Chess chess = new Chess(chessProperty);
-                chessPool.Add(chess);
-            }
-            chessPool_ = chessPool;
-        }
-
-        public Chess Dispense() {
+        public string Dispense() {
             if (chessPool_.Count == 0) {
                 return null;
             }
             System.Random random = new System.Random();
             int randomIndex = random.Next(chessPool_.Count);
-            Chess chess = chessPool_[randomIndex];
+            string chess = chessPool_[randomIndex];
             chessPool_.RemoveAt(randomIndex);
             return chess;
         }

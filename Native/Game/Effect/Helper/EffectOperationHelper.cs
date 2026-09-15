@@ -2,7 +2,7 @@ namespace FFF7RCore.Effect
 {
     public static class EffectOperationHelper
     {
-        public static void TriggerEffect(ChessPad chessPad, Int2D pos, bool once = true, ChessPadManager chessPadManager = null)
+        public static void TriggerEffect(ChessPad chessPad, Int2D pos, bool once, ChessPadManager chessPadManager)
         {
             PadGrid padGrid = chessPad[pos];
             ChessProperty property = padGrid.Chess;
@@ -14,7 +14,7 @@ namespace FFF7RCore.Effect
             {
                 case EffectOperation.PowerUp:
                 case EffectOperation.PowerDown:
-                    PowerChangeEffect(new Input(pos, property, playerType), chessPad, once);
+                    PowerChangeEffect(new Input(pos, property, playerType), chessPad, once, chessPadManager);
                     break;
                 case EffectOperation.DestroyCard:
                     // EffectTrigger.DestroyCardEffect();
@@ -28,7 +28,7 @@ namespace FFF7RCore.Effect
                     var cards = property.CardEffect.CardCodeList;
                     if (cards == null || cards.Count == 0 || chessPadManager == null) break;
 
-                    var padGrids = chessPad.GetGrids(
+                    var padGrids = chessPad.GetGridsByFilter(
                         (padGrid) => padGrid.Empty && padGrid.Status != PosStatus.EMPTY
                     );
                     foreach (var grid in padGrids)
@@ -45,7 +45,7 @@ namespace FFF7RCore.Effect
             }
         }
 
-        private static void PowerChangeEffect(Input input, ChessPad chessPad, bool dstOwned)
+        private static void PowerChangeEffect(Input input, ChessPad chessPad, bool dstOwned, ChessPadManager chessPadManager)
         {
             Log.TestLine("PowerChangeEffect Start", TextColor.BLACK);
             // 要作用的对象坐标以及值，dstOwned表示buff是否由目标拥有，如果是则需确保目标位置是有效的
@@ -101,7 +101,7 @@ namespace FFF7RCore.Effect
                 Buff buff = new Buff(dstOwned ? dstPos : input.pos, input.pos, value, targetType, srcType, mark);
                 Log.TestLine($"Add buff: value: {buff.value} src: {buff.source} dst: {dstPos} owner: {buff.owner} srcType: {buff.srcType} dstType: {buff.dstType} mark: {buff.mark}", 
                     TextColor.BLACK);
-                chessPad.AddBuff(dstPos, buff);
+                chessPadManager.AddBuff(dstPos, buff);
             }
         }
     }

@@ -100,30 +100,7 @@ namespace FFF7RCore {
             }
             return deepCopiedList;
         }
-        public static List<List<Chess>> DeepCopy(this List<List<Chess>> original)
-        {
-            if (original == null)
-            {
-                return null;
-            }
-            var deepCopiedList = new List<List<Chess>>();
-            foreach (var secondLevelList in original)
-            {
-                var secondLevelCopiedList = new List<Chess>();
-                foreach (var chess in secondLevelList)
-                {
-                    if (chess == null)
-                    {
-                        secondLevelCopiedList.Add(null);
-                        continue;
-                    }
-                    var copiedChess = chess.Clone();
-                    secondLevelCopiedList.Add(copiedChess);
-                }
-                deepCopiedList.Add(secondLevelCopiedList);
-            }
-            return deepCopiedList;
-        }
+
         public static List<List<bool>> DeepCopy(this List<List<bool>> original)
         {
             if (original == null)

@@ -84,4 +84,12 @@ namespace FFF7RCore.Effect {
         Grid,
         Card
     }
+
+    public enum EffectConditionType
+    {
+        Undefined,
+        Placed,
+        Buffed,
+        Dead
+    }
 }
