@@ -2,19 +2,19 @@ namespace FFF7RCore.Effect
 {
     public static class EffectOperationHelper
     {
-        public static void TriggerEffect(ChessPad chessPad, Int2D pos, bool once, ChessPadManager chessPadManager)
+        public static void TriggerEffect(ChessPadManager chessPadManager, Input input, bool once = true)
         {
-            PadGrid padGrid = chessPad[pos];
-            ChessProperty property = padGrid.Chess;
-            if (padGrid.Empty || property.CardEffect == null || padGrid.Status < PosStatus.OCCUPIED_PLAYER) return;
-            PlayerType playerType = padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
+            ChessPad chessPad = chessPadManager.ChessPad;
+            ChessProperty property = input.chess;
+            if (property.CardEffect == null) return;
+            PlayerType playerType = input.playerType;
 
             EffectOperation operation = property.CardEffect.Operation;
             switch (operation)
             {
                 case EffectOperation.PowerUp:
                 case EffectOperation.PowerDown:
-                    PowerChangeEffect(new Input(pos, property, playerType), chessPad, once, chessPadManager);
+                    PowerChangeEffect(new Input(input.pos, property, playerType), chessPad, once, chessPadManager);
                     break;
                 case EffectOperation.DestroyCard:
                     // EffectTrigger.DestroyCardEffect();
@@ -34,14 +34,15 @@ namespace FFF7RCore.Effect
                     foreach (var grid in padGrids)
                     {
                         int gridLevel = (int)grid.Status % 10;
-                        var input = new Input(grid.Position, cards[gridLevel - 1], playerType);
-                        chessPadManager.Input(input);
+                        var newInput = new Input(grid.Position, cards[gridLevel - 1], playerType);
+                        chessPadManager.InnerInput(newInput);
                     }
                     break;
                 case EffectOperation.AddScore:
                     break;
                 case EffectOperation.TransferScore:
                     break;
+                
             }
         }
 

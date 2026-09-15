@@ -3,7 +3,7 @@ namespace FFF7RCore {
 
     public class ChessPadManager
     {
-        public ChessPad Pad => chessPad_;
+        public ChessPad ChessPad => chessPad_;
 
         private ChessPad chessPad_;
 
@@ -11,34 +11,112 @@ namespace FFF7RCore {
 
         private readonly ChessBoardEventSubscriber eventSubscriber_;
 
+        private EffectQueue effectQueue;
+
         public ChessPadManager(ChessPad chessPad)
         {
             chessPad_ = chessPad;
             eventSystem_ = new EventSystem();
-            eventSubscriber_ = new ChessBoardEventSubscriber(this, eventSystem_, chessPad_);
+            effectQueue = new EffectQueue(this);
+            eventSubscriber_ = new ChessBoardEventSubscriber(effectQueue, eventSystem_, chessPad_);
         }
 
-        public bool Input(Input input)
+        public enum TurnStatus
+        {
+            Start,
+            ResetLast,
+            PlaceNew,
+            ProcessCardEffect,
+            ProcessPosEffect,
+            Over
+        }
+
+        public TurnStatus turnStatus = TurnStatus.Over;
+
+        // 该接口为原输入入口，现在仅内部使用，当需要循环输入时调用
+        public bool InnerInput(Input input)
         {
             if(!CheckInput(input)) return false;
-            RestPos(chessPad_, input.pos);
+
+            RestPos(input.pos);
 
             PadGrid padGrid = chessPad_[input.pos.x, input.pos.y];
             padGrid.Chess = input.chess;
             padGrid.Status = input.playerType == PlayerType.PLAYER ? PosStatus.OCCUPIED_PLAYER : PosStatus.OCCUPIED_RIVAL;
 
             Log.TestLine("SubscribeCardEffect", TextColor.BLACK);
-            SubscribeCardEffect(input, chessPad_);
+            SubscribeCardEffect(input);
 
             Log.TestLine("DoSelfPower", TextColor.BLACK);
             DoSelfPower(input, chessPad_);
 
             Log.TestLine("RaiseChessPlaced", TextColor.BLACK);
             eventSystem_.RaiseChessPlaced(input);
-            CheckDead(chessPad_);
+
+            // 本该处理卡牌效果
 
             Log.TestLine("DoPosEffect", TextColor.BLACK);
             DoPosEffect(input, chessPad_);
+
+            return true;
+        }
+
+        public bool PreNextStep(Input input)
+        {
+            if (CheckInput(input) && turnStatus == TurnStatus.Over)
+            {
+                turnStatus = TurnStatus.Start;
+                return true;
+            }
+            return false;
+        }
+
+        public bool NextStep(Input input)
+        {
+            if (CheckInput(input) && turnStatus == TurnStatus.Start)
+            {
+                turnStatus = TurnStatus.ResetLast;
+            } 
+            else if (TurnStatus.ResetLast == turnStatus)
+            {
+                RestPos(input.pos);
+
+                turnStatus = TurnStatus.PlaceNew;
+            }
+            else if (TurnStatus.PlaceNew == turnStatus)
+            {
+                PadGrid padGrid = chessPad_[input.pos.x, input.pos.y];
+                padGrid.Chess = input.chess;
+                padGrid.Status = input.playerType == PlayerType.PLAYER ? PosStatus.OCCUPIED_PLAYER : PosStatus.OCCUPIED_RIVAL;
+
+                Log.TestLine("SubscribeCardEffect", TextColor.BLACK);
+                SubscribeCardEffect(input);
+
+                Log.TestLine("DoSelfPower", TextColor.BLACK);
+                DoSelfPower(input, chessPad_);
+
+                Log.TestLine("RaiseChessPlaced", TextColor.BLACK);
+                eventSystem_.RaiseChessPlaced(input);
+
+                turnStatus = TurnStatus.ProcessCardEffect;
+            } 
+            else if (TurnStatus.ProcessCardEffect == turnStatus)
+            {
+                effectQueue.RunNext();
+                CheckDead(chessPad_);
+                if (!effectQueue.HasTask) {
+                    turnStatus = TurnStatus.ProcessPosEffect;
+                }
+            } 
+            else if (TurnStatus.ProcessPosEffect == turnStatus)
+            {
+                DoPosEffect(input, chessPad_);
+                turnStatus = TurnStatus.Over;
+            }
+            else
+            {
+                return false;
+            }
             return true;
         }
 
@@ -92,7 +170,7 @@ namespace FFF7RCore {
             }
         }
 
-        private void SubscribeCardEffect(Input input, ChessPad chessPad)
+        private void SubscribeCardEffect(Input input)
         {
             if (input.chess.CardEffect == null) return;
 
@@ -134,7 +212,7 @@ namespace FFF7RCore {
                     if (!padGrid.Empty && padGrid.Level <= 0)
                     {
                         hasDead = true;
-                        RestPos(chessPad, padGrid.Position);
+                        RestPos(padGrid.Position);
                     }
                 }
             }
@@ -146,14 +224,14 @@ namespace FFF7RCore {
             chessPad.StatusMap = PosEffect.DoPosEffect(input, chessPad);
         }
 
-        private void RestPos(ChessPad chessPad, Int2D pos)
+        private void RestPos(Int2D pos)
         {
-            if (!chessPad.IsInBoard(pos) || chessPad[pos].Empty) return;
+            if (!chessPad_.IsInBoard(pos) || chessPad_[pos].Empty) return;
 
-            PadGrid padGrid = chessPad[pos];
+            PadGrid padGrid = chessPad_[pos];
             if (padGrid.Chess.CardEffect != null && padGrid.Chess.CardEffect.Condition == EffectCondition.OnSelfDead)
             {
-                EffectOperationHelper.TriggerEffect(chessPad, padGrid.Position, true, this);
+                effectQueue.Enqueue(new Input(padGrid.Position, padGrid.Chess, padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL));
             }
 
             eventSubscriber_.UnsubscribeAllAt(pos);
@@ -162,7 +240,7 @@ namespace FFF7RCore {
             eventSystem_.RaiseChessDead(new EventSystem.ChessDeadEventArgs(padGrid.Chess, owner, pos));
 
             padGrid.Reset();
-            foreach (var line in chessPad)
+            foreach (var line in chessPad_)
             {
                 foreach (var grid in line)
                 {

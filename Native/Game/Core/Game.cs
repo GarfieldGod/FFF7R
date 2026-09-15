@@ -120,10 +120,30 @@ namespace FFF7RCore {
             return chessPadManager_.Preview(input);
         }
     //----------------------------------------------------------------------------------------------------------------------------------Input
-        public virtual bool Input(Input input) {
+        // public virtual bool Input(Input input) {
+        //     if (!CheckInput(input)) return false;
+        
+        //     bool ret = chessPadManager_.Input(input);
+        //     if (ret)
+        //     {
+        //         NextTurn();
+        //         if (!HasNextTurn()) End();
+        //     }
+
+        //     return ret;
+        // }
+
+        public virtual bool StagedInput(Input input) {
             if (!CheckInput(input)) return false;
         
-            bool ret = chessPadManager_.Input(input);
+            bool ret = chessPadManager_.PreNextStep(input);
+            while (ret && chessPadManager_.turnStatus != ChessPadManager.TurnStatus.Over)
+            {
+                // Thread.Sleep(100);
+                Log.TestLine($"NextStep: {chessPadManager_.turnStatus}", TextColor.RED);
+                chessPadManager_.NextStep(input);
+            }
+
             if (ret)
             {
                 NextTurn();

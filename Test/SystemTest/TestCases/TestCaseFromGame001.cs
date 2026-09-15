@@ -9,7 +9,7 @@ namespace FFF7RCore.Test {
             // Description = "No description.";  用例描述
             IgnoreTurnLimit = true;
             Description = "这是一局从游戏中获取的用例，该局游戏中第20步发生了游戏bug，导致效果没有触发，本项目会正常完成触发，因此本用例的第20步进行了屏蔽。";
-            NoLog = true;
+            // NoLog = true;
         }
 
         public override ChessPad InitChessPad()

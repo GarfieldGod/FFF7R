@@ -41,7 +41,7 @@ namespace FFF7RCore.Test {
                 Log.TestLine($"\n----------------[{this} step {stepIndex_}]----------------");
                 var step = steps_[stepIndex_];
                 Log.TestLine($"\n------------DebugInfo------------", TextColor.PURPLE);
-                bool ret = testGame_.Input(step.input);
+                bool ret = testGame_.StagedInput(step.input);
 
                 TestUtils.ShowStepInfo(step, stepIndex_);
                 Log.TestLine("Input ret: " + ret);

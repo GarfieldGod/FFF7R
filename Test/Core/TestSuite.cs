@@ -54,7 +54,6 @@ namespace FFF7RCore.Test {
             {
                 if (!testCase.Run()) {
                     testResult_ = false;
-                    if (InterruptedByFailure) break;
                 } else {
                     foreach (var cardCode in testCase.CoveredCards)
                     {
@@ -65,7 +64,11 @@ namespace FFF7RCore.Test {
                         }
                     }
                 }
+
+                Log.TestLine($"\n-----------------{testCase} End-----------------\n", TextColor.BLUE);
                 testCaseStepsResultDict_[testCase] = testCase.StepsResult;
+
+                if (!testResult_ && InterruptedByFailure) break;
             }
 
             PrintResult();

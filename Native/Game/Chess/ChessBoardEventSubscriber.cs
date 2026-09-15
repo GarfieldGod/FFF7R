@@ -4,16 +4,16 @@ namespace FFF7RCore
     public class ChessBoardEventSubscriber
     {
         private readonly EventSystem _eventSystem;
-        private readonly ChessPadManager _chessPadManager;
+        private readonly EffectQueue _effectQueue;
         private readonly ChessPad _targetPad;
 
         private readonly Dictionary<Int2D, EventHandler<Input>> _placedHandlers = new();
         private readonly Dictionary<Int2D, EventHandler<EventSystem.ChessBuffedEventArgs>> _buffedHandlers = new();
         private readonly Dictionary<Int2D, EventHandler<EventSystem.ChessDeadEventArgs>> _deadHandlers = new();
 
-        public ChessBoardEventSubscriber(ChessPadManager chessPadManager, EventSystem eventSystem, ChessPad targetPad)
+        public ChessBoardEventSubscriber(EffectQueue effectQueue, EventSystem eventSystem, ChessPad targetPad)
         {
-            _chessPadManager = chessPadManager;
+            _effectQueue = effectQueue;
             _eventSystem = eventSystem;
             _targetPad = targetPad;
         }
@@ -71,7 +71,7 @@ namespace FFF7RCore
                 if (match)
                 {
                     Log.TestLine($"Catch OnChessPlaced: {condition} pos: {input.pos} src: {placedInput.pos}");
-                    EffectOperationHelper.TriggerEffect(_targetPad, input.pos, condition == EffectCondition.OnPosition ? false : true, _chessPadManager);
+                    _effectQueue.Enqueue(input);
                 }
             };
             _placedHandlers[input.pos] = handler;
@@ -145,7 +145,7 @@ namespace FFF7RCore
                 if (match)
                 {
                     Log.TestLine($"Catch OnChessBuffed: {condition} pos: {input.pos} src: {buffedOne.Position}");
-                    EffectOperationHelper.TriggerEffect(_targetPad, input.pos, true, _chessPadManager);
+                    _effectQueue.Enqueue(input);
                 }
             };
             _buffedHandlers[input.pos] = handler;
@@ -181,7 +181,7 @@ namespace FFF7RCore
                 if (match)
                 {
                     Log.TestLine($"Catch OnChessDead: {condition} Name: {input.chess.Name} pos: {input.pos} src: {deadOne.Chess.Name}");
-                    EffectOperationHelper.TriggerEffect(_targetPad, input.pos, true, _chessPadManager);
+                    _effectQueue.Enqueue(input);
                 }
             };
             _deadHandlers[input.pos] = handler;
