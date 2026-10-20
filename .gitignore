@@ -1,35 +1,73 @@
-.vs
-.vscode
-Library
-Logs
-obj
-Packages
-ProjectSettings
-Temp
-UserSettings
+# ============================================================
+# Unity 工程 .gitignore
+# 原则：只忽略「可以重新生成」的东西。
+#   Library/ Temp/ obj/ Logs/ 是缓存        -> 忽略
+#   ProjectSettings/ Packages/ *.meta       -> 必须提交（见文末说明）
+# ============================================================
+
+# ---------- Unity 缓存与中间产物 ----------
+/[Ll]ibrary/
+/[Tt]emp/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+/[Bb]in/
+
+# 任意层级的 dotnet 中间产物（例如内核目录下的 obj/）
+[Oo]bj/
+
+# ---------- IDE 自动生成的工程文件 ----------
+# 由 Unity / dotnet 生成，克隆后重新生成即可；本工程用 Tools/gen_ide_projects.py 还原
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.opendb
+*.VC.db
+*.pdb
+*.mdb
+*.DotSettings.user
+.vs/
+.idea/
+.consulo/
 .vsconfig
-Assembly-CSharp.csproj
-FFF7.sln
-Assets/**/*.meta
-com.rlabrecque.steamworks.net
-Mirror
-ScriptTemplates
-Assembly-CSharp-Editor.csproj
-com.rlabrecque.steamworks.net.csproj
-com.rlabrecque.steamworks.net.editor.csproj
-Edgegap.csproj
-EncryptionTransportEditor.csproj
-FizzySteamworks.csproj
-kcp2k.csproj
-Mirror.Authenticators.csproj
-Mirror.CompilerSymbols.csproj
-Mirror.Components.csproj
-Mirror.csproj
-Mirror.Editor.csproj
-Mirror.Examples.csproj
-Mirror.Transports.csproj
-SimpleWebTransport.csproj
-Telepathy.csproj
-Unity.Mirror.CodeGen.csproj
+
+# 例外：Tools/ 下是手工维护的宿主工程（终端版内核），必须提交
+!/Tools/**/*.csproj
+!/Tools/**/*.sln
+
+# ---------- 本地 / 临时 / 崩溃日志 ----------
+sysinfo.txt
+crashlytics-build.properties
+*.tmp
+*.log
+/[Aa]ssets/[Aa]ssetStoreTools*
+*.apk
+*.aab
+.workbuddy/
+
+# ---------- 项目特有 ----------
+# Steam 客户端调试凭据，不进仓库
 steam_appid.txt
-Steamworks.NET
+
+# ---------- 内核是独立仓库 ----------
+# Assets/FFF7R 自带 .git，根仓库无法跟踪其内容（clone 下来会是空的）。
+# 正式做法：挂成 submodule，或由 CI 单独拉取到该路径。
+/Assets/FFF7R/
+
+# ============================================================
+# 以下是**故意不忽略**的内容，改动前请三思：
+#   ProjectSettings/         输入映射、标签、图层、场景列表、包版本都在这
+#   Packages/                manifest.json 决定包版本；缺了 ide.vscode 连 .sln 都不生成
+#   Assets/**/*.meta         GUID 载体，丢了场景/预制体里的脚本引用会全部变 Missing
+#   Assets/StreamingAssets/  内核运行时读取的 Data/CardProperties 在这里
+#   .vscode/                 含 dotnet.defaultSolution，指向 FFF7.sln
+#   Tools/                   工程生成脚本与终端宿主工程
+# ============================================================
