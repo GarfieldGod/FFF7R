@@ -39,6 +39,28 @@
 .consulo/
 .vsconfig
 
+# ---------- 被忽略文件的孤儿 meta ----------
+# Unity 给每个文件都生成 .meta。上面把「文件」忽略了，但 *.meta 本身没被忽略，
+# 结果仓库里会留下一批指向「不存在的文件」的孤儿 meta。
+# 没有「X 被忽略则 X.meta 也忽略」这种语法，只能逐条列。
+*.csproj.meta
+*.sln.meta
+*.suo.meta
+*.user.meta
+*.userprefs.meta
+*.pidb.meta
+*.booproj.meta
+*.svd.meta
+*.opendb.meta
+*.VC.db.meta
+*.pdb.meta
+*.mdb.meta
+*.DotSettings.user.meta
+*.tmp.meta
+*.log.meta
+*.apk.meta
+*.aab.meta
+
 # 例外：Tools/ 下是手工维护的宿主工程（终端版内核），必须提交
 !/Tools/**/*.csproj
 !/Tools/**/*.sln
@@ -51,7 +73,30 @@ crashlytics-build.properties
 /[Aa]ssets/[Aa]ssetStoreTools*
 *.apk
 *.aab
+*.unitypackage
+/[Ee]xported[Oo]bj/
 .workbuddy/
+
+# ---------- 操作系统垃圾 ----------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+*.stackdump
+
+# Rider 在 Assets 下生成的插件目录
+/[Aa]ssets/[Pp]lugins/[Ee]ditor/JetBrains*
+
+# ---------- Addressables ----------
+# 区分两件事：
+#   Assets/AddressableAssetsData/  是**配置**（分组、Schema、DataBuilder、Profile）-> 必须提交
+#   StreamingAssets 下的 aa*        是**构建产物**（catalog.json + *.bundle）      -> 忽略
+# 只忽略 aa*，不要整目录忽略：Assets/StreamingAssets/Data/ 是内核运行时读的卡牌数据。
+/[Aa]ssets/[Ss]treamingAssets/aa*
+# 每次构建重写的 IL2CPP 保留清单，不是资产
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/link.xml
+/[Aa]ssets/link.xml
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/**/*.bak
 
 # ---------- 项目特有 ----------
 # Steam 客户端调试凭据，不进仓库
