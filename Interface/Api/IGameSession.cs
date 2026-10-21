@@ -9,5 +9,11 @@ namespace FFF7R
     public interface IGameSession : IGameQuery, IGameCommand, IGameEvents, IDisposable
     {
         ICardCatalog Catalog { get; }
+
+        /// <summary>
+        /// 本局实际使用的牌序种子。<see cref="GameSetup.Seed"/> 传 0 时这里会给出随机生成的值，
+        /// 记下它就能用同一个种子重放这一局（崩溃复现、回放、录像都靠它）。
+        /// </summary>
+        int Seed { get; }
     }
 }

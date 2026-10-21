@@ -8,8 +8,18 @@ namespace FFF7RCore {
         public int Count => chessPool_.Count;
         private List<Chess> chessPool_;
 
-        public Dispenser(List<Chess> chessPool){
+        /// <summary>
+        /// 发牌用的随机源。由 <see cref="Game"/> 按种子派生后注入，保证同种子同牌序；
+        /// 传 null 时退化为无种子随机（老行为）。
+        /// 注意：这里持有实例而不是每次 <see cref="Dispense"/> 里 new，否则无法复现。
+        /// </summary>
+        private readonly Random random_;
+
+        public Dispenser(List<Chess> chessPool) : this(chessPool, null) { }
+
+        public Dispenser(List<Chess> chessPool, Random random){
             chessPool_ = chessPool;
+            random_ = random ?? new Random();
         }
 
         public Chess this[int index]
@@ -28,7 +38,9 @@ namespace FFF7RCore {
             }
         }
 
-        public Dispenser(List<string> chessName){
+        public Dispenser(List<string> chessName) : this(chessName, null) { }
+
+        public Dispenser(List<string> chessName, Random random){
             List<Chess> chessPool = new List<Chess>{};
             foreach(string name in chessName) {
                 ChessProperty chessProperty = Property.GetChessProperty(name);
@@ -36,14 +48,14 @@ namespace FFF7RCore {
                 chessPool.Add(chess);
             }
             chessPool_ = chessPool;
+            random_ = random ?? new Random();
         }
 
         public Chess Dispense() {
             if (chessPool_.Count == 0) {
                 return null;
             }
-            System.Random random = new System.Random();
-            int randomIndex = random.Next(chessPool_.Count);
+            int randomIndex = random_.Next(chessPool_.Count);
             Chess chess = chessPool_[randomIndex];
             chessPool_.RemoveAt(randomIndex);
             return chess;

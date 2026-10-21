@@ -122,6 +122,8 @@ namespace FFF7RCore {
 
         public class ChessBuffedEventArgs : EventArgs
         {
+            // 等级的实际变化量（Level 的 after - before），不是本次申请的 buff 值。
+            // 保证非 0：等值覆盖与 scope 过滤掉的 buff 不会触发事件，见 ChessPad.AddBuff。
             public int Value;
             public PlayerType Owner;
             public Int2D Position;

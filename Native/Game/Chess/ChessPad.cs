@@ -271,13 +271,58 @@ namespace FFF7RCore {
             RemoveAllBuffsFromPos(pos);
         }
 
+        /// <summary>
+        /// 加 buff 并广播变化。返回等级是否真的发生了变化。
+        /// <para>
+        /// 对外一律报告<b>等级实际变化量</b>（Level 的 after - before），而不是本次申请的 buff 值。
+        /// 差别只在 CountBased：EffectOperationHelper.PowerChangeEffect 对它采用覆盖语义
+        /// （先按 mark 清空旧 buff 再写入新 buff），重新算出的值常常与旧值相同，此时等级并没有动。
+        /// 若照发事件，听者会再算一遍同样的值、再覆盖一次，形成与数值大小无关的无限回响
+        /// （值有界、递归无界，最终栈溢出）。因此 delta 为 0 时整条通知链路必须静默。
+        /// </para>
+        /// </summary>
         public bool AddBuff(Int2D pos, Buff buff, bool DoSelfPowerBuff = false)
         {
             PadGrid padGrid = padGrids_[pos.x][pos.y];
+            int before = padGrid.Level;
+
             padGrid.AddBuff(buff);
-            // if (!padGrid.Empty && padGrid.Level <= 0)
-            CheckBuffEvent(padGrid, buff.value, DoSelfPowerBuff, buff.source);
-            return false;
+
+            return NotifyLevelChanged(padGrid, before, buff, DoSelfPowerBuff);
+        }
+
+        /// <summary>
+        /// 用 buff 替换掉本格上匹配 match 的旧 buff，作为一个原子操作结算。
+        /// <para>
+        /// 必须与 <see cref="AddBuff"/> 分开：CountBased 类效果是"先清空同 mark 的旧 buff 再写入新值"，
+        /// 若移除和写入分成两步、各自只看自己那一段的变化，写入方看到的恒是 +value（因为 before 已被挖掉），
+        /// 即使净变化为 0 也会广播事件，于是听者再算一遍同样的值、再覆盖一次，无限回响（值有界、递归无界）。
+        /// 这里把两者放在同一段里取前后值，净变化为 0 就完全静默。
+        /// </para>
+        /// </summary>
+        public bool ReplaceBuff(Int2D pos, Predicate<Buff> match, Buff buff, bool DoSelfPowerBuff = false)
+        {
+            PadGrid padGrid = padGrids_[pos.x][pos.y];
+            int before = padGrid.Level;
+
+            if (match != null) padGrid.BuffList.RemoveAll(match);
+            padGrid.AddBuff(buff);
+
+            return NotifyLevelChanged(padGrid, before, buff, DoSelfPowerBuff);
+        }
+
+        // 统一出口：只有等级真的变了才广播；没变时仅维护首次被 buff 的标记（它读 padGrid.BuffValue 字段，与入参无关）。
+        private bool NotifyLevelChanged(PadGrid padGrid, int before, Buff buff, bool DoSelfPowerBuff)
+        {
+            int delta = padGrid.Level - before;
+            if (delta == 0)
+            {
+                if (!DoSelfPowerBuff) CheckFirstBuffed(padGrid);
+                return false;
+            }
+
+            CheckBuffEvent(padGrid, delta, DoSelfPowerBuff, buff.source);
+            return true;
         }
 
         public void CheckBuffEvent(PadGrid padGrid, int buffValue, bool DoSelfPowerBuff = false, Int2D? source = null)

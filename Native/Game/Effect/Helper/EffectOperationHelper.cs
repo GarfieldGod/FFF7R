@@ -1,8 +1,15 @@
 namespace FFF7RCore.Effect
 {
+    using System;
     using System.Collections.Generic;
     public static class EffectOperationHelper
     {
+        // CountBased buff 的标记：同一格上只保留最新一份（覆盖语义）。
+        private const string CountBasedMark = "CountBased";
+
+        // 非捕获静态委托，避免每次结算都分配闭包。
+        private static readonly Predicate<Buff> CountBasedFilter = buff => buff.mark == CountBasedMark;
+
         public static void TriggerEffect(ChessPad chessPad, Int2D pos, bool once = true, ChessPadManager chessPadManager = null)
         {
             PadGrid padGrid = chessPad[pos];
@@ -92,8 +99,7 @@ namespace FFF7RCore.Effect
 
                 if (effectValueType == EffectValueType.CountBased)
                 {
-                    mark = "CountBased";
-                    chessPad[dstPos].BuffList.RemoveAll(buff => buff.mark == mark);
+                    mark = CountBasedMark;
                 }
 
                 if (operation == EffectOperation.PowerUp) value = effectValue;
@@ -102,7 +108,17 @@ namespace FFF7RCore.Effect
                 Buff buff = new Buff(dstOwned ? dstPos : input.pos, input.pos, value, targetType, srcType, mark);
                 Log.TestLine($"Add buff: value: {buff.value} src: {buff.source} dst: {dstPos} owner: {buff.owner} srcType: {buff.srcType} dstType: {buff.dstType} mark: {buff.mark}", 
                     TextColor.BLACK);
-                chessPad.AddBuff(dstPos, buff);
+                if (effectValueType == EffectValueType.CountBased)
+                {
+                    // 覆盖语义：先清掉本格旧的 CountBased buff 再写入。两者必须原子结算 ——
+                    // 若拆成"先 RemoveAll、再 AddBuff"，AddBuff 看到的 before 已被挖掉一块，
+                    // 净变化为 0 也会广播 ChessBuffed，听者再算一遍同样的值，形成无限回响。
+                    chessPad.ReplaceBuff(dstPos, CountBasedFilter, buff);
+                }
+                else
+                {
+                    chessPad.AddBuff(dstPos, buff);
+                }
             }
         }
     }

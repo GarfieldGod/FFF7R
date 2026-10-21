@@ -65,11 +65,14 @@ namespace FFF7R
         public override GameEventKind Kind => GameEventKind.ChessDead;
     }
 
-    /// <summary>某个既定格子的棋子吃到一次 buff（值可正可负）。</summary>
+    /// <summary>某个既定格子的棋子等级发生变化（值可正可负，保证非 0）。</summary>
     public sealed class ChessBuffedEvent : GameEvent
     {
         public Int2 Pos { get; }
         public PlayerSeat Owner { get; }
+
+        /// <summary>等级的实际变化量（after - before），不是本次申请的 buff 值。
+        /// 等级没变的写入（覆盖成同一个值、或被 scope 过滤）不会产生事件。</summary>
         public int Value { get; }
 
         /// <summary>施加者的位置；无法确定时为 <see cref="Int2.Unknown"/>。</summary>

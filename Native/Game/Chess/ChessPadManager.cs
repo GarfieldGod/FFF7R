@@ -226,7 +226,7 @@ namespace FFF7RCore {
             UnsubscribeBuffedEvent(input.pos);
             EventHandler<EventSystem.ChessBuffedEventArgs> handler = (sender, buffedOne) =>
             {
-                int value = buffedOne.Value;
+                int value = buffedOne.Value;          // 等级变化量，非 0（见 ChessPad.AddBuff）
                 bool positive = value > 0;
                 PlayerType owner = buffedOne.Owner;
                 PlayerType self = input.playerType;

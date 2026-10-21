@@ -21,6 +21,12 @@ namespace FFF7R
         /// <summary>回合上限；0 表示不限制。</summary>
         public int TurnLimit { get; }
 
+        /// <summary>
+        /// 牌序种子；0 表示随机（实际值可从 <see cref="IGameSession.Seed"/> 读回）。
+        /// 同一个种子 + 同一串指令 = 完全相同的对局。
+        /// </summary>
+        public int Seed { get; }
+
         public GameSetup(
             IReadOnlyList<string> playerPool,
             IReadOnlyList<string> rivalPool,
@@ -28,7 +34,8 @@ namespace FFF7R
             int boardHeight = 5,
             bool standardBoard = true,
             PlayerSeat firstSeat = PlayerSeat.Player,
-            int turnLimit = 0)
+            int turnLimit = 0,
+            int seed = 0)
         {
             PlayerPool = playerPool ?? new string[0];
             RivalPool = rivalPool ?? new string[0];
@@ -37,6 +44,7 @@ namespace FFF7R
             StandardBoard = standardBoard;
             FirstSeat = firstSeat;
             TurnLimit = turnLimit;
+            Seed = seed;
         }
     }
 }
