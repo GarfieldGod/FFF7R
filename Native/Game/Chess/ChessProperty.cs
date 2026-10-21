@@ -1,5 +1,6 @@
 namespace FFF7RCore {
     using Effect;
+    using System.Collections.Generic;
 
     public class ChessProperty {
         public string CardCode;

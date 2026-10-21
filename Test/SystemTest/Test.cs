@@ -2,6 +2,7 @@ namespace FFF7RCore.Test {
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using System.Linq;
 
     public class SystemTest
     {

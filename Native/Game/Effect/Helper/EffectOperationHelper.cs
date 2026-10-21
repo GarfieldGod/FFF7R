@@ -1,5 +1,6 @@
 namespace FFF7RCore.Effect
 {
+    using System.Collections.Generic;
     public static class EffectOperationHelper
     {
         public static void TriggerEffect(ChessPad chessPad, Int2D pos, bool once = true, ChessPadManager chessPadManager = null)

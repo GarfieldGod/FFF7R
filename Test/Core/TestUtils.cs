@@ -1,4 +1,5 @@
 namespace FFF7RCore.Test {
+    using System.Collections.Generic;
     public struct Step
     {
         public Input input;

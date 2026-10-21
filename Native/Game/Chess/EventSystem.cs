@@ -1,4 +1,5 @@
 namespace FFF7RCore {
+    using System;
     public class EventSystem
     {
         public event EventHandler<Input> OnChessPlaced;

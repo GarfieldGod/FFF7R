@@ -1,4 +1,6 @@
 namespace FFF7RCore {
+    using System.Collections.Generic;
+
     public class GamePlayer {
         public PlayerType Type => playerType;
         private readonly Dispenser dispenser;

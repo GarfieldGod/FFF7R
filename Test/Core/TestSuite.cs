@@ -1,5 +1,9 @@
 namespace FFF7RCore.Test {
     using System.Text;
+    using System.Collections.Generic;
+    using System;
+    using System.IO;
+    using System.Linq;
 
     public class TestSuite : IDisposable
     {

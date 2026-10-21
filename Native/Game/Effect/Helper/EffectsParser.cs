@@ -1,5 +1,8 @@
 namespace FFF7RCore.Effect 
 {
+    using System;
+    using System.Collections.Generic;
+
     public static class EffectsParser {
         // 计算以效果图为中心，有效果的相对位置
         public static Dictionary<Int2D, int> ParseEffectsInRelative(List<List<int>> effects, bool ignoreSelf = true)

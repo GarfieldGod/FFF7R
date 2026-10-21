@@ -1,5 +1,8 @@
 namespace FFF7RCore {
     using Effect;
+    using System;
+    using System.Collections.Generic;
+
 
     public class ChessPadManager
     {

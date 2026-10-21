@@ -1,4 +1,5 @@
 namespace FFF7RCore.Effect {
+    using System.Collections.Generic;
     public class CardEffectEntry
     {
         public EffectCondition Condition;      // 触发条件

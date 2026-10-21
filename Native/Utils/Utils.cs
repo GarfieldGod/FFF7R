@@ -1,5 +1,7 @@
 namespace FFF7RCore {
     using Effect;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public static class Utils
     {

@@ -1,5 +1,6 @@
 namespace FFF7RCore.Effect 
 {
+    using System.Collections.Generic;
     static class CardEffect {
         // 效果在棋盘中的实际位置
         public static Dictionary<Int2D, int> ParseCardEffectsInPosition(Input input, Int2D padSize) {

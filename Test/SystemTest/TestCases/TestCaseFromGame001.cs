@@ -1,4 +1,5 @@
 namespace FFF7RCore.Test {
+    using System.Collections.Generic;
     public class TestCaseFromGame001 : TestCase
     {
         public override void ConfigureOptions()

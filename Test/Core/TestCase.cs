@@ -1,4 +1,8 @@
 namespace FFF7RCore.Test {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public abstract class TestCase
     {
         public string Description;

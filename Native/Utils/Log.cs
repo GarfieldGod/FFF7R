@@ -1,5 +1,7 @@
 namespace FFF7RCore {
     using System.Text;
+    using System.IO;
+    using System;
 
     public enum TextColor {
         NONE,

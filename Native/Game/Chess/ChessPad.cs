@@ -2,6 +2,7 @@ namespace FFF7RCore {
     using System.Collections;
     using System.Collections.Generic;
     using Effect;
+    using System;
 
     public class ChessPad : IEnumerable<List<PadGrid>>
     {
