@@ -217,6 +217,9 @@ namespace FFF7RCore {
         public int x;
         public int y;
 
+        // 用于表达“位置未知”，避免各处各自写 (-1, -1)
+        public static readonly Int2D Unknown = new Int2D(-1, -1);
+
         public Int2D(int x, int y)
         {
             this.x = x;

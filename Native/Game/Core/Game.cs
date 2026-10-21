@@ -104,6 +104,8 @@ namespace FFF7RCore {
 
             gameStatus_ = GameStatus.GAME_END;
             ComputeResult();
+            // 必须在 ComputeResult 之后：gameWinner 在那里才被算出
+            chessPad_?.eventSystem?.RaiseGameEnd(new EventSystem.GameEndedEventArgs(gameWinner, gameTurns_));
         }
 
         public virtual void ComputeResult()
@@ -158,8 +160,10 @@ namespace FFF7RCore {
         }
 
         public virtual void NextTurn() {
+            PlayerType endedPlayer = currentPlayer_;
             currentPlayer_ = currentPlayer_ == PlayerType.PLAYER ? PlayerType.RIVAL : PlayerType.PLAYER;
             gameTurns_++;
+            chessPad_?.eventSystem?.RaiseTurnEnd(new EventSystem.TurnEndedEventArgs(endedPlayer, currentPlayer_, gameTurns_));
         }
     }
 }

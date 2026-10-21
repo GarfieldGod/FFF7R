@@ -276,23 +276,23 @@ namespace FFF7RCore {
             PadGrid padGrid = padGrids_[pos.x][pos.y];
             padGrid.AddBuff(buff);
             // if (!padGrid.Empty && padGrid.Level <= 0)
-            CheckBuffEvent(padGrid, buff.value, DoSelfPowerBuff);
+            CheckBuffEvent(padGrid, buff.value, DoSelfPowerBuff, buff.source);
             return false;
         }
 
-        public void CheckBuffEvent(PadGrid padGrid, int buffValue, bool DoSelfPowerBuff = false)
+        public void CheckBuffEvent(PadGrid padGrid, int buffValue, bool DoSelfPowerBuff = false, Int2D? source = null)
         {
             if (!DoSelfPowerBuff) CheckFirstBuffed(padGrid);
             CheckOnBuffed(padGrid, buffValue);
-            if (!DoSelfPowerBuff) InvokeBuffEvent(padGrid, buffValue);
+            if (!DoSelfPowerBuff) InvokeBuffEvent(padGrid, buffValue, source);
         }
 
-        public void InvokeBuffEvent(PadGrid padGrid, int buffValue)
+        public void InvokeBuffEvent(PadGrid padGrid, int buffValue, Int2D? source = null)
         {
             if (padGrid.Status == PosStatus.OCCUPIED_PLAYER || padGrid.Status == PosStatus.OCCUPIED_RIVAL)
             {
                 PlayerType gridOwner = padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
-                eventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, gridOwner, padGrid.Position));
+                eventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, gridOwner, padGrid.Position, source ?? Int2D.Unknown));
             }
         }
 
@@ -347,12 +347,33 @@ namespace FFF7RCore {
         private bool RemoveAllBuffsFromPos(Int2D pos)
         {
             // Log.TestLine("---RemoveBuffs--- " + id);
+            List<EventSystem.BuffExpiredEntry> expired = null;
             for (int x = 0; x < padGrids_.Count; x++)
             {
                 for (int y = 0; y < padGrids_[x].Count; y++)
                 {
-                    padGrids_[x][y].RemoveBuff(pos);
+                    PadGrid padGrid = padGrids_[x][y];
+                    // 没有以 pos 为来源的 buff 时直接跳过，保持原路径的开销
+                    if (!padGrid.BuffList.HasOwner(pos)) continue;
+
+                    int before = padGrid.Level;
+                    padGrid.RemoveBuff(pos);
+                    int after = padGrid.Level;
+                    if (before == after) continue;
+
+                    // 空格/等级格同样会带 buff、同样会掉等级，不能一律当成 RIVAL。
+                    PlayerType owner;
+                    if (padGrid.Status == PosStatus.OCCUPIED_PLAYER) owner = PlayerType.PLAYER;
+                    else if (padGrid.Status == PosStatus.OCCUPIED_RIVAL) owner = PlayerType.RIVAL;
+                    else owner = PlayerType.Null;
+
+                    expired ??= new List<EventSystem.BuffExpiredEntry>();
+                    expired.Add(new EventSystem.BuffExpiredEntry(padGrid.Position, owner, before, after));
                 }
+            }
+            if (expired != null)
+            {
+                eventSystem?.RaiseBuffsExpired(new EventSystem.BuffsExpiredEventArgs(pos, expired));
             }
             return true;
         }

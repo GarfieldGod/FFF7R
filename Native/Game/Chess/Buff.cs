@@ -78,6 +78,16 @@ namespace FFF7RCore {
             buffList_.RemoveAll(buff => buff.owner == src);
         }
 
+        // 是否存在以 src 为清理标识的 buff（只读，不改变列表）
+        public bool HasOwner(Int2D src)
+        {
+            foreach (var buff in buffList_)
+            {
+                if (buff.owner == src) return true;
+            }
+            return false;
+        }
+
         public int RemoveAll(Predicate<Buff> match)
         {
             return buffList_.RemoveAll(match);
