@@ -136,7 +136,7 @@ namespace FFF7R.Adapter
         private void HandleTurnEnd(object sender, EventSystem.TurnEndedEventArgs e)
         {
             Dispatch(new TurnEndedEvent(
-                e.Sequence, e.EndedPlayer.ToContract(), e.NextPlayer.ToContract(), e.Turns));
+                e.Sequence, e.EndedPlayer.ToContract(), e.NextPlayer.ToContract(), e.Turns, e.IsPass));
         }
 
         private void HandleGameEnd(object sender, EventSystem.GameEndedEventArgs e)

@@ -57,13 +57,19 @@ namespace FFF7RCore {
             return previewPad;
         }
 
-        public bool CheckInput(Input input)
+        public bool CheckInput(Input input) => CheckInput(input, out _);
+
+        /// <summary>
+        /// 只判落点规则：越界、占用、地形等级不足。手牌归属由 <see cref="Game.CheckInput"/> 负责。
+        /// </summary>
+        public bool CheckInput(Input input, out InputReject reject)
         {
-            if (input.chess == null) return false;
+            if (input.chess == null) { reject = InputReject.EmptyInput; return false; }
 
             if (!chessPad_.IsInBoard(input.pos))
             {
                 Log.TestLine("CheckInput Failed: pos out of board", TextColor.BLACK);
+                reject = InputReject.OutOfBoard;
                 return false;
             }
 
@@ -71,15 +77,17 @@ namespace FFF7RCore {
             int posLevel = (int)posStatus % 10;
             if (input.chess.Cost > 0)
             {
-                if (posStatus >= PosStatus.OCCUPIED_PLAYER || posLevel < input.chess.Cost) return false;
+                if (posStatus >= PosStatus.OCCUPIED_PLAYER) { reject = InputReject.CellOccupied; return false; }
+                if (posLevel < input.chess.Cost) { reject = InputReject.CellLevelTooLow; return false; }
             } 
             else // 覆盖棋子
             {
-                if (posStatus < PosStatus.OCCUPIED_PLAYER) return false;
-                if (input.playerType == PlayerType.PLAYER && posStatus != PosStatus.OCCUPIED_PLAYER) return false;
-                if (input.playerType == PlayerType.RIVAL && posStatus != PosStatus.OCCUPIED_RIVAL) return false;
+                if (posStatus < PosStatus.OCCUPIED_PLAYER) { reject = InputReject.NoOwnChessToCover; return false; }
+                if (input.playerType == PlayerType.PLAYER && posStatus != PosStatus.OCCUPIED_PLAYER) { reject = InputReject.NoOwnChessToCover; return false; }
+                if (input.playerType == PlayerType.RIVAL && posStatus != PosStatus.OCCUPIED_RIVAL) { reject = InputReject.NoOwnChessToCover; return false; }
             }
 
+            reject = InputReject.None;
             return true;
         }
 

@@ -19,69 +19,11 @@ namespace FFF7RCore {
             }
             return result;
         }
-        public static readonly List<List<int>> EmptyStandard2DList = new List<List<int>> {
-            new List<int> { 0, 0, 0, 0, 0 },
-            new List<int> { 0, 0, 0, 0, 0 },
-            new List<int> { 0, 0, 0, 0, 0 },
-        };
-        public static List<List<List<int>>> DeepCopy(List<List<List<int>>> original)
-        {
-            List<List<List<int>>> result = original
-            .Select(outerList => outerList
-                .Select(innerList => new List<int>(innerList))
-                .ToList())
-            .ToList();
-            return result;
-        }
         public static List<List<int>> DeepCopy(List<List<int>> original)
         {
             if (original == null) return null;
             List<List<int>> result = original.Select(innerList => new List<int>(innerList)).ToList();
             return result;
-        }
-        public static List<List<int>> Compose2DList(List<List<int>> ListA, List<List<int>> ListB)
-        {
-            if (ListA.Count == 0 || ListB.Count == 0 || ListA.Count != ListB.Count)
-            {
-                return null;
-            }
-            if (ListA[0].Count == 0 || ListB[0].Count == 0 || ListA[0].Count != ListB[0].Count)
-            {
-                return null;
-            }
-            List<List<int>> result = DeepCopy(ListA);
-            for (int i = 0; i < result.Count; i++)
-            {
-                for (int j = 0; j < result[0].Count; j++)
-                {
-                    result[i][j] += ListB[i][j];
-                }
-            }
-            return result;
-        }
-        public static List<List<List<Buff>>> DeepCopy(this List<List<List<Buff>>> original)
-        {
-            if (original == null)
-            {
-                return null;
-            }
-            var deepCopiedList = new List<List<List<Buff>>>();
-            foreach (var secondLevelList in original)
-            {
-                var secondLevelCopiedList = new List<List<Buff>>();
-                foreach (var thirdLevelList in secondLevelList)
-                {
-                    var thirdLevelCopiedList = new List<Buff>();
-                    foreach (var buff in thirdLevelList)
-                    {
-                        var copiedBuff = new Buff(buff);
-                        thirdLevelCopiedList.Add(copiedBuff);
-                    }
-                    secondLevelCopiedList.Add(thirdLevelCopiedList);
-                }
-                deepCopiedList.Add(secondLevelCopiedList);
-            }
-            return deepCopiedList;
         }
         public static List<List<PadGrid>> DeepCopy(this List<List<PadGrid>> original)
         {
@@ -97,48 +39,6 @@ namespace FFF7RCore {
                 {
                     var newPadGrid = new PadGrid(padGrid);
                     secondLevelCopiedList.Add(newPadGrid);
-                }
-                deepCopiedList.Add(secondLevelCopiedList);
-            }
-            return deepCopiedList;
-        }
-        public static List<List<Chess>> DeepCopy(this List<List<Chess>> original)
-        {
-            if (original == null)
-            {
-                return null;
-            }
-            var deepCopiedList = new List<List<Chess>>();
-            foreach (var secondLevelList in original)
-            {
-                var secondLevelCopiedList = new List<Chess>();
-                foreach (var chess in secondLevelList)
-                {
-                    if (chess == null)
-                    {
-                        secondLevelCopiedList.Add(null);
-                        continue;
-                    }
-                    var copiedChess = chess.Clone();
-                    secondLevelCopiedList.Add(copiedChess);
-                }
-                deepCopiedList.Add(secondLevelCopiedList);
-            }
-            return deepCopiedList;
-        }
-        public static List<List<bool>> DeepCopy(this List<List<bool>> original)
-        {
-            if (original == null)
-            {
-                return null;
-            }
-            var deepCopiedList = new List<List<bool>>();
-            foreach (var secondLevelList in original)
-            {
-                var secondLevelCopiedList = new List<bool>();
-                foreach (var chess in secondLevelList)
-                {
-                    secondLevelCopiedList.Add(chess);
                 }
                 deepCopiedList.Add(secondLevelCopiedList);
             }
@@ -253,82 +153,6 @@ namespace FFF7RCore {
         public override readonly string ToString()
         {
             return $"({x}, {y})";
-        }
-    }
-
-    public struct Int3D
-    {
-        public int x;
-        public int y;
-        public int z;
-
-        public Int3D(int x, int y, int z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public static bool operator ==(Int3D a, Int3D b)
-        {
-            return a.x == b.x && a.y == b.y && a.z == b.z;
-        }
-
-        public static bool operator !=(Int3D a, Int3D b)
-        {
-            return !(a == b);
-        }
-
-        public override readonly bool Equals(object obj)
-        {
-            if (obj is Int3D other)
-            {
-                return this == other;
-            }
-            return false;
-        }
-
-        public override readonly int GetHashCode()
-        {
-            return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
-        }
-    }
-
-    public struct Float3D
-    {
-        public float x;
-        public float y;
-        public float z;
-
-        public Float3D(float x, float y, float z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public static bool operator ==(Float3D a, Float3D b)
-        {
-            return a.x == b.x && a.y == b.y && a.z == b.z;
-        }
-
-        public static bool operator !=(Float3D a, Float3D b)
-        {
-            return !(a == b);
-        }
-
-        public override readonly bool Equals(object obj)
-        {
-            if (obj is Float3D other)
-            {
-                return this == other;
-            }
-            return false;
-        }
-
-        public override readonly int GetHashCode()
-        {
-            return x.GetHashCode() ^ y.GetHashCode() ^ z.GetHashCode();
         }
     }
 }

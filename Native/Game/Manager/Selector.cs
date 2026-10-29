@@ -5,7 +5,6 @@ namespace FFF7RCore {
     {
         public int Count => chessList_.Count;
         private List<Chess> chessList_;
-        private KeyValuePair<Chess, int> previewChess_ = new KeyValuePair<Chess, int>(null, -1);
 
         public Selector(List<Chess> chessList) {
             chessList_ = chessList;

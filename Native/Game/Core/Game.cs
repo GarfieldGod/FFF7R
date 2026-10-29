@@ -30,11 +30,18 @@ namespace FFF7RCore {
         /// </summary>
         public int seed;
 
-        public GameConfig(List<string> playerChessPool, List<string> rivalChessPool, ChessPad chessPad, int seed = 0) {
+        /// <summary>
+        /// 回合上限（以 <see cref="Game.Turns"/> 计）。0 表示不按回合数结束。
+        /// 注意：即使为 0，双方手牌都抽空时对局也会结束（见 <see cref="Game.HasNextTurn"/>）。
+        /// </summary>
+        public int turnLimit;
+
+        public GameConfig(List<string> playerChessPool, List<string> rivalChessPool, ChessPad chessPad, int seed = 0, int turnLimit = 0) {
             this.playerChessPool = playerChessPool;
             this.rivalChessPool = rivalChessPool;
             this.chessPad = chessPad;
             this.seed = seed;
+            this.turnLimit = turnLimit;
         }
     }
 
@@ -55,7 +62,11 @@ namespace FFF7RCore {
         /// </summary>
         public int Seed => seed_;
 
+        /// <summary>回合上限，0 表示只按"双方无牌可出"结束。<see cref="GameConfig.turnLimit"/>。</summary>
+        public int TurnLimit => turnLimit_;
+
         private readonly int seed_;
+        private readonly int turnLimit_;
     //----------------------------------------------------------------------------------------------------------------------------------INIT
         protected readonly GameConfig gameConfig_;
         protected ChessPad chessPad_ = null;
@@ -71,6 +82,7 @@ namespace FFF7RCore {
             gameConfig_ = GameConfig;
             // 0 视为“未指定”，用随机种子并记下来，保证这一局永远可重放
             seed_ = GameConfig.seed != 0 ? GameConfig.seed : new Random().Next(1, int.MaxValue);
+            turnLimit_ = GameConfig.turnLimit;
         }
 
         public virtual void Init(bool skipReDispense = false) {
@@ -110,17 +122,74 @@ namespace FFF7RCore {
 
             currentPlayer_ = firstPlayer;
             gameStatus_ = GameStatus.GAMING;
+
+            // 第一手就可能全手牌都下不去（例如起手 5 张费用 3，场上只有 1 级格）。
+            // 没有这一步，客户端一开局就会"轮到你却点不动任何格子"。
+            EnsurePlayableTurn();
         }
     //----------------------------------------------------------------------------------------------------------------------------------End
+        /// <summary>
+        /// 真实对局规则：动不了的一方自动跳过，双方都动不了就结束。
+        /// 脚本化测试用例（<see cref="Test.TestGame"/>）没有手牌、棋盘也是固定摆好的，
+        /// 必须关掉它，否则第一步之后就会被判定结束。
+        /// </summary>
+        protected virtual bool UseRealMatchRules => true;
+
+        /// <summary>
+        /// 对局是否还能继续。三个终止条件：
+        /// <list type="number">
+        /// <item>达到回合上限（<see cref="GameConfig.turnLimit"/> &gt; 0 时才生效）；</item>
+        /// <item>双方手牌都已抽空 —— 补牌是即时的，手牌空等价于牌池也空，即任何一方都动不了；</item>
+        /// <item>双方都没有任何合法落子（棋盘被铺满且地形等级都不够，或手里只剩下不去的牌）。</item>
+        /// </list>
+        /// </summary>
         public virtual bool HasNextTurn()
         {
             if (gameStatus_ != GameStatus.GAMING) return false;
+            if (!UseRealMatchRules) return true;
 
-            // if (!player_.CanInput && !rival_.CanInput) {
-            //     return false;
-            // }
+            if (turnLimit_ > 0 && gameTurns_ >= turnLimit_) return false;
+
+            if (!player_.CanInput && !rival_.CanInput) return false;
+
+            if (!HasAnyLegalMove(PlayerType.PLAYER) && !HasAnyLegalMove(PlayerType.RIVAL)) return false;
 
             return true;
+        }
+
+        /// <summary>
+        /// 这一方手里有没有任何一张牌能落在任何一格上。
+        /// 只用来判定"还能不能行动"，因此不理会当前该谁走。
+        /// </summary>
+        private bool HasAnyLegalMove(PlayerType playerType)
+        {
+            GamePlayer player = playerType == PlayerType.RIVAL ? rival_ : player_;
+            if (player == null) return false;
+
+            List<Chess> hand = player.ChessInHand;
+            if (hand == null || hand.Count == 0) return false;
+
+            for (int i = 0; i < hand.Count; i++)
+            {
+                Chess chess = hand[i];
+                if (chess == null || chess.Property == null) continue;
+
+                // 用下标遍历而不是 foreach：ChessPad 的枚举器是接口返回，foreach 会装箱。
+                // CheckInput 里那条越界日志只在外部传入非法坐标时才会打，这里不会触发。
+                List<List<PadGrid>> grid = chessPad_.GridMap;
+                for (int x = 0; x < grid.Count; x++)
+                {
+                    List<PadGrid> line = grid[x];
+                    for (int y = 0; y < line.Count; y++)
+                    {
+                        if (chessPadManager_.CheckInput(new Input(line[y].Position, chess.Property, playerType, i)))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
         public virtual void End() {
             if (gameStatus_ != GameStatus.GAMING) return;
@@ -157,29 +226,117 @@ namespace FFF7RCore {
             return chessPadManager_.Preview(input);
         }
     //----------------------------------------------------------------------------------------------------------------------------------Input
-        public virtual bool Input(Input input) {
-            if (!CheckInput(input)) return false;
-        
-            bool ret = chessPadManager_.Input(input);
-            if (ret)
-            {
-                NextTurn();
-                if (!HasNextTurn()) End();
-            }
+        public virtual bool Input(Input input) => Input(input, out _);
 
-            return ret;
-        }
+        /// <summary>
+        /// 落子。成功后依次做三件事：消耗这张手牌并补牌 → 换边（必要时跳过动不了的一方）→ 判定对局是否该结束。
+        /// </summary>
+        public virtual bool Input(Input input, out InputReject reject) {
+            if (!CheckInput(input, out reject)) return false;
 
-        public virtual bool CheckInput(Input input)
-        {
-            if (gameStatus_ != GameStatus.GAMING) return false;
-
-            if (!IgnoreTurnLimit && currentPlayer_ != input.playerType) {
-                Log.TestLine($"{input.playerType} is not allowed to input, this turn is {currentPlayer_}", TextColor.RED);
+            if (!chessPadManager_.Input(input)) {
+                reject = InputReject.Unknown;
                 return false;
             }
 
-            return chessPadManager_.CheckInput(input);
+            ConsumeCard(input);
+            AdvanceTurn();
+
+            reject = InputReject.None;
+            return true;
+        }
+
+        /// <summary>
+        /// 换边，并在新回合方没有任何合法落子时自动跳过（pass）。
+        /// <para>
+        /// 没有这一步，棋盘铺满后行动方会"有手牌但无处可下"，对局就永远停在那里 ——
+        /// 客户端表现为轮到你却点不动任何格子。跳过之后两种情况都会收敛：
+        /// 另一方还能走就继续，双方都不能走就结束。
+        /// </para>
+        /// </summary>
+        private void AdvanceTurn() {
+            NextTurn();
+            EnsurePlayableTurn();
+        }
+
+        /// <summary>
+        /// 保证 <see cref="currentPlayer_"/> 至少有一手能走：走不了就让出回合，
+        /// 双方都走不了就结束。需要重复是因为让出一方后接手的另一方也可能动不了。
+        /// </summary>
+        private void EnsurePlayableTurn() {
+            if (!UseRealMatchRules) return;
+
+            while (gameStatus_ == GameStatus.GAMING) {
+                if (turnLimit_ > 0 && gameTurns_ >= turnLimit_) { End(); return; }
+
+                if (HasAnyLegalMove(currentPlayer_)) return;   // 正常情况：轮到的人能走
+
+                // 轮到的人动不了：另一方还能走就让出回合，双方都动不了就结束
+                if (!HasAnyLegalMove(Other(currentPlayer_))) { End(); return; }
+
+                PassTurn();
+            }
+        }
+
+        /// <summary>
+        /// 跳过动不了的一方。只换边、不推进回合数 —— 否则 pass 会吃掉回合上限，
+        /// 让"回合上限 7"实际只够走三四手。
+        /// </summary>
+        private void PassTurn() {
+            PlayerType skipped = currentPlayer_;
+            currentPlayer_ = Other(currentPlayer_);
+            chessPad_?.eventSystem?.RaiseTurnEnd(
+                new EventSystem.TurnEndedEventArgs(skipped, currentPlayer_, gameTurns_, true));
+        }
+
+        private static PlayerType Other(PlayerType playerType) {
+            return playerType == PlayerType.PLAYER ? PlayerType.RIVAL : PlayerType.PLAYER;
+        }
+
+        /// <summary>
+        /// 把打出的牌从手牌里丢掉并补一张。只有 <see cref="Input.FromHand"/> 才消耗 ——
+        /// 脚本 / 测试直接喂牌的路径（handIndex = -1）不碰手牌。
+        /// </summary>
+        private void ConsumeCard(Input input) {
+            if (!input.FromHand) return;
+
+            GamePlayer player = input.playerType == PlayerType.RIVAL ? rival_ : player_;
+            player.DiscardFromHand(input.handIndex);
+        }
+
+        public virtual bool CheckInput(Input input) => CheckInput(input, out _);
+
+        public virtual bool CheckInput(Input input, out InputReject reject)
+        {
+            if (gameStatus_ != GameStatus.GAMING) { reject = InputReject.NotGaming; return false; }
+
+            if (!IgnoreTurnLimit && currentPlayer_ != input.playerType) {
+                Log.TestLine($"{input.playerType} is not allowed to input, this turn is {currentPlayer_}", TextColor.RED);
+                reject = InputReject.NotYourTurn;
+                return false;
+            }
+
+            if (input.Empty) { reject = InputReject.EmptyInput; return false; }
+
+            // 由手牌驱动的请求必须能对上手里那一张，否则内核会接受"出不在手里的牌"
+            if (input.FromHand && !IsHandIndexValid(input)) {
+                reject = InputReject.CardNotInHand;
+                return false;
+            }
+
+            return chessPadManager_.CheckInput(input, out reject);
+        }
+
+        private bool IsHandIndexValid(Input input)
+        {
+            GamePlayer player = input.playerType == PlayerType.RIVAL ? rival_ : player_;
+            if (player == null) return false;
+
+            List<Chess> hand = player.ChessInHand;
+            if (hand == null || input.handIndex >= hand.Count) return false;
+
+            Chess chess = hand[input.handIndex];
+            return chess != null && chess.Property != null && chess.Property.CardCode == input.chess.CardCode;
         }
 
         public virtual void NextTurn() {

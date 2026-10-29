@@ -132,12 +132,19 @@ namespace FFF7R
         public PlayerSeat NextPlayer { get; }
         public int Turns { get; }
 
-        public TurnEndedEvent(long sequence, PlayerSeat endedPlayer, PlayerSeat nextPlayer, int turns)
+        /// <summary>
+        /// true 表示这次换边是跳过：<see cref="EndedPlayer"/> 手里有牌但无处可下，回合被自动让出。
+        /// 这类事件不增加 <see cref="Turns"/>，表现层通常不该为它播回合动画。
+        /// </summary>
+        public bool IsPass { get; }
+
+        public TurnEndedEvent(long sequence, PlayerSeat endedPlayer, PlayerSeat nextPlayer, int turns, bool isPass = false)
             : base(sequence)
         {
             EndedPlayer = endedPlayer;
             NextPlayer = nextPlayer;
             Turns = turns;
+            IsPass = isPass;
         }
 
         public override GameEventKind Kind => GameEventKind.TurnEnded;

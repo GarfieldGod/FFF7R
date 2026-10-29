@@ -28,7 +28,12 @@ namespace FFF7RCore.Test {
             testGame_ = new TestGame(steps_, gameConfig);
         }
 
-        public bool Run()
+        /// <summary>
+        /// 跑本用例。默认实现：按 <see cref="InitSteps"/> 声明的剧本逐条出牌，每步比对棋盘。
+        /// 想完全不按剧本跑的用例（例如 E2E 套）可以覆写本方法——但**必须**用
+        /// <see cref="RecordStepResult"/> 登记结果，否则 <see cref="TestSuite"/> 的 Passed / Failed 统计会漏。
+        /// </summary>
+        public virtual bool Run()
         {
             if (NoLog) Log.PrintToConsole = false;
 
@@ -65,6 +70,20 @@ namespace FFF7RCore.Test {
 
             Log.PrintToConsole = true;
             return result_;
+        }
+
+        /// <summary>
+        /// 给覆写 <see cref="Run"/> 的子类登记一条结果，下标对应 <see cref="AddStep"/> 的调用顺序。
+        /// <para>
+        /// 为什么需要它：<see cref="TestSuite"/> 的 Passed / Failed 不是看 <see cref="Run"/> 的返回值，
+        /// 而是看 <see cref="StepsResult"/> 里每步的真假。覆写 Run 的用例如果一条都不登记，
+        /// 它失败时会被统计成 "Failed: 0"，只有最终 Test Result 变红——数字自相矛盾。
+        /// </para>
+        /// </summary>
+        protected void RecordStepResult(int stepIndex, bool ok)
+        {
+            if (stepIndex < 0 || stepIndex >= steps_.Count) return;
+            stepsRet_[steps_[stepIndex]] = ok;
         }
 
         public virtual GameConfig InitGameConfig()

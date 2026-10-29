@@ -2,19 +2,18 @@ namespace FFF7R
 {
     using System.Collections.Generic;
 
-    /// <summary>
-    /// 写指令通道。全部同步执行，调用返回时状态与事件都已经落定。
-    /// 失败不抛异常，用 <see cref="CommandResult"/> 返回。
-    /// </summary>
+    // 上层使用的操作接口
     public interface IGameCommand
     {
-        /// <summary>开局。</summary>
+        // 开局
         CommandResult Start(PlayerSeat firstPlayer);
 
-        /// <summary>出一张手牌到指定格。</summary>
+        CommandResult PassTurn(PlayerSeat seat);
+
+        // 出一张手牌到指定格
         CommandResult Place(PlayerSeat seat, int handIndex, Int2 pos);
 
-        /// <summary>重抽阶段保留指定的手牌，其余换掉。</summary>
+        // 重抽阶段保留指定的手牌，其余换掉
         CommandResult ReDispense(PlayerSeat seat, IReadOnlyList<int> keepIndexes);
     }
 }

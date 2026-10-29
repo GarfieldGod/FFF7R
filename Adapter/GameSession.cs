@@ -8,15 +8,14 @@ namespace FFF7R.Adapter
     /// <summary>
     /// <see cref="IGameSession"/> 的本地实现：把一个 <see cref="FFF7RCore.Game"/> 包成纯契约。
     ///
-    /// 表现层只需要 <c>new LocalGameSession(setup)</c>，之后拿到的全是 <c>FFF7R</c> 命名空间下的类型，
+    /// 表现层只需要 <c>new GameSession(setup)</c>，之后拿到的全是 <c>FFF7R</c> 命名空间下的类型，
     /// 看不到 Game / ChessPad / ChessProperty / Int2D 中的任何一个。
     /// </summary>
-    public sealed class LocalGameSession : IGameSession
+    public sealed class GameSession : IGameSession
     {
         private readonly Game game_;
         private readonly CardCatalog catalog_;
         private readonly SessionEventBridge bridge_;
-        private readonly int turnLimit_;
         private bool disposed_;
 
         private Action<GameEvent> raised_;
@@ -25,7 +24,7 @@ namespace FFF7R.Adapter
 
         public int Seed => game_.Seed;
 
-        public LocalGameSession(GameSetup setup)
+        public GameSession(GameSetup setup)
         {
             if (setup == null) throw new ArgumentNullException(nameof(setup));
 
@@ -39,12 +38,11 @@ namespace FFF7R.Adapter
                 new List<string>(setup.PlayerPool),
                 new List<string>(setup.RivalPool),
                 pad,
-                setup.Seed);
+                setup.Seed,
+                setup.TurnLimit);
 
             game_ = new Game(config);
             game_.Init();
-
-            turnLimit_ = setup.TurnLimit;
 
             // Init 内部 new 了 ChessPad 与 ChessPadManager，eventSystem 这时才存在
             bridge_ = new SessionEventBridge(game_.ChessPad.eventSystem, OnBridgeEvent);
@@ -134,6 +132,11 @@ namespace FFF7R.Adapter
             return CommandResult.Success(bridge_.RaisedCount);
         }
 
+        public CommandResult PassTurn(PlayerSeat seat)
+        {
+            return CommandResult.Success(bridge_.RaisedCount);
+        }
+
         public CommandResult Place(PlayerSeat seat, int handIndex, Int2 pos)
         {
             if (disposed_) return CommandResult.Fail(RejectReason.Unknown);
@@ -146,13 +149,12 @@ namespace FFF7R.Adapter
             }
 
             bridge_.ResetCount();
-            if (!game_.Input(input))
+            InputReject kernelReject;
+            if (!game_.Input(input, out kernelReject))
             {
-                // 走到这里说明内核在 CheckInput 之后还有别的拒绝条件，契约层无法细分
-                return CommandResult.Fail(RejectReason.IllegalPlacement);
+                return CommandResult.Fail(kernelReject.ToContract());
             }
 
-            ApplyTurnLimit();
             return CommandResult.Success(bridge_.RaisedCount);
         }
 
@@ -226,34 +228,17 @@ namespace FFF7R.Adapter
                 return false;
             }
 
-            Input candidate = new Input(kernelPos, property, kernelSeat);
-            if (!game_.CheckInput(candidate))
+            Input candidate = new Input(kernelPos, property, kernelSeat, handIndex);
+            InputReject kernelReject;
+            if (!game_.CheckInput(candidate, out kernelReject))
             {
-                PosStatus status = game_.ChessPad[kernelPos.x, kernelPos.y].Status;
-                // 费用 > 0 的牌只能落在空/低级格上；落在已占据格是最常见的一种“合法拒绝”
-                reason = property.Cost > 0 && status >= PosStatus.OCCUPIED_PLAYER
-                    ? RejectReason.CellOccupied
-                    : RejectReason.IllegalPlacement;
+                reason = kernelReject.ToContract();
                 return false;
             }
 
             input = candidate;
             reason = RejectReason.None;
             return true;
-        }
-
-        /// <summary>
-        /// 回合上限由会话层负责收尾。
-        /// 内核自己的 <c>Game.HasNextTurn()</c> 目前在 GAMING 期间恒为 true，
-        /// 导致 <c>Input</c> 里那句 <c>if (!HasNextTurn()) End();</c> 永不成立，GameEnded 打不出来。
-        /// 在把它修好之前，这里用配置的回合上限主动 End，保证这条链路可测。
-        /// </summary>
-        private void ApplyTurnLimit()
-        {
-            if (turnLimit_ <= 0) return;
-            if (game_.Status != GameStatus.GAMING) return;
-            if (game_.Turns < turnLimit_) return;
-            game_.End();
         }
 
         public void Dispose()

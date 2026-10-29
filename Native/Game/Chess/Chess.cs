@@ -1,4 +1,5 @@
 namespace FFF7RCore {
+
     public class Chess
     {
         public ChessProperty Property => property_;
@@ -7,11 +8,6 @@ namespace FFF7RCore {
         public Chess(ChessProperty property)
         {
             property_ = new ChessProperty(property);
-        }
-
-        public Chess Clone()
-        {
-            return new Chess(this.property_);
         }
     }
 }

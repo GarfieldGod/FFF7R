@@ -63,6 +63,9 @@ namespace FFF7RCore {
             neverBuffed_ = padGrid.NeverBuffed;
             neverDeBuffed_ = padGrid.NeverDeBuffed;
 
+            FirstPowerReach = padGrid.FirstPowerReach;
+            deathPowerSnapshot_ = padGrid.deathPowerSnapshot_;
+
             foreach (var buff in padGrid.BuffList)
             {
                 buffs_.Add(new Buff(buff));

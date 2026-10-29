@@ -5,7 +5,9 @@ namespace FFF7RCore {
     public class EventSystem
     {
         // 事件序号：每次 Raise 之前自增，随事件载荷一起下发。
-        // 适配层按 Sequence 排序即可还原真实结算顺序（同一帧内的嵌套触发也能区分）。
+        // 用途是<b>丢包检测</b>，不是排序：同一帧内的嵌套触发按回调顺序就是结算顺序，
+        // 不需要按序号重排。订阅方记住 lastSequence，收到 != last+1 就说明漏了事件，
+        // 应当拉一次全量快照重新同步，而不是把当前事件硬套到已错位的状态上。
         private long sequence_;
         public long Sequence => sequence_;
 
@@ -197,13 +199,19 @@ namespace FFF7RCore {
         {
             public PlayerType EndedPlayer;   // 刚结束回合的一方
             public PlayerType NextPlayer;    // 接手回合的一方
-            public int Turns;                // 已完成的回合数（NextTurn 之后的值）
+            public int Turns;                // 已完成的落子次数（NextTurn 之后的值，不含 pass）
+            /// <summary>
+            /// true 表示这次换边是<b>跳过</b>：该方手里有牌但没有任何合法落点，回合被自动让出。
+            /// 这类 TurnEnded 不增加 <see cref="Turns"/>，表现层通常不该为它播回合动画。
+            /// </summary>
+            public bool IsPass;
             public long Sequence;
-            public TurnEndedEventArgs(PlayerType endedPlayer, PlayerType nextPlayer, int turns)
+            public TurnEndedEventArgs(PlayerType endedPlayer, PlayerType nextPlayer, int turns, bool isPass = false)
             {
                 EndedPlayer = endedPlayer;
                 NextPlayer = nextPlayer;
                 Turns = turns;
+                IsPass = isPass;
             }
         }
 

@@ -18,6 +18,15 @@ namespace FFF7RCore {
             get => selector[index];
         }
 
+        /// <summary>
+        /// 这一方还有没有牌可出。手牌为空即无法行动（补牌是即时的，手牌空 ⟺ 牌池也空）。
+        /// <c>Game.HasNextTurn</c> 用它判定"双方都动不了 → 对局结束"。
+        /// </summary>
+        public bool CanInput => selector.Count > 0;
+
+        /// <summary>牌池里还剩多少张（不含手牌）。</summary>
+        public int PoolCount => dispenser.Count;
+
         public void InitDespense(int initNum) {
             while(initNum > 0) {
                 GetCardFromCardPool();
@@ -25,10 +34,21 @@ namespace FFF7RCore {
             }
         }
 
+        /// <summary>
+        /// 丢弃指定手牌并立刻补一张。返回是否真的移除成功。
+        /// 出牌消耗必须走这里，否则同一张牌可以无限次打出。
+        /// </summary>
+        public bool DiscardFromHand(int index) {
+            if (!selector.RemoveAt(index)) return false;
+            GetCardFromCardPool();   // 牌池见底时补不进来，手牌自然变少
+            return true;
+        }
+
         public void ReDispense(List<int> index) {
             
         }
 
+        /// <summary>从牌池抽一张进手牌；牌池空时什么都不做。</summary>
         public void GetCardFromCardPool() {
             selector.Add(dispenser.Dispense());
         }

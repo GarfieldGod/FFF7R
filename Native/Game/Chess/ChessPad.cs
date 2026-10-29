@@ -92,30 +92,6 @@ namespace FFF7RCore {
             }
         }
 
-        public List<List<Chess>> ChessMap
-        {
-            get {
-                List<List<Chess>> result = new List<List<Chess>>();
-                for (int x = 0; x < padGrids_.Count; x++)
-                {
-                    var line = new List<Chess>();
-                    for (int y = 0; y < padGrids_[0].Count; y++)
-                    {
-                        if (padGrids_[x][y].Chess != null)
-                        {
-                            line.Add(new Chess(padGrids_[x][y].Chess));
-                        }
-                        else
-                        {
-                            line.Add(null);
-                        }
-                    }
-                    result.Add(line);
-                }
-                return result;
-            }
-        }
-
         public List<List<BuffList>> BuffsMap
         {
             get 
@@ -169,18 +145,6 @@ namespace FFF7RCore {
                         padGrids_[x][y].NeverBuffed = value[x][y];
                     }
                 }
-            }
-        }
-
-        public void SetChess(Int2D pos, Chess src)
-        {
-            if (src != null)
-            {
-                padGrids_[pos.x][pos.y].Chess = src.Property;
-            }
-            else
-            {
-                padGrids_[pos.x][pos.y].Chess = null;
             }
         }
 

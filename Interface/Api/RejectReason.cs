@@ -14,6 +14,9 @@ namespace FFF7R
         /// <summary>手牌下标越界。</summary>
         HandIndexOutOfRange,
 
+        /// <summary>该下标上的牌与请求的卡不一致（手牌已变化，表现层需刷新）。</summary>
+        CardNotInHand,
+
         /// <summary>卡牌编号查不到定义。</summary>
         CardNotFound,
 
@@ -23,7 +26,13 @@ namespace FFF7R
         /// <summary>目标格已被占据，不能落子。</summary>
         CellOccupied,
 
-        /// <summary>该卡在此处不合法（费用不足、范围不匹配等，内核拒绝但未细分原因）。</summary>
+        /// <summary>目标格的地形等级低于这张牌的费用。</summary>
+        CellLevelTooLow,
+
+        /// <summary>费用为 0 的覆盖型卡，目标格上没有己方棋子可覆盖。</summary>
+        NoOwnChessToCover,
+
+        /// <summary>该卡在此处不合法（内核拒绝但未细分原因）。</summary>
         IllegalPlacement,
 
         /// <summary>当前阶段不接受该指令。</summary>

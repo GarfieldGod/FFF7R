@@ -56,6 +56,27 @@ namespace FFF7R.Adapter
 
         public static CellState ToContract(this PosStatus v) => (CellState)(int)v;
 
+        /// <summary>
+        /// 内核的拒绝原因 → 契约的拒绝原因。两边是各自独立的枚举，不要互相强转：
+        /// 内核枚举描述的是"规则为什么不过"，契约枚举描述的是"给玩家看什么提示"。
+        /// </summary>
+        public static RejectReason ToContract(this InputReject v)
+        {
+            switch (v)
+            {
+                case InputReject.None: return RejectReason.None;
+                case InputReject.NotGaming: return RejectReason.NotGaming;
+                case InputReject.NotYourTurn: return RejectReason.NotYourTurn;
+                case InputReject.EmptyInput: return RejectReason.CardNotFound;
+                case InputReject.CardNotInHand: return RejectReason.CardNotInHand;
+                case InputReject.OutOfBoard: return RejectReason.OutOfBoard;
+                case InputReject.CellOccupied: return RejectReason.CellOccupied;
+                case InputReject.CellLevelTooLow: return RejectReason.CellLevelTooLow;
+                case InputReject.NoOwnChessToCover: return RejectReason.NoOwnChessToCover;
+                default: return RejectReason.IllegalPlacement;
+            }
+        }
+
         //-------------------------------------------------------------------- 卡牌定义
 
         /// <summary>
