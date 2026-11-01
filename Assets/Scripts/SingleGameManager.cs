@@ -8,6 +8,8 @@ public class SingleGameManager : MonoBehaviour
     private FFF7RCore.Game InnerGame_;
     private ChessBoard chessBoard;
 
+    [SerializeField] private CardSelector cardSelector;
+
     void Start()
     {
         InitGame();

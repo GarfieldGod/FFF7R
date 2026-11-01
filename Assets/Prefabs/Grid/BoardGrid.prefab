@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6552723028248474630}
   - component: {fileID: 4010946960141704333}
+  - component: {fileID: 6265762024344516484}
   m_Layer: 0
   m_Name: BoardGrid
   m_TagString: GridInBoard
@@ -53,3 +54,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 0.1, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &6265762024344516484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3912336484967244376}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c159520df360f2b438ec241cc8226758, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LevelSpacing: 2
+  LevelHeight: 1
+  ballPrefab: {fileID: 938554682491469808, guid: 96b2ccb5ad2976847bb94fa382b71525, type: 3}
+  ballMat:
+  - {fileID: 2100000, guid: e50552a790e46f0408252a209823624c, type: 2}
+  - {fileID: 2100000, guid: 19b909ba9455580459194e9defc57b5c, type: 2}

@@ -16,6 +16,8 @@ public class Card : MonoBehaviour
     private GridCellOnCard[,] gridCells = new GridCellOnCard[5,5];
     [SerializeField] private Image costCellPrefab;
 
+    public string CardCode;
+
     void Awake()
     {
         FFF7RCore.Property.LoadChessProperties();
@@ -43,6 +45,7 @@ public class Card : MonoBehaviour
             Debug.LogError("Card data is null");
             return;
         }
+        CardCode = cardData.CardCode;
 
         NameText.text = cardData.Name;
         PowerText.value = cardData.Level;

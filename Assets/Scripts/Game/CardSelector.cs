@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using FFF7R;
 using UnityEngine;
 
 public class CardSelector : MonoBehaviour
@@ -9,14 +10,20 @@ public class CardSelector : MonoBehaviour
     public float CardSelectorLength = -25;
     public float CardSelectorHeight = 1;
     public List<Card> cards = new List<Card>();
+
     // Start is called before the first frame update
     void Start()
     {
-        AddCard("Card001");
-        AddCard("Card051");
-        AddCard("Card031");
-        AddCard("Card041");
-        AddCard("Card071");
+
+    }
+
+    public void UpdateHand(HandSnapshot hand)
+    {
+        cards.Clear();
+        foreach (CardView cardView in hand.Cards)
+        {
+            AddCard(cardView.CardCode);
+        }
     }
 
     public void AddCard(string cardCode)
@@ -30,7 +37,7 @@ public class CardSelector : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-            UpdateCardsPos();
+        UpdateCardsPos();
     }
 
     void UpdateCardsPos()
