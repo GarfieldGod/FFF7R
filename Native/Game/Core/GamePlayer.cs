@@ -45,7 +45,17 @@ namespace FFF7RCore {
         }
 
         public void ReDispense(List<int> index) {
-            
+            index.Sort();
+
+            string[] cardsToReturn = new string[index.Count];
+            for (int i = index.Count - 1; i >= 0; i--) {
+                cardsToReturn[i] = selector[index[i]].Property.CardCode;
+                selector.RemoveAt(index[i]);
+            }
+            foreach (int i in index) {
+                selector.Add(dispenser.Dispense());
+            }
+            dispenser.Add(cardsToReturn);
         }
 
         /// <summary>从牌池抽一张进手牌；牌池空时什么都不做。</summary>

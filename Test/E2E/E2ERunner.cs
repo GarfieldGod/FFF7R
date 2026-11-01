@@ -30,6 +30,14 @@ namespace FFF7RCore.Test.E2E
         public const int MaxPliesPerGame = 300;
         public const int TurnLimit = 24;
 
+        /// <summary>
+        /// 连续主动跳过回合的上限。
+        /// 理论最大值是 1：PassTurn → NextTurn → CheckEnd，接手方要么能落子（游戏继续），
+        /// 要么双方都不能落子（直接 End），所以不可能连着 pass 两次还不收敛。
+        /// 这里留一格余量，免得断言绑死在 CheckEnd 的具体实现顺序上。
+        /// </summary>
+        public const int MaxConsecutivePass = 2;
+
         public static bool RunAll() => RunAll(new E2ECheck());
 
         public static bool RunAll(E2ECheck report)
@@ -76,16 +84,21 @@ namespace FFF7RCore.Test.E2E
         //-------------------------------------------------------------------- 不变式
 
         /// <summary>
-        /// 每手都断言：**GAMING 期间当前方一定至少有一手能走**。
+        /// 每手都断言：**GAMING 期间当前方要么有合法落子，要么 PassTurn 必须成功**。
         ///
         /// 这是 S0 修的"卡死"回归防线 —— 客户端表现为"轮到你却点不动任何格子"，
         /// 而它不会报错，只会静默停住，靠终态断言永远抓不到。
+        ///
+        /// 内核改成"只能主动跳过"之后，动不了不再是故障（正确动作是让出回合），
+        /// 所以找不到落子时改发 <see cref="IGameCommand.PassTurn"/>，
+        /// 并额外钉住三条硬约束：不改手牌、换人、Turns +1；以及连续 pass 不得超限。
         /// </summary>
         private static void RunInvariant(E2ECheck report, List<string> pool)
         {
             int assertionsBefore = report.Assertions;
             int games = 0;
             int plies = 0;
+            int passes = 0;
             int stuck = 0;
             int notEnded = 0;
             int instantEnd = 0;
@@ -99,6 +112,13 @@ namespace FFF7RCore.Test.E2E
                     games++;
                     int pliesThisGame = 0;
 
+                    CommandResult reDispense = session.ReDispense(new List<int>(), new List<int>());
+                    if (!reDispense.Ok)
+                    {
+                        report.Fail(ctx, "ReDispense 被拒: " + reDispense.Reason);
+                        continue;
+                    }
+
                     CommandResult start = session.Start(PlayerSeat.Player);
                     if (!start.Ok)
                     {
@@ -107,6 +127,7 @@ namespace FFF7RCore.Test.E2E
                     }
 
                     int step = 0;
+                    int consecutivePass = 0;
                     for (; step < MaxPliesPerGame; step++)
                     {
                         GameStateView state = session.State;
@@ -120,32 +141,65 @@ namespace FFF7RCore.Test.E2E
 
                         int handIndex;
                         Int2 pos;
-                        if (!TryFindMove(session, state.Current, out handIndex, out pos))
+                        if (TryFindMove(session, state.Current, out handIndex, out pos))
+                        {
+                            CommandResult placed = session.Place(state.Current, handIndex, pos);
+                            if (!placed.Ok)
+                            {
+                                report.Fail(ctx, "CanPlace 说能下、Place 却被拒: " + placed.Reason);
+                                break;
+                            }
+                            if (placed.EventsRaised == 0)
+                            {
+                                report.Fail(ctx, "落子成功但一个事件都没派发");
+                                break;
+                            }
+
+                            plies++;
+                            pliesThisGame++;
+                            consecutivePass = 0;   // 只要真落了一手，连续 pass 计数就清零
+                            continue;
+                        }
+
+                        // —— 动不了不是故障：内核不再替玩家跳过，正确动作是主动让出回合 ——
+                        // 真正该失败的只有「动不了 + 连 pass 都被拒」，那才是客户端点了没反应。
+                        PlayerSeat passer = state.Current;
+                        int handBefore = session.Hand(passer).Count;
+                        int turnsBefore = state.Turns;
+
+                        CommandResult passed = session.PassTurn(passer);
+                        if (!passed.Ok)
                         {
                             stuck++;
-                            report.Fail(ctx, "当前方(" + state.Current + ")无任何合法落子，ply=" + step
-                                + "，手牌 " + session.Hand(state.Current).Count + " 张");
+                            report.Fail(ctx, "无任何合法落子，且 PassTurn 被拒: " + passed.Reason
+                                + "，ply=" + step + "，手牌 " + handBefore + " 张");
+                            break;
+                        }
+                        if (passed.EventsRaised == 0)
+                        {
+                            report.Fail(ctx, "pass 成功但一个事件都没派发");
                             break;
                         }
 
-                        CommandResult placed = session.Place(state.Current, handIndex, pos);
-                        if (!placed.Ok)
-                        {
-                            report.Fail(ctx, "CanPlace 说能下、Place 却被拒: " + placed.Reason);
-                            break;
-                        }
-                        if (placed.EventsRaised == 0)
-                        {
-                            report.Fail(ctx, "落子成功但一个事件都没派发");
-                            break;
-                        }
+                        passes++;
+                        consecutivePass++;
 
-                        plies++;
-                        pliesThisGame++;
+                        GameStateView after = session.State;
+                        report.That(session.Hand(passer).Count == handBefore, ctx, "pass 改变了手牌数");
+                        report.That(!after.IsGaming || after.Turns == turnsBefore + 1, ctx,
+                            "pass 没有推进 Turns: " + turnsBefore + " → " + after.Turns);
+                        report.That(!after.IsGaming || after.Current != passer, ctx,
+                            "pass 之后行动权还在 " + passer + " 手上");
+
+                        if (consecutivePass > MaxConsecutivePass)
+                        {
+                            report.Fail(ctx, "连续 pass " + consecutivePass + " 次仍未收敛，ply=" + step);
+                            break;
+                        }
                     }
 
-                    // 0 手是合法结果：起手双方都没有任何合法落子时，内核在 Start 里就直接终局了
-                    // （Game.HasNextTurn 的第 3 条终止条件）。这里只统计，不判失败 —— 但要留痕。
+                    // 0 手是合法结果：起手双方都没有任何合法落子时，CheckEnd 在 Start 里一次就判终局。
+                    // 这里只统计，不判失败 —— 但要留痕。
                     if (session.State.IsGaming) notEnded++;
                     if (pliesThisGame == 0) instantEnd++;
 
@@ -157,8 +211,8 @@ namespace FFF7RCore.Test.E2E
             report.That(games == InvariantGames, "invariant", "实际开局 " + games + " 局，预期 " + InvariantGames);
             report.That(plies > 0, "invariant", "全部对局一手都没走成，这套测试等于没跑");
 
-            report.Note("invariant: games=" + games + " plies=" + plies + " stuck=" + stuck
-                + " notEnded=" + notEnded + " instantEnd=" + instantEnd
+            report.Note("invariant: games=" + games + " plies=" + plies + " passes=" + passes
+                + " stuck=" + stuck + " notEnded=" + notEnded + " instantEnd=" + instantEnd
                 + " checks=" + (report.Assertions - assertionsBefore));
         }
 
@@ -183,7 +237,14 @@ namespace FFF7RCore.Test.E2E
                     games++;
 
                     List<GameEvent> events = new List<GameEvent>();
-                    session.Raised += events.Add;   // 必须在 Start 之前订阅，启动时的被动 pass 也要收到
+                    session.Raised += events.Add;   // 必须在 Start 之前订阅：起手双方都不能动时，GameEnded 在 Start 里就派发了
+
+                    CommandResult reDispense = session.ReDispense(new List<int>(), new List<int>());
+                    if (!reDispense.Ok)
+                    {
+                        report.Fail(ctx, "ReDispense 被拒: " + reDispense.Reason);
+                        continue;
+                    }
 
                     CommandResult start = session.Start(PlayerSeat.Player);
                     if (!start.Ok)
@@ -200,9 +261,27 @@ namespace FFF7RCore.Test.E2E
 
                         int handIndex;
                         Int2 pos;
-                        if (!TryFindMove(session, state.Current, out handIndex, out pos)) break;
-                        if (!session.Place(state.Current, handIndex, pos).Ok) break;
-                        played++;
+                        if (TryFindMove(session, state.Current, out handIndex, out pos))
+                        {
+                            CommandResult placed = session.Place(state.Current, handIndex, pos);
+                            if (!placed.Ok)
+                            {
+                                report.Fail(ctx, "Place 被拒: " + placed.Reason);
+                                break;
+                            }
+                            played++;
+                            continue;
+                        }
+
+                        // 动不了要主动让出回合。静默 break 会让后面的 CheckGameEnded
+                        // 只报"跑完仍未结束"，指不出真正断在哪一步。
+                        CommandResult passed = session.PassTurn(state.Current);
+                        if (!passed.Ok)
+                        {
+                            report.Fail(ctx, "无任何合法落子，且 PassTurn 被拒: " + passed.Reason);
+                            break;
+                        }
+                        report.That(passed.EventsRaised > 0, ctx, "pass 成功但一个事件都没派发");
                     }
 
                     CheckSequence(report, ctx, events);
@@ -351,6 +430,7 @@ namespace FFF7RCore.Test.E2E
             using (IGameSession session = Open(pool, seed))
             {
                 session.Raised += e => signatures.Add(Sign(e));
+                session.ReDispense(new List<int>(), new List<int>());
                 session.Start(PlayerSeat.Player);
 
                 for (int step = 0; step < MaxPliesPerGame; step++)
@@ -360,8 +440,26 @@ namespace FFF7RCore.Test.E2E
 
                     int handIndex;
                     Int2 pos;
-                    if (!TryFindMove(session, state.Current, out handIndex, out pos)) break;
-                    if (!session.Place(state.Current, handIndex, pos).Ok) break;
+                    if (TryFindMove(session, state.Current, out handIndex, out pos))
+                    {
+                        CommandResult placed = session.Place(state.Current, handIndex, pos);
+                        if (!placed.Ok)
+                        {
+                            // 静默 break 是这套测试最大的盲点：失败只能表现为"事件变少"，
+                            // 说不清是哪一步断的。所以失败原因要进签名流。
+                            signatures.Add("ERR|Place|" + placed.Reason);
+                            break;
+                        }
+                        continue;
+                    }
+
+                    // 动不了就让出回合，否则这一局会在半路停住，后半局的事件全部丢失
+                    CommandResult passed = session.PassTurn(state.Current);
+                    if (!passed.Ok)
+                    {
+                        signatures.Add("ERR|Pass|" + passed.Reason);
+                        break;
+                    }
                 }
             }
 
@@ -450,6 +548,13 @@ namespace FFF7RCore.Test.E2E
 
             using (IGameSession session = Open(pool, 20261021))
             {
+                CommandResult reDispense = session.ReDispense(new List<int>(), new List<int>());
+                if (!reDispense.Ok)
+                {
+                    report.Fail(ctx, "ReDispense 被拒: " + reDispense.Reason);
+                    return;
+                }
+
                 CommandResult start = session.Start(PlayerSeat.Player);
                 if (!start.Ok)
                 {

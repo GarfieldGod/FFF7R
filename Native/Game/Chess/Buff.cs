@@ -23,16 +23,6 @@ namespace FFF7RCore {
             this.mark = mark;
         }
 
-        public Buff(Buff buff)
-        {
-            owner = buff.owner;
-            source = buff.source;
-            value = buff.value;
-            dstType = buff.dstType;
-            srcType = buff.srcType;
-            mark = buff.mark;
-        }
-
         public override string ToString()
         {
             return $"Buff: value: {value} owner: {owner} source: {source} dstType: {dstType} srcType: {srcType} mark: {mark}";
@@ -50,6 +40,16 @@ namespace FFF7RCore {
         public BuffList(PadGrid padGrid)
         {
             padGrid_ = padGrid;
+        }
+
+        public void CopyFrom(BuffList src)
+        {
+            buffList_.Clear();
+
+            for (int i = 0; i < src.Count; i++)
+            {
+                buffList_.Add(src[i]);
+            }
         }
 
         public Buff this[int index]

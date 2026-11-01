@@ -6,39 +6,37 @@ namespace FFF7RCore {
 
     public class ChessPad : IEnumerable<List<PadGrid>>
     {
-        public Int2D Size => size_;
-        public int Height => padGrids_.Count;
-        public int Width { get {return padGrids_.Count > 0 ? padGrids_[0].Count : 0;}}
+        public readonly Int2D Size;
         public List<List<PadGrid>> GridMap => padGrids_;
+        public EventSystem EventSystem = new EventSystem();
 
-        private readonly Int2D size_;
         private List<List<PadGrid>> padGrids_ = new List<List<PadGrid>> { };
-
-        public EventSystem eventSystem;
 
         public ChessPad(int x, int y)
         {
-            size_ = new Int2D(x, y);
+            Size = new Int2D(x, y);
             InitGridMap(x, y);
-        }
-
-        public ChessPad(Int2D size)
-        {
-            size_ = size;
-            InitGridMap(size.x, size.y);
-        }
-
-        public ChessPad(List<List<PadGrid>> padGrids)
-        {
-            size_ = new Int2D(padGrids.Count, padGrids[0].Count);
-            padGrids_ = padGrids;
         }
 
         // 深拷贝
         public ChessPad(ChessPad chessPad)
         {
-            size_ = chessPad.Size;
+            Size = chessPad.Size;
             padGrids_ = Utils.DeepCopy(chessPad.GridMap);
+        }
+
+        public bool CopyFrom(ChessPad chessPad)
+        {
+            if (Size != chessPad.Size) return false;
+
+            for (int i = 0; i < padGrids_.Count; i++)
+            {
+                for (int j = 0; j < padGrids_[0].Count; j++)
+                {
+                    padGrids_[i][j].CopyFrom(chessPad[i, j]);
+                }
+            }
+            return true;
         }
 
         public bool IsInBoard(Int2D pos)
@@ -87,62 +85,6 @@ namespace FFF7RCore {
                     for (int y = 0; y < padGrids_[0].Count; y++)
                     {
                         padGrids_[x][y].Status = (PosStatus)value[x][y];
-                    }
-                }
-            }
-        }
-
-        public List<List<BuffList>> BuffsMap
-        {
-            get 
-            {
-                List<List<BuffList>> result = new List<List<BuffList>>();
-                foreach (var line in padGrids_)
-                {
-                    var retLine = new List<BuffList>();
-                    foreach (var padGrid in line)
-                    {
-                        retLine.Add(padGrid.BuffList);
-                    }
-                    result.Add(retLine);
-                }
-                return result;
-            }
-            set
-            {
-                for (int x = 0; x < padGrids_.Count; x++)
-                {
-                    for (int y = 0; y < padGrids_[0].Count; y++)
-                    {
-                        padGrids_[x][y].BuffList = value[x][y];
-                    }
-                }
-            }
-        }
-
-        public List<List<bool>> BuffStatus
-        {
-            get
-            {
-                List<List<bool>> result = new List<List<bool>>();
-                foreach (var line in padGrids_)
-                {
-                    var retLine = new List<bool>();
-                    foreach (var padGrid in line)
-                    {
-                        retLine.Add(padGrid.NeverBuffed);
-                    }
-                    result.Add(retLine);
-                }
-                return result;
-            }
-            set
-            {
-                for (int x = 0; x < padGrids_.Count; x++)
-                {
-                    for (int y = 0; y < padGrids_[0].Count; y++)
-                    {
-                        padGrids_[x][y].NeverBuffed = value[x][y];
                     }
                 }
             }
@@ -301,7 +243,7 @@ namespace FFF7RCore {
             if (padGrid.Status == PosStatus.OCCUPIED_PLAYER || padGrid.Status == PosStatus.OCCUPIED_RIVAL)
             {
                 PlayerType gridOwner = padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
-                eventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, gridOwner, padGrid.Position, source ?? Int2D.Unknown));
+                EventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, gridOwner, padGrid.Position, source ?? Int2D.Unknown));
             }
         }
 
@@ -382,7 +324,7 @@ namespace FFF7RCore {
             }
             if (expired != null)
             {
-                eventSystem?.RaiseBuffsExpired(new EventSystem.BuffsExpiredEventArgs(pos, expired));
+                EventSystem?.RaiseBuffsExpired(new EventSystem.BuffsExpiredEventArgs(pos, expired));
             }
             return true;
         }

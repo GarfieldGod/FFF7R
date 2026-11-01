@@ -3,137 +3,89 @@ namespace FFF7RCore {
 
     public class PadGrid
     {
-        public Int2D Position => pos_;
-        public int Level => buffs_.Compute();
+        public Int2D Position { get; private set; } = new Int2D(-1, -1);
         public bool Empty => property_ == null;
-        public int LastPowerSnapshot => deathPowerSnapshot_;
+        public int LastPowerSnapshot { get; private set; }
+
+        public BuffList BuffList {get; private set;}
+        public int Level => BuffList.Compute();
+        public int BuffValue => BuffList.Compute(b => b.value > 0 && b.source != Position);
+        public int DeBuffValue => BuffList.Compute(b => b.value < 0 && b.source != Position);
         public bool OnBuffed => Level > property_.Level;
         public bool OnDeBuffed => Level < property_.Level;
+
+        // flags
+        public bool NeverBuffed = true;
+        public bool NeverDeBuffed = true;
         public bool FirstPowerReach = false;
 
-        private PosStatus posStatus_ = PosStatus.EMPTY;
+        public PosStatus Status = PosStatus.EMPTY;
         private PosStatus posStatusBackUp_ = PosStatus.EMPTY;
         private ChessProperty property_ = null;
-        private BuffList buffs_;
-        private Int2D pos_ = new Int2D(-1, -1);
-        private int deathPowerSnapshot_ = 0;
-
-        private bool neverBuffed_ = true;
-        private bool neverDeBuffed_ = true;
-
-        public PosStatus Status
-        {
-            get => posStatus_;
-            set => posStatus_ = value;
-        }
 
         public ChessProperty Chess
         {
             get => property_;
             set
             {
-                if (property_ == null && value != null)
+                if (property_ == null && value != null) posStatusBackUp_ = Status;
+                if (value == null)
                 {
-                    posStatusBackUp_ = posStatus_;
+                    NeverBuffed = true;
+                    NeverDeBuffed = true;
                 }
                 property_ = value;
             }
         }
 
-        public BuffList BuffList
-        {
-            get => buffs_;
-            set => buffs_ = value;
-        }
-
         public PadGrid(Int2D pos)
         {
-            pos_ = pos;
-            buffs_ = new BuffList(this);
+            Position = pos;
+            BuffList = new BuffList(this);
         }
 
-        public PadGrid(PadGrid padGrid)
+        public PadGrid(PadGrid padGrid) : this(padGrid.Position)
         {
-            pos_ = padGrid.Position;
-            buffs_ = new BuffList(this);
-
-            posStatus_ = padGrid.Status;
-            posStatusBackUp_ = padGrid.posStatusBackUp_;
-            property_ = padGrid.Chess;
-            neverBuffed_ = padGrid.NeverBuffed;
-            neverDeBuffed_ = padGrid.NeverDeBuffed;
-
-            FirstPowerReach = padGrid.FirstPowerReach;
-            deathPowerSnapshot_ = padGrid.deathPowerSnapshot_;
-
-            foreach (var buff in padGrid.BuffList)
-            {
-                buffs_.Add(new Buff(buff));
-            }
+            CopyStateFrom(padGrid);
         }
 
-        public bool NeverBuffed
+        public bool CopyFrom(PadGrid padGrid)
         {
-            get{
-                if (property_ == null)
-                {
-                    neverBuffed_ = true;
-                }
-                return neverBuffed_;
-            }
-            set
-            {
-                neverBuffed_ = value;
-            }
+            if (padGrid == null || ReferenceEquals(padGrid, this)) return false;
+            CopyStateFrom(padGrid);
+            return true;
         }
 
-        public bool NeverDeBuffed
+        private void CopyStateFrom(PadGrid src)
         {
-            get {
-                if (property_ == null)
-                {
-                    neverDeBuffed_ = true;
-                }
-                return neverDeBuffed_;
-            }
-            set
-            {
-                neverDeBuffed_ = value;
-            }
-        }
-
-        public int BuffValue
-        {
-            get{
-                return buffs_.Compute(b => b.value > 0 && b.source != pos_);
-            }
-        }
-
-        public int DeBuffValue
-        {
-            get{
-                return buffs_.Compute(b => b.value < 0 && b.source != pos_);
-            }
+            BuffList.CopyFrom(src.BuffList);
+            Status = src.Status;
+            posStatusBackUp_ = src.posStatusBackUp_;
+            property_ = src.Chess;
+            NeverBuffed = src.NeverBuffed;
+            NeverDeBuffed = src.NeverDeBuffed;
+            FirstPowerReach = src.FirstPowerReach;
+            LastPowerSnapshot = src.LastPowerSnapshot;
         }
 
         public void AddBuff(Buff buff)
         {
-            buffs_.Add(buff);
+            BuffList.Add(buff);
         }
 
         public void RemoveBuff(Int2D src)
         {
-            buffs_.Remove(src);
+            BuffList.Remove(src);
         }
 
         public void Recover()
         {
-            neverBuffed_ = true;
-            neverDeBuffed_ = true;
+            NeverBuffed = true;
+            NeverDeBuffed = true;
             property_ = null;
-            deathPowerSnapshot_ = Level;
-            posStatus_ = posStatus_ == PosStatus.OCCUPIED_PLAYER ? PosStatus.LEVEL_ONE_PLAYER : PosStatus.LEVEL_ONE_RIVAL;
-            Log.TestLine($"Recover pos: {pos_} status: {(int)posStatus_} deathPowerSnapshot_: {deathPowerSnapshot_}");
+            LastPowerSnapshot = Level;
+            Status = Status == PosStatus.OCCUPIED_PLAYER ? PosStatus.LEVEL_ONE_PLAYER : PosStatus.LEVEL_ONE_RIVAL;
+            Log.TestLine($"Recover pos: {Position} status: {(int)Status} LastPowerSnapshot: {LastPowerSnapshot}");
         }
 
         public void Reset()

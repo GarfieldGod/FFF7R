@@ -60,5 +60,15 @@ namespace FFF7RCore {
             chessPool_.RemoveAt(randomIndex);
             return chess;
         }
+
+        public void Add(string[] cardCode)
+        {
+            foreach (string code in cardCode)
+            {
+                ChessProperty chessProperty = Property.GetChessProperty(code);
+                Chess chess = new Chess(chessProperty);
+                chessPool_.Add(chess);
+            }
+        }
     }
 }

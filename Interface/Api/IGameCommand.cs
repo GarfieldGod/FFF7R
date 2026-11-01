@@ -14,6 +14,8 @@ namespace FFF7R
         CommandResult Place(PlayerSeat seat, int handIndex, Int2 pos);
 
         // 重抽阶段保留指定的手牌，其余换掉
-        CommandResult ReDispense(PlayerSeat seat, IReadOnlyList<int> keepIndexes);
+        CommandResult ReDispense(List<int> playerDiscardIndexes, List<int> rivalDiscardIndexes);
+
+        CommandResult EndGame();
     }
 }

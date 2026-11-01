@@ -27,10 +27,8 @@ namespace FFF7RCore {
         }
         public static List<List<PadGrid>> DeepCopy(this List<List<PadGrid>> original)
         {
-            if (original == null)
-            {
-                return null;
-            }
+            if (original == null) return null;
+
             var deepCopiedList = new List<List<PadGrid>>();
             foreach (var secondLevelList in original)
             {

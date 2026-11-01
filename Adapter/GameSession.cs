@@ -44,8 +44,8 @@ namespace FFF7R.Adapter
             game_ = new Game(config);
             game_.Init();
 
-            // Init 内部 new 了 ChessPad 与 ChessPadManager，eventSystem 这时才存在
-            bridge_ = new SessionEventBridge(game_.ChessPad.eventSystem, OnBridgeEvent);
+            // Init 内部 new 了 ChessPad 与 ChessPadManager，EventSystem 这时才存在
+            bridge_ = new SessionEventBridge(game_.ChessPad.EventSystem, OnBridgeEvent);
         }
 
         //-------------------------------------------------------------------- IGameEvents
@@ -119,12 +119,7 @@ namespace FFF7R.Adapter
         {
             if (disposed_) return CommandResult.Fail(RejectReason.Unknown);
 
-            // 内核 Init 之后停在“重抽”阶段，而 ReDispense 目前是空实现，直接推进到 Ready
-            if (game_.Status == GameStatus.REDISPENSE_CHESS)
-            {
-                game_.ReDispense(new List<int>(), new List<int>());
-            }
-
+            if (game_.Status == GameStatus.REDISPENSE_CHESS) game_.ReDispense(new List<int>(), new List<int>());
             if (game_.Status != GameStatus.Ready) return CommandResult.Fail(RejectReason.WrongPhase);
 
             bridge_.ResetCount();
@@ -134,6 +129,14 @@ namespace FFF7R.Adapter
 
         public CommandResult PassTurn(PlayerSeat seat)
         {
+            if (disposed_) return CommandResult.Fail(RejectReason.Unknown);
+
+            if (game_.Status != GameStatus.GAMING) return CommandResult.Fail(RejectReason.WrongPhase);
+
+            bridge_.ResetCount();
+            bool ret = game_.PassTurn(seat.ToKernel());
+            if (!ret) return CommandResult.Fail(RejectReason.NotYourTurn);
+
             return CommandResult.Success(bridge_.RaisedCount);
         }
 
@@ -158,17 +161,25 @@ namespace FFF7R.Adapter
             return CommandResult.Success(bridge_.RaisedCount);
         }
 
-        public CommandResult ReDispense(PlayerSeat seat, IReadOnlyList<int> keepIndexes)
+        public CommandResult EndGame()
+        {
+            if (disposed_) return CommandResult.Fail(RejectReason.Unknown);
+
+            if (game_.Status != GameStatus.GAMING) return CommandResult.Fail(RejectReason.WrongPhase);
+
+            bridge_.ResetCount();
+            game_.End();
+
+            return CommandResult.Success(bridge_.RaisedCount);
+        }
+
+        public CommandResult ReDispense(List<int> playerDiscardIndexes, List<int> rivalDiscardIndexes)
         {
             if (disposed_) return CommandResult.Fail(RejectReason.Unknown);
             if (game_.Status != GameStatus.REDISPENSE_CHESS) return CommandResult.Fail(RejectReason.WrongPhase);
 
-            List<int> kept = keepIndexes != null ? new List<int>(keepIndexes) : new List<int>();
-            List<int> none = new List<int>();
-
             bridge_.ResetCount();
-            if (seat == PlayerSeat.Rival) game_.ReDispense(none, kept);
-            else game_.ReDispense(kept, none);
+            game_.ReDispense(playerDiscardIndexes, rivalDiscardIndexes);
 
             return CommandResult.Success(bridge_.RaisedCount);
         }
@@ -247,9 +258,9 @@ namespace FFF7R.Adapter
             disposed_ = true;
 
             bridge_.Dispose();
-            if (game_.ChessPad != null && game_.ChessPad.eventSystem != null)
+            if (game_.ChessPad != null && game_.ChessPad.EventSystem != null)
             {
-                game_.ChessPad.eventSystem.ClearAll();
+                game_.ChessPad.EventSystem.ClearAll();
             }
         }
     }

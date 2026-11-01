@@ -114,18 +114,20 @@ namespace FFF7RCore {
         public virtual void ReDispense(List<int> playerIndexes, List<int> rivalIndexes) {
             if (gameStatus_ != GameStatus.REDISPENSE_CHESS) return;
 
+            player_.ReDispense(playerIndexes);
+            rival_.ReDispense(rivalIndexes);
             gameStatus_ = GameStatus.Ready;
         }
     //----------------------------------------------------------------------------------------------------------------------------------Start
         public virtual void Start(PlayerType firstPlayer = PlayerType.PLAYER) {
-            if (gameStatus_ != GameStatus.Ready) return;
+            if (gameStatus_ != GameStatus.Ready && gameStatus_ != GameStatus.REDISPENSE_CHESS) return;
 
             currentPlayer_ = firstPlayer;
             gameStatus_ = GameStatus.GAMING;
 
             // 第一手就可能全手牌都下不去（例如起手 5 张费用 3，场上只有 1 级格）。
             // 没有这一步，客户端一开局就会"轮到你却点不动任何格子"。
-            EnsurePlayableTurn();
+            CheckEnd();
         }
     //----------------------------------------------------------------------------------------------------------------------------------End
         /// <summary>
@@ -191,13 +193,14 @@ namespace FFF7RCore {
             }
             return false;
         }
+
         public virtual void End() {
             if (gameStatus_ != GameStatus.GAMING) return;
 
             gameStatus_ = GameStatus.GAME_END;
             ComputeResult();
             // 必须在 ComputeResult 之后：gameWinner 在那里才被算出
-            chessPad_?.eventSystem?.RaiseGameEnd(new EventSystem.GameEndedEventArgs(gameWinner, gameTurns_));
+            chessPad_?.EventSystem?.RaiseGameEnd(new EventSystem.GameEndedEventArgs(gameWinner, gameTurns_));
         }
 
         public virtual void ComputeResult()
@@ -223,6 +226,7 @@ namespace FFF7RCore {
     //----------------------------------------------------------------------------------------------------------------------------------Preview
         public virtual ChessPad Preview(Input input) {
             if (!CheckInput(input)) return null;
+
             return chessPadManager_.Preview(input);
         }
     //----------------------------------------------------------------------------------------------------------------------------------Input
@@ -240,53 +244,36 @@ namespace FFF7RCore {
             }
 
             ConsumeCard(input);
-            AdvanceTurn();
+            NextTurn();
 
             reject = InputReject.None;
             return true;
         }
 
-        /// <summary>
-        /// 换边，并在新回合方没有任何合法落子时自动跳过（pass）。
-        /// <para>
-        /// 没有这一步，棋盘铺满后行动方会"有手牌但无处可下"，对局就永远停在那里 ——
-        /// 客户端表现为轮到你却点不动任何格子。跳过之后两种情况都会收敛：
-        /// 另一方还能走就继续，双方都不能走就结束。
-        /// </para>
-        /// </summary>
-        private void AdvanceTurn() {
-            NextTurn();
-            EnsurePlayableTurn();
+        public virtual void NextTurn() {
+            PlayerType endedPlayer = currentPlayer_;
+            currentPlayer_ = currentPlayer_ == PlayerType.PLAYER ? PlayerType.RIVAL : PlayerType.PLAYER;
+            gameTurns_++;
+            chessPad_?.EventSystem?.RaiseTurnEnd(new EventSystem.TurnEndedEventArgs(endedPlayer, currentPlayer_, gameTurns_));
+
+            CheckEnd();
         }
 
-        /// <summary>
-        /// 保证 <see cref="currentPlayer_"/> 至少有一手能走：走不了就让出回合，
-        /// 双方都走不了就结束。需要重复是因为让出一方后接手的另一方也可能动不了。
-        /// </summary>
-        private void EnsurePlayableTurn() {
-            if (!UseRealMatchRules) return;
-
-            while (gameStatus_ == GameStatus.GAMING) {
-                if (turnLimit_ > 0 && gameTurns_ >= turnLimit_) { End(); return; }
-
-                if (HasAnyLegalMove(currentPlayer_)) return;   // 正常情况：轮到的人能走
-
-                // 轮到的人动不了：另一方还能走就让出回合，双方都动不了就结束
-                if (!HasAnyLegalMove(Other(currentPlayer_))) { End(); return; }
-
-                PassTurn();
-            }
+        private void CheckEnd()
+        {
+            if (!HasNextTurn()) End();
         }
 
         /// <summary>
         /// 跳过动不了的一方。只换边、不推进回合数 —— 否则 pass 会吃掉回合上限，
         /// 让"回合上限 7"实际只够走三四手。
         /// </summary>
-        private void PassTurn() {
-            PlayerType skipped = currentPlayer_;
-            currentPlayer_ = Other(currentPlayer_);
-            chessPad_?.eventSystem?.RaiseTurnEnd(
-                new EventSystem.TurnEndedEventArgs(skipped, currentPlayer_, gameTurns_, true));
+        public bool PassTurn(PlayerType skipped = PlayerType.Null) {
+            if (skipped == PlayerType.Null) skipped = currentPlayer_;
+            else if (skipped != currentPlayer_) return false;
+
+            NextTurn();
+            return true;
         }
 
         private static PlayerType Other(PlayerType playerType) {
@@ -337,13 +324,6 @@ namespace FFF7RCore {
 
             Chess chess = hand[input.handIndex];
             return chess != null && chess.Property != null && chess.Property.CardCode == input.chess.CardCode;
-        }
-
-        public virtual void NextTurn() {
-            PlayerType endedPlayer = currentPlayer_;
-            currentPlayer_ = currentPlayer_ == PlayerType.PLAYER ? PlayerType.RIVAL : PlayerType.PLAYER;
-            gameTurns_++;
-            chessPad_?.eventSystem?.RaiseTurnEnd(new EventSystem.TurnEndedEventArgs(endedPlayer, currentPlayer_, gameTurns_));
         }
     }
 }
