@@ -168,7 +168,7 @@ namespace FFF7R.Adapter
                 }
             }
 
-            return new BoardSnapshot(width, height, cells, playerScore, rivalScore);
+            return new BoardSnapshot(height, width, cells, playerScore, rivalScore);
         }
     }
 }

@@ -28,7 +28,7 @@ namespace FFF7R
         public bool IsInBoard(Int2 pos) => pos.X >= 0 && pos.X < Width && pos.Y >= 0 && pos.Y < Height;
 
         /// <summary>按列优先存放，索引 = X * Height + Y。</summary>
-        public CellView this[int x, int y] => cells_[x * Height + y];
+        public CellView this[int x, int y] => cells_[x * Width + y];
 
         public CellView this[Int2 pos] => this[pos.X, pos.Y];
 
