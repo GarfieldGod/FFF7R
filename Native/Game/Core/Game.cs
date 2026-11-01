@@ -229,6 +229,9 @@ namespace FFF7RCore {
 
             return chessPadManager_.Preview(input);
         }
+
+        public virtual PreviewResult PreviewDetail(Input input)           // 新增
+            => chessPadManager_.PreviewDetail(input);
     //----------------------------------------------------------------------------------------------------------------------------------Input
         public virtual bool Input(Input input) => Input(input, out _);
 

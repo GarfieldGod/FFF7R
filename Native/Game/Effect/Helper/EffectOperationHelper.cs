@@ -43,7 +43,7 @@ namespace FFF7RCore.Effect
                     {
                         int gridLevel = (int)grid.Status % 10;
                         var input = new Input(grid.Position, cards[gridLevel - 1], playerType);
-                        chessPadManager.Input(input);
+                        chessPadManager.InputOnPad(input, chessPad);
                     }
                     break;
                 case EffectOperation.AddScore:

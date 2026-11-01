@@ -23,40 +23,40 @@ namespace FFF7RCore {
         internal Action<ChessBuffedEventArgs> SettleBuffed;
         internal Action<ChessDeadEventArgs>   SettleDead;
 
-        public enum EventType { Placed, Buffed, Dead }
+        // public enum EventType { Placed, Buffed, Dead }
 
-        private readonly Dictionary<(EventType Type, Int2D Pos), Delegate> slots_ = new();
+        // private readonly Dictionary<(EventType Type, Int2D Pos), Delegate> slots_ = new();
 
-        public void Unbind(EventType type, Int2D pos)
-        {
-            if (!slots_.TryGetValue((type, pos), out var handler)) return;
-            slots_.Remove((type, pos));
-            switch (type)
-            {
-                case EventType.Placed: OnChessPlaced -= (EventHandler<ChessPlacedEventArgs>)handler; break;
-                case EventType.Buffed: OnChessBuffed -= (EventHandler<ChessBuffedEventArgs>)handler; break;
-                case EventType.Dead:   OnChessDead   -= (EventHandler<ChessDeadEventArgs>)handler;   break;
-            }
-        }
+        // public void Unbind(EventType type, Int2D pos)
+        // {
+        //     if (!slots_.TryGetValue((type, pos), out var handler)) return;
+        //     slots_.Remove((type, pos));
+        //     switch (type)
+        //     {
+        //         case EventType.Placed: OnChessPlaced -= (EventHandler<ChessPlacedEventArgs>)handler; break;
+        //         case EventType.Buffed: OnChessBuffed -= (EventHandler<ChessBuffedEventArgs>)handler; break;
+        //         case EventType.Dead:   OnChessDead   -= (EventHandler<ChessDeadEventArgs>)handler;   break;
+        //     }
+        // }
 
-        public void Bind(EventType type, Int2D pos, Delegate handler)
-        {
-            Unbind(type, pos);
-            slots_[(type, pos)] = handler;
-            switch (type)
-            {
-                case EventType.Placed: OnChessPlaced += (EventHandler<ChessPlacedEventArgs>)handler; break;
-                case EventType.Buffed: OnChessBuffed += (EventHandler<ChessBuffedEventArgs>)handler; break;
-                case EventType.Dead:   OnChessDead   += (EventHandler<ChessDeadEventArgs>)handler;   break;
-            }
-        }
+        // public void Bind(EventType type, Int2D pos, Delegate handler)
+        // {
+        //     Unbind(type, pos);
+        //     slots_[(type, pos)] = handler;
+        //     switch (type)
+        //     {
+        //         case EventType.Placed: OnChessPlaced += (EventHandler<ChessPlacedEventArgs>)handler; break;
+        //         case EventType.Buffed: OnChessBuffed += (EventHandler<ChessBuffedEventArgs>)handler; break;
+        //         case EventType.Dead:   OnChessDead   += (EventHandler<ChessDeadEventArgs>)handler;   break;
+        //     }
+        // }
 
-        public void UnbindAll(Int2D pos)
-        {
-            Unbind(EventType.Placed, pos);
-            Unbind(EventType.Buffed, pos);
-            Unbind(EventType.Dead, pos);
-        }
+        // public void UnbindAll(Int2D pos)
+        // {
+        //     Unbind(EventType.Placed, pos);
+        //     Unbind(EventType.Buffed, pos);
+        //     Unbind(EventType.Dead, pos);
+        // }
 
         public void RaiseChessPlaced(Input input)
         {
@@ -64,8 +64,9 @@ namespace FFF7RCore {
             Log.Test($"OnChessPlaced", TextColor.YELLOW);
             Log.Test(" were Invoked");
             Log.TestLine($" ({input})", TextColor.BLACK);
-            OnChessPlaced?.Invoke(this, new ChessPlacedEventArgs(input.pos, input.playerType, input.chess?.CardCode, sequence_));
-            SettlePlaced?.Invoke(new ChessPlacedEventArgs(input.pos, input.playerType, input.chess?.CardCode, sequence_));
+            var e = new ChessPlacedEventArgs(input.pos, input.playerType, input.chess?.CardCode, sequence_);
+            OnChessPlaced?.Invoke(this, e);
+            SettlePlaced?.Invoke(e);
         }
 
         public void RaiseChessDead(ChessDeadEventArgs e)

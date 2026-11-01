@@ -9,6 +9,7 @@ namespace FFF7RCore {
         public readonly Int2D Size;
         public List<List<PadGrid>> GridMap => padGrids_;
         public EventSystem EventSystem = new EventSystem();
+        public EffectSystem EffectSystem = new EffectSystem();
 
         private List<List<PadGrid>> padGrids_ = new List<List<PadGrid>> { };
 
@@ -16,12 +17,19 @@ namespace FFF7RCore {
         {
             Size = new Int2D(x, y);
             InitGridMap(x, y);
+
+            AttachSettlement();
+        }
+
+        private void AttachSettlement() {
+            EventSystem.SettlePlaced += e => EffectSystem.Dispatch(this, EventKind.Placed, e);
+            EventSystem.SettleBuffed += e => EffectSystem.Dispatch(this, EventKind.Buffed, e);
+            EventSystem.SettleDead   += e => EffectSystem.Dispatch(this, EventKind.Dead,   e);
         }
 
         // 深拷贝
-        public ChessPad(ChessPad chessPad)
+        public ChessPad(ChessPad chessPad) : this(chessPad.Size.x, chessPad.Size.y)
         {
-            Size = chessPad.Size;
             padGrids_ = Utils.DeepCopy(chessPad.GridMap);
         }
 
@@ -31,11 +39,13 @@ namespace FFF7RCore {
 
             for (int i = 0; i < padGrids_.Count; i++)
             {
-                for (int j = 0; j < padGrids_[0].Count; j++)
+                for (int j = 0; j < padGrids_[i].Count; j++)
                 {
                     padGrids_[i][j].CopyFrom(chessPad[i, j]);
                 }
             }
+
+            EffectSystem.CopyFrom(chessPad.EffectSystem);
             return true;
         }
 
