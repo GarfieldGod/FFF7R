@@ -1,19 +1,12 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using FFF7R;
 
 public class PlayerOperation : MonoBehaviour
 {
     public CardSelector cardSelector;
-
-    public enum OperationStatus {
-        Idle,
-        Select,
-        Preview,
-        Input
-    }
-
-    public OperationStatus operationStatus = OperationStatus.Idle;
+    public GameRuntime runtime;
     void Start()
     {
 
@@ -31,18 +24,23 @@ public class PlayerOperation : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
                 GameObject hitOne = hit.collider.gameObject;
-                // Debug.Log($"命中物体: {hit.collider.gameObject.name} tag:{hit.collider.gameObject.tag}");
                 if (hitOne.CompareTag("CardInHand")) {
-                    // PlyerDoSelect(hitOne);
-                    Debug.Log("CardInHand Hit");
-                    if (cardSelector.Select(hitOne.GetComponent<Card>()))
-                    {
-                        operationStatus = OperationStatus.Select;
+                    if (hitOne.TryGetComponent(out Card card)) {
+                        cardSelector.Select(card);
                     }
                 }
                 if (hitOne.CompareTag("GridInBoard")) {
-                    // PlayerDoInput(hitOne);
-                    Debug.Log("GridInBoard Hit");
+                    if (cardSelector.selectedCard != null)
+                    {
+                        CommandResult r = runtime.Execute(
+                            c => c.Place(
+                                PlayerSeat.Player,
+                                cardSelector.selectedCard.HandIndex,
+                                hitOne.GetComponent<BoardGrid>().Pos
+                            )
+                        );
+                        if (r.Ok) cardSelector.UnSelect();
+                    }
                 }
             }
         }

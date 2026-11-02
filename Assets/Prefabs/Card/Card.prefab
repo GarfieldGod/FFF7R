@@ -243,7 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.39215687, g: 0.6467873, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -530,10 +530,13 @@ MonoBehaviour:
   TargetRot: {x: 0, y: 0, z: 0, w: 0}
   gridCellPrefab: {fileID: 2542996892644947198, guid: 8b9e0d7018c6f154daec858762940910, type: 3}
   costCellPrefab: {fileID: 8645415102981052723, guid: ef67da7ed079cd54dad2daffd8a35681, type: 3}
+  BorderImage: {fileID: 5149006768281254733}
+  BackGroundImage: {fileID: 867390375232131398}
+  borderSprites: CardBorder
+  borderSpritesFull: CardBorderFull
   CardCode: 
   HandIndex: 0
   Collider: {fileID: 0}
-  Status: 3
 --- !u!65 &4301010766751598916
 BoxCollider:
   m_ObjectHideFlags: 0

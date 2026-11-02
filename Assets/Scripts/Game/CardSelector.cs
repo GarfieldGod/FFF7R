@@ -12,6 +12,7 @@ public class CardSelector : MonoBehaviour, IGameView
     public List<Card> cards = new List<Card>();
     public Card selectedCard;
 
+    [SerializeField] float previewHeight = 2.5f;
     private IGameQuery _gameQuery;
 
     public void Start()
@@ -58,7 +59,9 @@ public class CardSelector : MonoBehaviour, IGameView
             if (i >= cards.Count)
                 AddCard(view);
             else if (cards[i].CardCode != view.CardCode)
-                cards[i].SetCard(view);
+            {
+                cards[i].SetCardInHand(view);
+            }
 
             cards[i].HandIndex = view.HandIndex;
         }
@@ -69,7 +72,8 @@ public class CardSelector : MonoBehaviour, IGameView
     public void AddCard(CardView cardView)
     {
         Card card = Instantiate(cardPrefab, transform);
-        card.SetCard(cardView);
+        card.SetCardInHand(cardView);
+        card.SetPlayerSeat(PlayerSeat.Player);
         cards.Add(card);
     }
 
@@ -96,7 +100,6 @@ public class CardSelector : MonoBehaviour, IGameView
 
         selectedCard = card;
         selectedCard.Collider.enabled = false;
-        selectedCard.Status = Card.CardStatus.Selected;
 
         LayoutCards();
 
@@ -135,8 +138,21 @@ public class CardSelector : MonoBehaviour, IGameView
         if (Physics.Raycast(rayHover, out hitHover, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)
             && hitHover.collider.CompareTag("GridInBoard")
         ) {
-            targetPos = hitHover.transform.position + new Vector3(0, 5, 0);
+            targetPos = hitHover.transform.position + new Vector3(0, previewHeight, 0);
             targetRot = hitHover.transform.rotation * Quaternion.Euler(-90, 0, 0);
+
+            RejectReason reason;
+            bool ret = _gameQuery.CanPlace(PlayerSeat.Player, selectedCard.HandIndex, hitHover.transform.GetComponent<BoardGrid>().Pos, out reason);
+            if (!ret)
+            {
+                Debug.Log($"Cannot place card {selectedCard.CardCode} at {hitHover.transform.GetComponent<BoardGrid>().Pos} because {reason}");
+            } else
+            {
+                Debug.Log($"Can place card {selectedCard.CardCode} at {hitHover.transform.GetComponent<BoardGrid>().Pos}");
+            }
+        } else
+        {
+
         }
 
         selectedCard.transform.position = Vector3.SmoothDamp(

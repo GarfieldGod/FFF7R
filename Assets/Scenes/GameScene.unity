@@ -176,8 +176,8 @@ GameObject:
   m_Component:
   - component: {fileID: 162197758}
   - component: {fileID: 162197757}
-  - component: {fileID: 162197759}
   - component: {fileID: 162197760}
+  - component: {fileID: 162197761}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -216,7 +216,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &162197759
+--- !u!114 &162197760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162197756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4da80a641b99432498dca7d651a94c7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cardSelector: {fileID: 1868156437}
+  runtime: {fileID: 162197761}
+--- !u!114 &162197761
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -232,19 +246,6 @@ MonoBehaviour:
   viewBehaviours:
   - {fileID: 1868156437}
   - {fileID: 1609996237}
---- !u!114 &162197760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 162197756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4da80a641b99432498dca7d651a94c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardSelector: {fileID: 1868156437}
 --- !u!1 &267782706
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,37 +316,6 @@ Transform:
   - {fileID: 1089263925}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &516159610
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 516159611}
-  m_Layer: 0
-  m_Name: RivalSelector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &516159611
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 516159610}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 29.57, y: -7.31, z: -2.854}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1868156436}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &572593417
 GameObject:
   m_ObjectHideFlags: 0
@@ -377,37 +347,6 @@ Transform:
   m_Children:
   - {fileID: 899203257}
   m_Father: {fileID: 512136938}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &598247166
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 598247167}
-  m_Layer: 0
-  m_Name: PreviewPos
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &598247167
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 598247166}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 23.15, y: -14.9, z: 10.26}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1868156436}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
@@ -838,7 +777,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.79335374, z: -0.608761, w: 0}
-  m_LocalPosition: {x: 0, y: 40, z: 15}
+  m_LocalPosition: {x: 0, y: 30.3, z: 11.6}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -981,37 +920,6 @@ MonoBehaviour:
   BoardGridGroup: {fileID: 1609996235}
   BoardGridPrefab: {fileID: 3912336484967244376, guid: b475a6e2ee716d84aaede232dfd39e37, type: 3}
   colliderHeight: 0.1
---- !u!1 &1636026175
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1636026176}
-  m_Layer: 0
-  m_Name: PlayerSelector
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1636026176
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1636026175}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1868156436}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1745653084 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e333b5b8c3868534baaa7db9a48a9ac8, type: 3}
@@ -1042,14 +950,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1868156435}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6087614, y: -0, z: -0, w: 0.79335344}
-  m_LocalPosition: {x: 20.220007, y: 14.69206, z: 16.479994}
+  m_LocalRotation: {x: 0.608761, y: -0.000000034678592, z: 0.000000026609788, w: -0.79335374}
+  m_LocalPosition: {x: 19.42, y: 5.5, z: 13.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 598247167}
-  - {fileID: 1636026176}
-  - {fileID: 516159611}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -75, y: 0, z: 0}
 --- !u!114 &1868156437
@@ -1065,7 +970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardPrefab: {fileID: 7653390149079099122, guid: eb503a83f0778b04d93c8a363dca3e12, type: 3}
-  CardSelectorLength: -35
+  CardSelectorLength: -30
   CardSelectorHeight: 0.1
   cards: []
   selectedCard: {fileID: 0}

@@ -68,7 +68,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LevelSpacing: 2
   LevelHeight: 1
+  CardHeight: 0.5
   ballPrefab: {fileID: 938554682491469808, guid: 96b2ccb5ad2976847bb94fa382b71525, type: 3}
   ballMat:
   - {fileID: 2100000, guid: e50552a790e46f0408252a209823624c, type: 2}
   - {fileID: 2100000, guid: 19b909ba9455580459194e9defc57b5c, type: 2}
+  CardPrefab: {fileID: 7653390149079099122, guid: eb503a83f0778b04d93c8a363dca3e12, type: 3}
+  currentCard: {fileID: 0}
+  currentOwner: 0

@@ -37,7 +37,7 @@ public class CardBoard : MonoBehaviour, IGameView
         // 行对应高度方向（x）、列对应宽度方向（y），所以行列边界直接对应 Height / Width。
         if (_boardCells.Count != board.Height || (_boardCells.Count > 0 && _boardCells[0].Count != board.Width))
         {
-            GenerateBoardGirds(rowCount: board.Height, colCount: board.Width);
+            GenerateBoardGirds(board);
         }
 
         // Debug.Log($"UpdateBoardGrid Board Size: {board.Width}, {board.Height}");
@@ -59,8 +59,10 @@ public class CardBoard : MonoBehaviour, IGameView
     [SerializeField] private GameObject BoardGridPrefab;
     [SerializeField] private float colliderHeight = 0.1f;
 
-    void GenerateBoardGirds(int rowCount, int colCount)
+    void GenerateBoardGirds(BoardSnapshot board)
     {
+        int rowCount= board.Height; 
+        int colCount= board.Width;
         MeshFilter mf = BoardModel.GetComponent<MeshFilter>();
 
         Transform modelT = BoardModel.transform;
@@ -103,8 +105,12 @@ public class CardBoard : MonoBehaviour, IGameView
             List<BoardGrid> rowCells = new List<BoardGrid>();
             for (int y = 0; y < colCount; y++)
             {
-                GameObject go = Instantiate(BoardGridPrefab, parent) as GameObject;
-                rowCells.Add(go.GetComponent<BoardGrid>());
+                GameObject go = Instantiate(BoardGridPrefab, parent);
+
+                var boardGrid = go.GetComponent<BoardGrid>();
+                boardGrid.Pos = board[x, y].Pos;
+                rowCells.Add(boardGrid);
+
                 SetCustomBoxCollider(go, cellW, cellD, colliderHeight);
                 go.name = $"BoardGrid_{x}_{y}";
 

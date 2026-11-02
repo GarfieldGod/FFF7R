@@ -2,14 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FFF7R;
+using UnityEngine.PlayerLoop;
 
 public class BoardGrid : MonoBehaviour
 {
+    public Int2 Pos;
     public float LevelSpacing = 2f;
     public float LevelHeight = 1f;
+    public float CardHeight = 0.5f; 
 
     [SerializeField] GameObject ballPrefab;
     [SerializeField] Material[] ballMat;
+    [SerializeField] Card CardPrefab;
+    public Card currentCard;
+    public PlayerSeat currentOwner;
     List<GameObject> _balls = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
@@ -26,6 +32,30 @@ public class BoardGrid : MonoBehaviour
     public void UpdateBoardGrid(CellView cellView)
     {
         SetGridState(cellView.State);
+        SetGridCard(cellView);
+    }
+
+    public void SetGridCard(CellView cellView)
+    {
+        if (cellView.CardCode == null)
+        {
+            if (currentCard != null) currentCard.gameObject.SetActive(false);
+            return;
+        }
+
+        if (currentCard == null)
+        {
+            currentCard = Instantiate(CardPrefab, transform, false);
+            currentCard.transform.localPosition = new Vector3(0, CardHeight, 0);
+            currentCard.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+        } else
+        {
+            currentCard.gameObject.SetActive(true);
+        }
+
+        if (currentCard.CardCode != cellView.CardCode) currentCard.SetCardOnBoard(cellView.CardCode);
+        if (currentOwner != cellView.Owner) currentCard.SetPlayerSeat(cellView.Owner);
+        currentCard.SetPower(cellView.Level);
     }
 
     public void SetGridState(CellState cellState)

@@ -24,6 +24,7 @@ public class GameBootstrap : MonoBehaviour
 
     private void Awake()
     {
+        FFF7RCore.Log.PrintToConsole = false;
         StartGame();
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using FFF7R;
 using System;
 
-public class GameViewBinder : MonoBehaviour
+public class GameRuntime : MonoBehaviour
 {
     [SerializeField] GameBootstrap bootstrap;
     [SerializeField] List<MonoBehaviour> viewBehaviours;
@@ -21,10 +21,6 @@ public class GameViewBinder : MonoBehaviour
             if (mb is IGameView v) _gameViews.Add(v);
             else Debug.LogError($"{mb?.name} 未实现 IGameView");
         if (bootstrap != null) bootstrap.SessionCreated += Bind;
-
-        if (bootstrap == null) { enabled = false; return; }
-        bootstrap.SessionCreated += Bind;
-        if (bootstrap.Session != null) Bind(bootstrap.Session);   // ← 关键：补一次回放
     }
 
     void OnEnable()   // 晚于全部 Awake，补一次回放，消除 Awake 顺序竞态
@@ -38,14 +34,16 @@ public class GameViewBinder : MonoBehaviour
         Unbind();
     }
 
-    public CommandResult Execute(Func<CommandResult> command)   // 唯一的下命令出口
+    public CommandResult Execute(Func<IGameCommand, CommandResult> op)
     {
         _eventBuffer.Clear();
-        CommandResult r = command();
+        CommandResult r = op(_session);          // 调用方拿不到 session，只能在这一帧里用
         if (_lost || _eventBuffer.Count != r.EventsRaised) Resync($"resync：事件数不符（实收 {_eventBuffer.Count}，声明 {r.EventsRaised}）");
         else if (_eventBuffer.Count > 0) Flush();
         return r;
     }
+
+    public void Execute(Action<IGameCommand> op) => Execute(c => { op(c); return CommandResult.Success(); });
 
     void Resync(string why)
     {

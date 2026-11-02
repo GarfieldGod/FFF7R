@@ -12,9 +12,14 @@ public static class PropertyEx
 
     public static void GetCardSpriteAsync(string cardCode, Action<Sprite> onLoaded)
     {
+        LoadSpriteAsync(cardCode, onLoaded);
+    }
+
+    public static void LoadSpriteAsync(string spriteName, Action<Sprite> onLoaded)
+    {
         try
         {
-            Addressables.LoadAssetAsync<Sprite>(cardCode).Completed += op =>
+            Addressables.LoadAssetAsync<Sprite>(spriteName).Completed += op =>
             {
                 if (op.Status == AsyncOperationStatus.Succeeded)
                 {
@@ -22,14 +27,14 @@ public static class PropertyEx
                 }
                 else
                 {
-                    Debug.LogWarning($"Addressables加载卡面失败：{cardCode}");
+                    Debug.LogWarning($"Addressables加载失败：{spriteName}");
                     onLoaded?.Invoke(null);
                 }
             };
         }
         catch (Exception e)
         {
-            Debug.LogError($"Addressables加载卡面失败：{cardCode}\n{e}");
+            Debug.LogError($"Addressables加载失败：{spriteName}\n{e}");
         }
     }
 }
