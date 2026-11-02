@@ -3,31 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using FFF7R;
 
-public class CardBoard : MonoBehaviour
+public class CardBoard : MonoBehaviour, IGameView
 {
+    private IGameQuery _gameQuery;
     private List<List<BoardGrid>> _boardCells = new List<List<BoardGrid>>();
     // Start is called before the first frame update
-    void Awake()
+    public void Bind(IGameQuery gameQuery)
     {
-
+        _gameQuery = gameQuery;
+        Resync();
     }
 
-    void Start()
+    public void Unbind()
     {
-
+        _gameQuery = null;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Resync()
     {
-        
+        if (_gameQuery == null) return;
+        UpdateBoard(_gameQuery.Board);
+    }
+
+    public void OnEvents(GameEventBatch batch)
+    {
+        if (_gameQuery == null) return;
+        UpdateBoard(_gameQuery.Board);
     }
 
     public void UpdateBoard(BoardSnapshot board)
     {
-        if (_boardCells.Count != board.Height || _boardCells[0].Count != board.Width)
+        // board.Width 是横向格数（棋盘 y 轴），board.Height 是纵向格数（棋盘 x 轴）。
+        // 行对应高度方向（x）、列对应宽度方向（y），所以行列边界直接对应 Height / Width。
+        if (_boardCells.Count != board.Height || (_boardCells.Count > 0 && _boardCells[0].Count != board.Width))
         {
-            GenerateBoardGirds(board.Height, board.Width);
+            GenerateBoardGirds(rowCount: board.Height, colCount: board.Width);
         }
 
         // Debug.Log($"UpdateBoardGrid Board Size: {board.Width}, {board.Height}");

@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class PlayerOperation : MonoBehaviour
 {
+    public CardSelector cardSelector;
+
+    public enum OperationStatus {
+        Idle,
+        Select,
+        Preview,
+        Input
+    }
+
+    public OperationStatus operationStatus = OperationStatus.Idle;
     void Start()
     {
 
@@ -12,13 +22,8 @@ public class PlayerOperation : MonoBehaviour
     void Update()
     {
         PlayerClick();
-        // PlayerPreView();
-        // ScreenPosToWorldPos(Input.mousePosition);
     }
 
-    // UnityEngine.Vector3 ScreenPosToWorldPos(UnityEngine.Vector3 mouseScreenPosition){
-    //     return Camera.main.ScreenToWorldPoint(new UnityEngine.Vector3(mouseScreenPosition.x, mouseScreenPosition.y, Camera.main.nearClipPlane));
-    // }
 
     void PlayerClick() {
         if (Input.GetMouseButtonDown(0)) {
@@ -30,18 +35,16 @@ public class PlayerOperation : MonoBehaviour
                 if (hitOne.CompareTag("CardInHand")) {
                     // PlyerDoSelect(hitOne);
                     Debug.Log("CardInHand Hit");
+                    if (cardSelector.Select(hitOne.GetComponent<Card>()))
+                    {
+                        operationStatus = OperationStatus.Select;
+                    }
                 }
                 if (hitOne.CompareTag("GridInBoard")) {
                     // PlayerDoInput(hitOne);
                     Debug.Log("GridInBoard Hit");
                 }
             }
-        } else if (Input.GetMouseButtonDown(1)){
-            // if(preview) {
-            //     // GetComponent<GameManager>().CancelPreview();
-            //     // currentChessObject = CHESSNULL;
-            //     preview = false;
-            // }
         }
     }
 

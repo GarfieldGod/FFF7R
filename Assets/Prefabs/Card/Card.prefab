@@ -502,7 +502,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5423304520425265292}
@@ -526,8 +526,14 @@ MonoBehaviour:
   PowerText: {fileID: 9154576791245297864}
   CostPanel: {fileID: 3656910080618216241}
   GridPanel: {fileID: 4115657012995457906}
+  TargetPos: {x: 0, y: 0, z: 0}
+  TargetRot: {x: 0, y: 0, z: 0, w: 0}
   gridCellPrefab: {fileID: 2542996892644947198, guid: 8b9e0d7018c6f154daec858762940910, type: 3}
   costCellPrefab: {fileID: 8645415102981052723, guid: ef67da7ed079cd54dad2daffd8a35681, type: 3}
+  CardCode: 
+  HandIndex: 0
+  Collider: {fileID: 0}
+  Status: 3
 --- !u!65 &4301010766751598916
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -74,6 +74,8 @@
         "**/Logs/**": true
     },
     "cSpell.words": [
+        "Behaviour",
+        "Behaviours",
         "UGUI"
     ],
     "dotnet.preferCSharpExtension": false

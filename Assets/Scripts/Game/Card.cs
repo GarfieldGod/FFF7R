@@ -3,20 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using FFF7R;
 
 public class Card : MonoBehaviour
 {
+    public enum CardStatus
+    {
+        InHand,
+        Selected,
+        Previewing,
+        InBoard
+    }
+
     public Image CardImage;
     public TextMeshProUGUI NameText;
     public PowerNumDisplay PowerText;
     public GridLayoutGroup CostPanel;
     public GridLayoutGroup GridPanel;
 
+    public Vector3 TargetPos = new Vector3();
+    public Quaternion TargetRot = new Quaternion();
+
     [SerializeField] private GridCellOnCard gridCellPrefab;
     private GridCellOnCard[,] gridCells = new GridCellOnCard[5,5];
     [SerializeField] private Image costCellPrefab;
 
     public string CardCode;
+    public int HandIndex;
+
+    public BoxCollider Collider;
+    public CardStatus Status = CardStatus.InBoard;
 
     void Awake()
     {
@@ -33,13 +49,15 @@ public class Card : MonoBehaviour
         gridCells[2,2].SetCenter();
     }
 
-    public void SetCard(string cardCode)
+    public void Start()
     {
-        SetCard(FFF7RCore.Property.GetChessProperty(cardCode));
+        Collider = GetComponent<BoxCollider>();
     }
 
-    public void SetCard(FFF7RCore.ChessProperty cardData)
+    public void SetCard(CardView cardView)
     {
+        HandIndex = cardView.HandIndex;
+        CardDefView cardData = cardView.Def;
         if (cardData == null)
         {
             Debug.LogError("Card data is null");
@@ -70,11 +88,11 @@ public class Card : MonoBehaviour
 
         if (cardData.PosEffect != null)
         {
-            for(int y = 0; y < cardData.PosEffect.Count; y++)
+            for(int y = 0; y < cardData.PosEffect.Width; y++)
             {
-                for(int x = 0; x < cardData.PosEffect[0].Count; x++)
+                for(int x = 0; x < cardData.PosEffect.Height; x++)
                 {
-                    if(cardData.PosEffect[y][x] != 0)
+                    if(cardData.PosEffect[y, x] != 0)
                     {
                         gridCells[x,y].SetPosEffect();
                     }
@@ -82,13 +100,13 @@ public class Card : MonoBehaviour
             }
         }
 
-        if (cardData.CardEffect != null && cardData.CardEffect.Scope != null)
+        if (cardData.EffectScope != null)
         {
-            for(int y = 0; y < cardData.CardEffect.Scope.Count; y++)
+            for(int y = 0; y < cardData.EffectScope.Width; y++)
             {
-                for(int x = 0; x < cardData.CardEffect.Scope[0].Count; x++)
+                for(int x = 0; x < cardData.EffectScope.Height; x++)
                 {
-                    if (cardData.CardEffect.Scope[y][x] != 0)
+                    if (cardData.EffectScope[y, x] != 0)
                     {
                         gridCells[x,y].SetCardEffect();
                     }
@@ -109,18 +127,6 @@ public class Card : MonoBehaviour
                 Debug.LogWarning($"卡面加载失败: {cardData.CardCode}");
             }
         });
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        // SetCard("Card001");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public void OnHover()
