@@ -4,7 +4,7 @@ using UnityEngine;
 using FFF7R;
 using System;
 
-public class GameRuntime : MonoBehaviour
+public class GameRuntime : MonoBehaviour, ISeatCommands
 {
     [SerializeField] GameBootstrap bootstrap;
     [SerializeField] List<MonoBehaviour> viewBehaviours;
@@ -14,6 +14,11 @@ public class GameRuntime : MonoBehaviour
     readonly List<GameEvent> _eventBuffer = new();
     long _lastSeq;
     bool _lost;
+    public bool IsBusy;
+
+    public IGameQuery Query => _session;
+    public event Action<IGameSession> SessionBound;
+    public event Action EventFlushed;
 
     void Awake()
     {
@@ -28,7 +33,7 @@ public class GameRuntime : MonoBehaviour
         if (bootstrap != null && bootstrap.Session != null) Bind(bootstrap.Session);
     }
 
-   void OnDestroy()
+    void OnDestroy()
     {
         if (bootstrap != null) bootstrap.SessionCreated -= Bind;
         Unbind();
@@ -36,14 +41,22 @@ public class GameRuntime : MonoBehaviour
 
     public CommandResult Execute(Func<IGameCommand, CommandResult> op)
     {
+        IsBusy = true;
         _eventBuffer.Clear();
-        CommandResult r = op(_session);          // 调用方拿不到 session，只能在这一帧里用
-        if (_lost || _eventBuffer.Count != r.EventsRaised) Resync($"resync：事件数不符（实收 {_eventBuffer.Count}，声明 {r.EventsRaised}）");
-        else if (_eventBuffer.Count > 0) Flush();
-        return r;
+        try {
+            CommandResult r = op(_session);          // 调用方拿不到 session，只能在这一帧里用
+            if (_lost || _eventBuffer.Count != r.EventsRaised) Resync($"resync：事件数不符（实收 {_eventBuffer.Count}，声明 {r.EventsRaised}）");
+            else if (_eventBuffer.Count > 0) Flush();
+            return r;
+        }
+        finally { IsBusy = false; }
     }
 
     public void Execute(Action<IGameCommand> op) => Execute(c => { op(c); return CommandResult.Success(); });
+
+    public CommandResult Place(PlayerSeat seat, int handIndex, Int2 pos) => Execute(c => c.Place(seat, handIndex, pos));
+
+    public CommandResult Pass(PlayerSeat seat) => Execute(c => c.PassTurn(seat));
 
     void Resync(string why)
     {
@@ -67,6 +80,7 @@ public class GameRuntime : MonoBehaviour
             try { _gameViews[i].OnEvents(batch); }
             catch (Exception ex) { Debug.LogException(ex); }        // 一个视图炸不能截断其它视图
         _eventBuffer.Clear();
+        EventFlushed?.Invoke();
     }
 
     void Bind(IGameSession s)
@@ -76,6 +90,7 @@ public class GameRuntime : MonoBehaviour
         _lastSeq = s.LastSequence;        // 基线：开局那批事件本来就没订阅，不该报跳号
         s.Raised += OnRaised;
         for (int i = 0; i < _gameViews.Count; i++) _gameViews[i].Bind(s);   // 隐式转成 IGameQuery
+        SessionBound?.Invoke(_session);
     }
 
     void Unbind()

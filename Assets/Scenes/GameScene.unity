@@ -178,6 +178,7 @@ GameObject:
   - component: {fileID: 162197757}
   - component: {fileID: 162197760}
   - component: {fileID: 162197761}
+  - component: {fileID: 162197762}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -223,7 +224,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 162197756}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4da80a641b99432498dca7d651a94c7f, type: 3}
   m_Name: 
@@ -246,6 +247,21 @@ MonoBehaviour:
   viewBehaviours:
   - {fileID: 1868156437}
   - {fileID: 1609996237}
+  IsBusy: 0
+--- !u!114 &162197762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 162197756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce27084f6f3e50b45a3ac4534d20f1b3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  runtime: {fileID: 162197761}
+  cardSelector: {fileID: 1868156437}
 --- !u!1 &267782706
 GameObject:
   m_ObjectHideFlags: 0
@@ -974,6 +990,7 @@ MonoBehaviour:
   CardSelectorHeight: 0.1
   cards: []
   selectedCard: {fileID: 0}
+  previewHeight: 2.5
   _grabDepth: 20
   cam: {fileID: 963194227}
 --- !u!1 &1917326607

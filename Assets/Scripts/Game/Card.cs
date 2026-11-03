@@ -89,7 +89,7 @@ public class Card : MonoBehaviour
         PropertyEx.LoadSpriteAsync(onBoard ? borderSprites : borderSpritesFull,
             sprite =>
             {
-                if (sprite != null)
+                if (BorderImage != null && sprite != null)
                 {
                     BorderImage.sprite = sprite;
                 }
@@ -102,7 +102,7 @@ public class Card : MonoBehaviour
 
         PropertyEx.GetCardSpriteAsync(cardCode, sprite =>
         {
-            if (sprite != null)
+            if (CardImage != null && sprite != null)
             {
                 CardImage.sprite = sprite;
             }
