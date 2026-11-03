@@ -135,28 +135,33 @@ namespace FFF7R.Adapter
         //-------------------------------------------------------------------- 棋盘快照
 
         /// <summary>
-        /// 注意：<c>ChessPad.Width/Height</c> 这两个属性的名字和实际含义是反的
-        /// （Width 返回的是 y 方向长度），这里一律按 <c>Size.x / Size.y</c> 取，不要用它们。
+        /// 内核棋盘 → 契约快照。
+        /// <para>
+        /// 本工程的坐标约定：<b>x 是高度方向（纵向），y 是宽度方向（横向）</b>。
+        /// 所以 <c>Width = pad.Size.y</c>、<c>Height = pad.Size.x</c> —— 名字取自屏幕朝向，
+        /// 不是 <c>Size</c> 的分量名，两者交叉是刻意的。
+        /// </para>
+        /// 存放顺序与 <see cref="BoardSnapshot"/> 的索引器一致：<c>cells[x * Width + y]</c>。
         /// </summary>
         public static BoardSnapshot ToBoard(ChessPad pad)
         {
             if (pad == null) return null;
 
-            int width = pad.Size.x;
-            int height = pad.Size.y;
-            CellView[] cells = new CellView[width * height];
+            int w = pad.Size.y;   // 宽度方向的格数（y 轴）
+            int h = pad.Size.x;   // 高度方向的格数（x 轴）
+            CellView[] cells = new CellView[w * h];
             int playerScore = 0;
             int rivalScore = 0;
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < h; x++)
             {
-                for (int y = 0; y < height; y++)
+                for (int y = 0; y < w; y++)
                 {
                     PadGrid grid = pad[x, y];
                     ChessProperty property = grid.Chess;
                     CellState state = grid.Status.ToContract();
 
-                    cells[x * height + y] = new CellView(
+                    cells[x * w + y] = new CellView(
                         new Int2(x, y),
                         state,
                         property != null ? property.CardCode : null,
@@ -168,7 +173,7 @@ namespace FFF7R.Adapter
                 }
             }
 
-            return new BoardSnapshot(height, width, cells, playerScore, rivalScore);
+            return new BoardSnapshot(w, h, cells, playerScore, rivalScore);
         }
     }
 }

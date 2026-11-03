@@ -29,6 +29,8 @@ namespace FFF7RCore {
         /// <summary>费用 = 0（覆盖型）的牌，目标格上没有己方棋子可供覆盖。</summary>
         NoOwnChessToCover,
 
+        NotYourGrid,
+
         Unknown = 99,
     }
 

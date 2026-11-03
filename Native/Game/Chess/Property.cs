@@ -78,7 +78,7 @@ namespace FFF7RCore {
                         {
                             try
                             {
-                                Log.TestLine($"Loading file:{filePath}");
+                                // Log.TestLine($"Loading file:{filePath}");
                                 string fileContent = File.ReadAllText(filePath);
                                 DeserializeAndAddList(fileContent);
                             }
@@ -117,7 +117,7 @@ namespace FFF7RCore {
                 return;
             }
 
-            Log.TestLine($"Parsed list count = {list.Count}");
+            // Log.TestLine($"Parsed list count = {list.Count}");
 
             foreach (var chess in list)
             {

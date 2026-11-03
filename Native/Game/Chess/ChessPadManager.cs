@@ -132,6 +132,8 @@ namespace FFF7RCore {
             int posLevel = (int)posStatus % 10;
             if (input.chess.Cost > 0)
             {
+                if (input.playerType == PlayerType.PLAYER && posStatus >= PosStatus.EMPTY) {reject = InputReject.NotYourGrid; return false;}
+                if (input.playerType == PlayerType.RIVAL && posStatus <= PosStatus.EMPTY) {reject = InputReject.NotYourGrid; return false;}
                 if (posStatus >= PosStatus.OCCUPIED_PLAYER) { reject = InputReject.CellOccupied; return false; }
                 if (posLevel < input.chess.Cost) { reject = InputReject.CellLevelTooLow; return false; }
             } 
