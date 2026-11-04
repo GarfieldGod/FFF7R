@@ -16,16 +16,40 @@ namespace FFF7R
         public int Height { get; }
 
         /// <summary>按列累计的双方得分（内核 ScoreMap 的合计）。</summary>
-        public int PlayerScore { get; }
-        public int RivalScore { get; }
+        public List<int> PlayerScoreList { get; }
+        public List<int> RivalScoreList { get; }
 
-        public BoardSnapshot(int width, int height, CellView[] cells, int playerScore, int rivalScore)
+        public int PlayerScore
+        {
+            get
+            {
+                int ret = 0;
+                foreach(var num in PlayerScoreList) {
+                    ret += num;
+                }
+                return ret;
+            }
+        }
+
+        public int RivalScore
+        {
+            get
+            {
+                int ret = 0;
+                foreach(var num in RivalScoreList) {
+                    ret += num;
+                }
+                return ret;
+            }
+        }
+
+        public BoardSnapshot(int width, int height, CellView[] cells, List<int> playerScoreList, List<int> rivalScoreList)
         {
             Width = width;
             Height = height;
             cells_ = cells;
-            PlayerScore = playerScore;
-            RivalScore = rivalScore;
+            PlayerScoreList = playerScoreList;
+            RivalScoreList = rivalScoreList;
         }
 
         /// <summary>

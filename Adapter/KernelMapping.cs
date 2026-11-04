@@ -150,11 +150,14 @@ namespace FFF7R.Adapter
             int w = pad.Size.y;   // 宽度方向的格数（y 轴）
             int h = pad.Size.x;   // 高度方向的格数（x 轴）
             CellView[] cells = new CellView[w * h];
-            int playerScore = 0;
-            int rivalScore = 0;
+
+            List<int> playerScoreList = new List<int>(h);
+            List<int> rivalScoreList = new List<int>(h);
 
             for (int x = 0; x < h; x++)
             {
+                int ps = 0;
+                int rs = 0;
                 for (int y = 0; y < w; y++)
                 {
                     PadGrid grid = pad[x, y];
@@ -168,12 +171,14 @@ namespace FFF7R.Adapter
                         grid.Level,                                // 含 buff
                         property != null ? property.Level : 0);    // 基础战力
 
-                    if (state == CellState.OccupiedPlayer) playerScore += grid.Level;
-                    else if (state == CellState.OccupiedRival) rivalScore += grid.Level;
+                    if (state == CellState.OccupiedPlayer) ps += grid.Level;
+                    else if (state == CellState.OccupiedRival) rs += grid.Level;
                 }
+                playerScoreList.Add(ps);
+                rivalScoreList.Add(rs);
             }
 
-            return new BoardSnapshot(w, h, cells, playerScore, rivalScore);
+            return new BoardSnapshot(w, h, cells, playerScoreList, rivalScoreList);
         }
     }
 }
