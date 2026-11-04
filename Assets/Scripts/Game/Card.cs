@@ -29,11 +29,6 @@ public class Card : MonoBehaviour
 
     public BoxCollider Collider;
 
-    void Awake()
-    {
-        FFF7RCore.Property.LoadChessProperties();
-    }
-
     public void Start()
     {
         Collider = GetComponent<BoxCollider>();
@@ -59,12 +54,14 @@ public class Card : MonoBehaviour
 
     public void SetCardOnBoard(string cardCode)
     {
+        CardCode = cardCode;
+        NameText.enabled = false;
         SetSprite(cardCode, true);
     }
 
     public void SetPower(int power)
     {
-        PowerText.value = power;
+        PowerText.SetNumber(power);
     }
 
     private void SetCardData(CardDefView cardData)
@@ -76,7 +73,7 @@ public class Card : MonoBehaviour
         }
 
         CardCode = cardData.CardCode;
-        PowerText.value = cardData.Level;
+        PowerText.SetNumber(cardData.Level);
         NameText.text = cardData.Name;
         SetCost(cardData.Cost);
         SetScope(cardData);
@@ -130,56 +127,38 @@ public class Card : MonoBehaviour
     {
         EnsureGrids();
 
-        for(int y = 0; y < 5; y++)
-        {
-            for(int x = 0; x < 5; x++)
-            {
-                gridCells[x,y].Init();
-            }
-        }
-
-        if (cardData.PosEffect != null)
-        {
-            for(int y = 0; y < cardData.PosEffect.Width; y++)
-            {
-                for(int x = 0; x < cardData.PosEffect.Height; x++)
-                {
-                    if(cardData.PosEffect[y, x] != 0)
-                    {
-                        gridCells[x,y].SetPosEffect();
-                    }
-                }
-            }
-        }
-
-        if (cardData.EffectScope != null)
-        {
-            for(int y = 0; y < cardData.EffectScope.Width; y++)
-            {
-                for(int x = 0; x < cardData.EffectScope.Height; x++)
-                {
-                    if (cardData.EffectScope[y, x] != 0)
-                    {
-                        gridCells[x,y].SetCardEffect();
-                    }
-                }
-            }
-        }
+        ApplyPattern(cardData.PosEffect,  c => c.SetPosEffect());
+        ApplyPattern(cardData.EffectScope, c => c.SetCardEffect());
 
         gridCells[2,2].SetCenter();
     }
 
+    void ApplyPattern(GridPattern p, System.Action<GridCellOnCard> mark)
+    {
+        if (p == null) return;
+        for (int y = 0; y < p.Height; y++)
+            for (int x = 0; x < p.Width; x++)
+                if (p[x, y] != 0) mark(gridCells[x, y]);
+    }
+
     public void EnsureGrids()
     {
-        if (gridCells != null) return;
-        gridCells = new GridCellOnCard[5,5];
-
-        for(int y = 0; y < 5; y++)
+        if (gridCells != null)
         {
-            for(int x = 0; x < 5; x++)
+            foreach(var cell in gridCells)
+            {
+                cell.Init();
+            }
+            return;
+        }
+
+        gridCells = new GridCellOnCard[5, 5];
+        for(int x = 0; x < 5; x++)
+        {
+            for(int y = 0; y < 5; y++)
             {
                 GridCellOnCard cell = Instantiate(gridCellPrefab, GridPanel.transform);
-                gridCells[x,y] = cell;
+                gridCells[y, x] = cell;
                 cell.Init();
             }
         }

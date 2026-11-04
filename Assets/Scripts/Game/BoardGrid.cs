@@ -33,6 +33,7 @@ public class BoardGrid : MonoBehaviour
     {
         SetGridState(cellView.State);
         SetGridCard(cellView);
+        if (currentCard != null) currentCard.SetPower(cellView.Level);
     }
 
     public void SetGridCard(CellView cellView)
@@ -54,8 +55,11 @@ public class BoardGrid : MonoBehaviour
         }
 
         if (currentCard.CardCode != cellView.CardCode) currentCard.SetCardOnBoard(cellView.CardCode);
-        if (currentOwner != cellView.Owner) currentCard.SetPlayerSeat(cellView.Owner);
-        currentCard.SetPower(cellView.Level);
+        if (currentOwner != cellView.Owner)
+        {
+            currentCard.SetPlayerSeat(cellView.Owner);
+            currentOwner = cellView.Owner;
+        }
     }
 
     public void SetGridState(CellState cellState)

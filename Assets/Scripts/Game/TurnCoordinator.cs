@@ -4,39 +4,33 @@ using System.Collections;
 
 public class TurnCoordinator : MonoBehaviour
 {
-    [SerializeField] GameRuntime runtime;
-    [SerializeField] ISeatPlayer player;
-    [SerializeField] ISeatPlayer rival;
-    public CardSelector cardSelector;
+    [SerializeField] GameRuntime _runtime;
+    SeatPlayer player;
+    SeatPlayer rival;
 
-    IGameQuery _query;
+    private ISeatActionSource _playerSource;
+    private ISeatActionSource _rivalSource;
+    public CardSelector cardSelector;
 
     void Awake()
     {
-        // player = new LocalSeatPlayer(PlayerSeat.Player, cardSelector);
-        player = new AiSeatPlayer(PlayerSeat.Player);
-        rival = new AiSeatPlayer(PlayerSeat.Rival);
+        player = new SeatPlayer(PlayerSeat.Player);
+        rival = new SeatPlayer(PlayerSeat.Rival);
+
+        _playerSource = new LocalPlayerActionSource(cardSelector);
+        _rivalSource = new AiActionSource();
     }
-
-    void OnEnable()
-    {
-        runtime.SessionBound += OnBound;
-    }
-
-    void OnDisable() => runtime.SessionBound -= OnBound;
-
-    void OnBound(IGameSession s) { _query = s;}
 
     void Update()
     {
-        if (runtime == null || runtime.IsBusy) return;
-        if (_query == null) _query = runtime.Query;
-        if (_query == null) return;
+        if (_runtime == null || _runtime.IsBusy) return;
+        if (_runtime.Query == null) return;
 
-        var st = _query.State;
+        var st = _runtime.Query.State;
         if (!st.IsGaming) return;
 
         var seat = st.Current == PlayerSeat.Player ? player : rival;
-        seat.Tick(_query, runtime, null);
+        var actionSrc = st.Current == PlayerSeat.Player ? _playerSource : _rivalSource;
+        seat.Tick(_runtime.Query, _runtime, actionSrc);
     }
 }

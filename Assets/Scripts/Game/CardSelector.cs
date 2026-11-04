@@ -12,6 +12,8 @@ public class CardSelector : MonoBehaviour, IGameView
     public List<Card> cards = new List<Card>();
     public Card selectedCard;
 
+    public Transform DispenseCardSrc;
+
     [SerializeField] float previewHeight = 2.5f;
     private IGameQuery _gameQuery;
 
@@ -77,7 +79,6 @@ public class CardSelector : MonoBehaviour, IGameView
         cards.Add(card);
     }
 
-    // Update is called once per frame
     void Update()
     {
         Selecting();
@@ -116,6 +117,14 @@ public class CardSelector : MonoBehaviour, IGameView
         LayoutCards();
     }
 
+    public void DispenseCard()
+    {
+        if (selectedCard == null) return;
+        Card card = selectedCard;
+        UnSelect();
+        card.transform.position = DispenseCardSrc.position;
+    }
+
     [SerializeField] float _grabDepth = 15;
     Vector3 _vel;
     [SerializeField] Camera cam;
@@ -141,18 +150,8 @@ public class CardSelector : MonoBehaviour, IGameView
             targetPos = hitHover.transform.position + new Vector3(0, previewHeight, 0);
             targetRot = hitHover.transform.rotation * Quaternion.Euler(-90, 0, 0);
 
-            RejectReason reason;
-            bool ret = _gameQuery.CanPlace(PlayerSeat.Player, selectedCard.HandIndex, hitHover.transform.GetComponent<BoardGrid>().Pos, out reason);
-            if (!ret)
-            {
-                Debug.Log($"Cannot place card {selectedCard.CardCode} at {hitHover.transform.GetComponent<BoardGrid>().Pos} because {reason}");
-            } else
-            {
-                Debug.Log($"Can place card {selectedCard.CardCode} at {hitHover.transform.GetComponent<BoardGrid>().Pos}");
-            }
-        } else
-        {
-
+            // RejectReason reason;
+            // bool ret = _gameQuery.CanPlace(PlayerSeat.Player, selectedCard.HandIndex, hitHover.transform.GetComponent<BoardGrid>().Pos, out reason);
         }
 
         selectedCard.transform.position = Vector3.SmoothDamp(

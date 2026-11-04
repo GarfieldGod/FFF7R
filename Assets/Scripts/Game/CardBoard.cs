@@ -2,11 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using FFF7R;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class CardBoard : MonoBehaviour, IGameView
 {
+    [Header("分数格配置")]
+    [SerializeField] private GameObject ScoreGridGroup;
+    [SerializeField] private GameObject ScoreGridPrefab;
+    [SerializeField] private float ScoreGridOffset = 5f;
+    [SerializeField] private float ScoreGridHeight = 0.5f;
+
+    [Header("棋盘格配置")]
+    [SerializeField] private GameObject BoardModel;
+    [SerializeField] private GameObject BoardGridGroup;
+    [SerializeField] private GameObject BoardGridPrefab;
+    [SerializeField] private float colliderHeight = 0.1f;
+
     private IGameQuery _gameQuery;
-    private List<List<BoardGrid>> _boardCells = new List<List<BoardGrid>>();
+    private List<List<BoardGrid>> _boardCells;
+    private List<ScoreGrid> _playerScores;
+    private List<ScoreGrid> _rivalScores;
     // Start is called before the first frame update
     public void Bind(IGameQuery gameQuery)
     {
@@ -31,35 +46,73 @@ public class CardBoard : MonoBehaviour, IGameView
         UpdateBoard(_gameQuery.Board);
     }
 
-    public void UpdateBoard(BoardSnapshot board)
+    private void UpdateBoard(BoardSnapshot board)
     {
-        // board.Width 是横向格数（棋盘 y 轴），board.Height 是纵向格数（棋盘 x 轴）。
-        // 行对应高度方向（x）、列对应宽度方向（y），所以行列边界直接对应 Height / Width。
-        if (_boardCells.Count != board.Height || (_boardCells.Count > 0 && _boardCells[0].Count != board.Width))
+        UpdateBoardGrids(board);
+        UpdateScoreGrids(board);
+    }
+
+    // 分数格子 更新与创建
+    private void UpdateScoreGrids(BoardSnapshot board)
+    {
+        if (_playerScores == null || _playerScores.Count != board.Height || 
+            _rivalScores == null || _rivalScores.Count != board.Height)
+        {
+            GenerateScoreGrids(board);
+        }
+
+        for (int x = 0; x < board.Height; x++)
+        {
+            _playerScores[x].SetScore(board.PlayerScoreList[x]);
+            _rivalScores[x].SetScore(board.RivalScoreList[x]);
+        }
+    }
+
+    private void GenerateScoreGrids(BoardSnapshot board)
+    {
+        Transform parent = ScoreGridGroup.transform;
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Transform child = parent.GetChild(i);
+            Destroy(child.gameObject);
+        }
+
+        _playerScores = new List<ScoreGrid>();
+        _rivalScores = new List<ScoreGrid>();
+        for (int i = 0; i < board.Height; i++)
+        {
+            var goP = Instantiate(ScoreGridPrefab, ScoreGridGroup.transform, false);
+            var gridP = goP.GetComponent<ScoreGrid>();
+            _playerScores.Add(gridP);
+            goP.transform.localPosition = _boardCells[i][0].transform.localPosition + new Vector3(ScoreGridOffset, ScoreGridHeight, 0);
+
+            var goR = Instantiate(ScoreGridPrefab, ScoreGridGroup.transform, false);
+            var gridR = goR.GetComponent<ScoreGrid>();
+            _rivalScores.Add(gridR);
+            goR.transform.localPosition = _boardCells[i][^1].transform.localPosition + new Vector3(-ScoreGridOffset, ScoreGridHeight, 0);
+        }
+    }
+
+    private void UpdateBoardGrids(BoardSnapshot board)
+    {
+        if (_boardCells == null || _boardCells.Count != board.Height || (_boardCells.Count > 0 && _boardCells[0].Count != board.Width))
         {
             GenerateBoardGirds(board);
         }
 
-        // Debug.Log($"UpdateBoardGrid Board Size: {board.Width}, {board.Height}");
-        // Debug.Log($"UpdateBoardGrid UI Size: {_boardCells.Count}");
         for (int x = 0; x < board.Height; x++)
         {
             for (int y = 0; y < board.Width; y++)
             {
                 CellView cellView = board[x, y];
-                // Debug.Log($"UpdateBoardGrid CellView {x}, {y} Pos: {cellView.Pos} State: {cellView.State}");
                 _boardCells[x][y].UpdateBoardGrid(cellView);
             }
         }
     }
 
-    [Header("棋盘配置")]
-    [SerializeField] private GameObject BoardModel;
-    [SerializeField] private GameObject BoardGridGroup;
-    [SerializeField] private GameObject BoardGridPrefab;
-    [SerializeField] private float colliderHeight = 0.1f;
 
-    void GenerateBoardGirds(BoardSnapshot board)
+    // 棋盘格子 更新与创建
+    private void GenerateBoardGirds(BoardSnapshot board)
     {
         int rowCount= board.Height; 
         int colCount= board.Width;
@@ -105,7 +158,7 @@ public class CardBoard : MonoBehaviour, IGameView
             List<BoardGrid> rowCells = new List<BoardGrid>();
             for (int y = 0; y < colCount; y++)
             {
-                GameObject go = Instantiate(BoardGridPrefab, parent);
+                GameObject go = Instantiate(BoardGridPrefab, parent, false);
 
                 var boardGrid = go.GetComponent<BoardGrid>();
                 boardGrid.Pos = board[x, y].Pos;

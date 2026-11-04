@@ -14,7 +14,7 @@ public class PowerNumDisplay : MonoBehaviour
     [Header("数字之间的间距")]
     public float spacing = 0;
     [Header("值")]
-    public int value = 0;
+    private int value = 0;
 
     private List<Image> _spawnedDigits = new List<Image>();
 
@@ -57,10 +57,5 @@ public class PowerNumDisplay : MonoBehaviour
             Destroy(img.gameObject);
         }
         _spawnedDigits.Clear();
-    }
-
-    private void Update()
-    {
-        SetNumber(value);
     }
 }

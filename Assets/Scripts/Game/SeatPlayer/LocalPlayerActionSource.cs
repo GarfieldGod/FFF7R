@@ -3,22 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using FFF7R;
 
-public sealed class LocalSeatPlayer: ISeatPlayer
+public sealed class LocalPlayerActionSource: ISeatActionSource
 {
-    public PlayerSeat Seat { get; }
     public CardSelector cardSelector;
-    public LocalSeatPlayer(PlayerSeat seat, CardSelector cardSelector)
+    public LocalPlayerActionSource(CardSelector cardSelector)
     {
-        Seat = seat;
         this.cardSelector = cardSelector;
     }
 
-    public void Tick(IGameQuery query, ISeatCommands commands, ISeatInputSource input)
+    public void OnResult(CommandResult result)
     {
-        PlayerClick(commands);
+        if (result.Ok)
+        {
+            cardSelector.DispenseCard();
+        } else {
+            Debug.Log($"无法落子：{result.Reason}");
+            // cardSelector.NotifyReject();
+        }
     }
 
-    void PlayerClick(ISeatCommands c) {
+    public bool TryTake(IGameQuery query, PlayerSeat seat, out SeatAction action)
+    {
         if (Input.GetMouseButtonDown(0)) {
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -32,10 +37,13 @@ public sealed class LocalSeatPlayer: ISeatPlayer
                 if (hitOne.CompareTag("GridInBoard")) {
                     if (cardSelector.selectedCard != null)
                     {
-                        c.Place(Seat, cardSelector.selectedCard.HandIndex, hitOne.GetComponent<BoardGrid>().Pos);
+                        action = SeatAction.Place(cardSelector.selectedCard.HandIndex, hitOne.GetComponent<BoardGrid>().Pos);
+                        return true;
                     }
                 }
             }
         }
+        action = SeatAction.None;
+        return false;
     }
 }

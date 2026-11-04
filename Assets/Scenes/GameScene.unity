@@ -122,6 +122,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &32706079
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 32706080}
+  m_Layer: 0
+  m_Name: DispenseSrc
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &32706080
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 32706079}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1868156436}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &65401314
 GameObject:
   m_ObjectHideFlags: 0
@@ -260,7 +291,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce27084f6f3e50b45a3ac4534d20f1b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  runtime: {fileID: 162197761}
+  _runtime: {fileID: 162197761}
   cardSelector: {fileID: 1868156437}
 --- !u!1 &267782706
 GameObject:
@@ -932,6 +963,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e2e0e26f64ff8942a5112109b3b578a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScoreGridPrefab: {fileID: 2117751081737584990, guid: 25bccc7557c06d3488be2a59f2dbfb21, type: 3}
+  ScoreGridOffset: 7.9
+  ScoreGridHeight: 0.5
   BoardModel: {fileID: 464572183}
   BoardGridGroup: {fileID: 1609996235}
   BoardGridPrefab: {fileID: 3912336484967244376, guid: b475a6e2ee716d84aaede232dfd39e37, type: 3}
@@ -970,7 +1004,8 @@ Transform:
   m_LocalPosition: {x: 19.42, y: 5.5, z: 13.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 32706080}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: -75, y: 0, z: 0}
 --- !u!114 &1868156437
@@ -990,6 +1025,7 @@ MonoBehaviour:
   CardSelectorHeight: 0.1
   cards: []
   selectedCard: {fileID: 0}
+  DispenseCardSrc: {fileID: 32706080}
   previewHeight: 2.5
   _grabDepth: 20
   cam: {fileID: 963194227}
