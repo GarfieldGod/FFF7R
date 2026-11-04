@@ -25,12 +25,19 @@ public class GameBootstrap : MonoBehaviour
     private void Awake()
     {
         FFF7RCore.Log.PrintToConsole = false;
+        PreLoadCardAssets();
         StartGame();
     }
 
     private void OnDestroy()
     {
         DisposeSession();
+    }
+
+    private static void PreLoadCardAssets()
+    {
+        foreach (var code in DefaultPlayerPool) GameAssets.Sprites.Request(code, _ => { });
+        foreach (var code in DefaultRivalPool)  GameAssets.Sprites.Request(code, _ => { });
     }
 
     public void StartGame()

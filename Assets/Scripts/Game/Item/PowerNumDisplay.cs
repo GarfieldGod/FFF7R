@@ -13,8 +13,6 @@ public class PowerNumDisplay : MonoBehaviour
 
     [Header("数字之间的间距")]
     public float spacing = 0;
-    [Header("值")]
-    private int value = 0;
 
     private List<Image> _spawnedDigits = new List<Image>();
 

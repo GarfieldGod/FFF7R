@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -83,29 +84,19 @@ public class Card : MonoBehaviour
 
     private void SetSprite(string cardCode, bool onBoard = false)
     {
-        PropertyEx.LoadSpriteAsync(onBoard ? borderSprites : borderSpritesFull,
-            sprite =>
-            {
-                if (BorderImage != null && sprite != null)
-                {
-                    BorderImage.sprite = sprite;
-                }
-                else
-                {
-                    Debug.LogWarning($"卡面加载失败: {cardCode}");
-                }
+        BorderImage.enabled = false;
+        GameAssets.Sprites.Request(onBoard ? borderSprites : borderSpritesFull, (s) => {
+            if (BorderImage != null && s != null) {
+                BorderImage.sprite = s;
+                BorderImage.enabled = true;
             }
-        );
+        });
 
-        PropertyEx.GetCardSpriteAsync(cardCode, sprite =>
-        {
-            if (CardImage != null && sprite != null)
-            {
-                CardImage.sprite = sprite;
-            }
-            else
-            {
-                Debug.LogWarning($"卡面加载失败: {cardCode}");
+        CardImage.enabled = false;
+        GameAssets.Sprites.Request(cardCode, (s) => {
+            if (CardImage != null && s != null) {
+                CardImage.sprite = s;
+                CardImage.enabled = true;
             }
         });
     }

@@ -207,7 +207,6 @@ GameObject:
   m_Component:
   - component: {fileID: 162197758}
   - component: {fileID: 162197757}
-  - component: {fileID: 162197760}
   - component: {fileID: 162197761}
   - component: {fileID: 162197762}
   m_Layer: 0
@@ -248,20 +247,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &162197760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 162197756}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4da80a641b99432498dca7d651a94c7f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardSelector: {fileID: 1868156437}
-  runtime: {fileID: 162197761}
 --- !u!114 &162197761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -394,6 +379,37 @@ Transform:
   m_Children:
   - {fileID: 899203257}
   m_Father: {fileID: 512136938}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &631824012
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 631824013}
+  m_Layer: 0
+  m_Name: ScoreGrids
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &631824013
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 631824012}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1609996236}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &705507993
 GameObject:
@@ -883,26 +899,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1089263925}
-  - component: {fileID: 1089263924}
   m_Layer: 0
-  m_Name: CardBoard
+  m_Name: CardBoardModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1089263924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1089263923}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 06d189a31ed53cf49817891e1d7747a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1089263925
 Transform:
   m_ObjectHideFlags: 0
@@ -948,7 +951,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 3.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1734915426}
+  - {fileID: 631824013}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1609996237
@@ -963,13 +968,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e2e0e26f64ff8942a5112109b3b578a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScoreGridGroup: {fileID: 631824012}
   ScoreGridPrefab: {fileID: 2117751081737584990, guid: 25bccc7557c06d3488be2a59f2dbfb21, type: 3}
   ScoreGridOffset: 7.9
   ScoreGridHeight: 0.5
   BoardModel: {fileID: 464572183}
-  BoardGridGroup: {fileID: 1609996235}
+  BoardGridGroup: {fileID: 1734915425}
   BoardGridPrefab: {fileID: 3912336484967244376, guid: b475a6e2ee716d84aaede232dfd39e37, type: 3}
   colliderHeight: 0.1
+--- !u!1 &1734915425
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1734915426}
+  m_Layer: 0
+  m_Name: BoardGrids
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1734915426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1734915425}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1609996236}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1745653084 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e333b5b8c3868534baaa7db9a48a9ac8, type: 3}
