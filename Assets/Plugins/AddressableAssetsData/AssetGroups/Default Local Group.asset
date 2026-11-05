@@ -687,6 +687,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d5b1f154b23834c428ad6c3c3c6defb5
+    m_Address: SubtitleBar
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d875dc6e766ebd54eb5b53425db5dc00
     m_Address: Card125
     m_ReadOnly: 0

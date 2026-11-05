@@ -6,23 +6,26 @@ using UnityEngine;
 
 public class CardSelector : MonoBehaviour, IGameView
 {
-    public Card cardPrefab;
-    public float CardSelectorLength = -25;
-    public float CardSelectorHeight = 1;
     public List<Card> cards = new List<Card>();
     public Card selectedCard;
 
-    public Transform DispenseCardSrc;
+    [Header("设置")]
+    [SerializeField] private Card cardPrefab;
+    [SerializeField] private Transform DispenseCardSrc;
+    [SerializeField] private float CardSelectorLength = -25;
+    [SerializeField] private float CardSelectorHeight = 1;
+    [SerializeField] private float previewHeight = 2.5f;
+    [SerializeField] private float _grabDepth = 15;
+    [SerializeField] private Camera cam;
 
-    [SerializeField] float previewHeight = 2.5f;
     private IGameQuery _gameQuery;
+    private Vector3 _vel;
 
     public void Start()
     {
         transform.rotation = ForwardToCam;
     }
 
-    // Start is called before the first frame update
     public void Bind(IGameQuery gameQuery)
     {
         _gameQuery = gameQuery;
@@ -124,10 +127,6 @@ public class CardSelector : MonoBehaviour, IGameView
         UnSelect();
         card.transform.position = DispenseCardSrc.position;
     }
-
-    [SerializeField] float _grabDepth = 15;
-    Vector3 _vel;
-    [SerializeField] Camera cam;
 
     void Selecting()
     {

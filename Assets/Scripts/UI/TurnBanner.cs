@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using FFF7R;
 using System;
 
-[RequireComponent(typeof(CanvasGroup))]
 public class TurnBanner : MonoBehaviour
 {
     [SerializeField] float transTime = 0.5f;
