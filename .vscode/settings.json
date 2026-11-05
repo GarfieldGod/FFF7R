@@ -56,7 +56,7 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "FFF7.sln",
+    "dotnet.defaultSolution": "FFF7.slnx",
     "workbench.editor.wrapTabs": true,
     "files.watcherExclude": {
         "**/Library/**": true,

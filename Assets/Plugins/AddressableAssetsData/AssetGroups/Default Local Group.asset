@@ -32,6 +32,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0361962e7389fc7419bf6e0bc8913d91
+    m_Address: Text_RivalTurn
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0654f5e0dcc65db48b1b86841945ebac
     m_Address: Card061
     m_ReadOnly: 0
@@ -104,6 +109,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1e8a9b731b7e86749b59212dcf87c0e5
     m_Address: Card014
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ed28775dcac0144d919213a3f51e843
+    m_Address: TurnBanner_Player
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -369,6 +379,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 716a004dffc099345a04760634d1e28a
     m_Address: Card120
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 71d873d4431dd0d4fb2bea341d57025d
+    m_Address: TurnBanner_Rival
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -784,6 +799,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fad5f747fd6e4764cb1a1942e33a7b0e
     m_Address: Card090
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fb66ee5bfb8f1b4419395c2e09f0e8d2
+    m_Address: Text_PlayerTurn
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

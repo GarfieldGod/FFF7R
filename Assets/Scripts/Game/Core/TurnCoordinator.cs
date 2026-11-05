@@ -11,6 +11,9 @@ public class TurnCoordinator : MonoBehaviour
     private ISeatActionSource _playerSource;
     private ISeatActionSource _rivalSource;
     public CardSelector cardSelector;
+    public TurnBanner turnBanner;
+
+    int _lastTurn = -1;
 
     void Awake()
     {
@@ -18,7 +21,8 @@ public class TurnCoordinator : MonoBehaviour
         rival = new SeatPlayer(PlayerSeat.Rival);
 
         _playerSource = new LocalPlayerActionSource(cardSelector);
-        _rivalSource = new AiActionSource();
+        var aiSource = new AiActionSource();
+        _rivalSource = new DelayedActionSource(aiSource, 3f);
     }
 
     void Update()
@@ -32,5 +36,14 @@ public class TurnCoordinator : MonoBehaviour
         var seat = st.Current == PlayerSeat.Player ? player : rival;
         var actionSrc = st.Current == PlayerSeat.Player ? _playerSource : _rivalSource;
         seat.Tick(_runtime.Query, _runtime, actionSrc);
+
+        st = _runtime.Query.State;
+        if (!st.IsGaming) return;
+
+        if (st.Turns != _lastTurn)
+        {
+            _lastTurn = st.Turns;
+            turnBanner.Show(st.Current);
+        }
     }
 }
