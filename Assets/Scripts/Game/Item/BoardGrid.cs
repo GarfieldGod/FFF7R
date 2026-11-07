@@ -15,7 +15,6 @@ public class BoardGrid : MonoBehaviour
     [SerializeField] Material[] ballMat;
     [SerializeField] Card CardPrefab;
     public Card currentCard;
-    public PlayerSeat currentOwner;
     List<GameObject> _balls = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
@@ -40,7 +39,7 @@ public class BoardGrid : MonoBehaviour
     {
         if (cellView.CardCode == null)
         {
-            if (currentCard != null) currentCard.gameObject.SetActive(false);
+            if (currentCard != null) {currentCard.gameObject.SetActive(false);}
             return;
         }
 
@@ -54,12 +53,8 @@ public class BoardGrid : MonoBehaviour
             currentCard.gameObject.SetActive(true);
         }
 
-        if (currentCard.CardCode != cellView.CardCode) currentCard.SetCardOnBoard(cellView.CardCode);
-        if (currentOwner != cellView.Owner)
-        {
-            currentCard.SetPlayerSeat(cellView.Owner);
-            currentOwner = cellView.Owner;
-        }
+        if (currentCard.CardCode != cellView.CardCode)
+            currentCard.SetCardOnBoard(cellView.CardCode, cellView.Owner);
     }
 
     public void SetGridState(CellState cellState)

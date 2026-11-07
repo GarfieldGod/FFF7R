@@ -1,41 +1,59 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using FFF7R;
 
-public class Card : MonoBehaviour
+public class CardFace : MonoBehaviour
 {
-    public Image CardImage;
-    public TextMeshProUGUI NameText;
-    public PowerNumDisplay PowerText;
-    public GridLayoutGroup CostPanel;
-    public GridLayoutGroup GridPanel;
-
-    public Vector3 TargetPos = new Vector3();
-    public Quaternion TargetRot = new Quaternion();
-
+    [Header("卡面设置")]
+    [SerializeField] private Image BackGroundImage;
+    [SerializeField] private Image CardImage;
+    [SerializeField] private Image BorderImage;
+    [Header("名字")]
+    [SerializeField] private TextMeshProUGUI NameText;
+    [Header("威力")]
+    [SerializeField] private PowerNumDisplay PowerText;
+    [Header("消耗")]
+    [SerializeField] private GridLayoutGroup CostPanel;
+    [SerializeField] private Image costCellPrefab;
+    [Header("效果范围")]
+    [SerializeField] private GridLayoutGroup GridPanel;
     [SerializeField] private GridCellOnCard gridCellPrefab;
     private GridCellOnCard[,] gridCells = null;
-    [SerializeField] private Image costCellPrefab;
-    [SerializeField] private Image BorderImage;
-    [SerializeField] private Image BackGroundImage;
-    [SerializeField] private string borderSprites = "CardBorder";
-    [SerializeField] private string borderSpritesFull = "CardBorderFull";
 
-    public string CardCode;
-    public int HandIndex;
+    private static readonly string borderSprites = "CardBorder";
+    private static readonly string borderSpritesFull = "CardBorderFull";
+    private string _cardCode;
 
-    public BoxCollider Collider;
-
-    public void Start()
+    public void SetCardInHand(CardDefView cardDef, PlayerSeat seat)
     {
-        Collider = GetComponent<BoxCollider>();
+        if (_cardCode == cardDef.CardCode) return;
+
+        NameText.enabled = true;
+        SetCardData(cardDef);
+
+        SetSprite(cardDef.CardCode, false);
+        SetPlayerSeat(seat);
+        _cardCode = cardDef.CardCode;
     }
 
-    public void SetPlayerSeat(PlayerSeat seat)
+    public void SetCardOnBoard(string cardCode, PlayerSeat seat)
+    {
+        if (_cardCode == cardCode) return;
+
+        NameText.enabled = false;
+
+        SetSprite(cardCode, true);
+        SetPlayerSeat(seat);
+        _cardCode = cardCode;
+    }
+
+    public void SetPower(int power)
+    {
+        PowerText.SetNumber(power);
+    }
+
+    private void SetPlayerSeat(PlayerSeat seat)
     {
         if (seat == PlayerSeat.Player)
         {
@@ -47,24 +65,6 @@ public class Card : MonoBehaviour
         }
     }
 
-    public void SetCardInHand(CardView cardView)
-    {
-        HandIndex = cardView.HandIndex;
-        SetCardData(cardView.Def);
-    }
-
-    public void SetCardOnBoard(string cardCode)
-    {
-        CardCode = cardCode;
-        NameText.enabled = false;
-        SetSprite(cardCode, true);
-    }
-
-    public void SetPower(int power)
-    {
-        PowerText.SetNumber(power);
-    }
-
     private void SetCardData(CardDefView cardData)
     {
         if (cardData == null)
@@ -73,13 +73,10 @@ public class Card : MonoBehaviour
             return;
         }
 
-        CardCode = cardData.CardCode;
         PowerText.SetNumber(cardData.Level);
         NameText.text = cardData.Name;
         SetCost(cardData.Cost);
         SetScope(cardData);
-
-        SetSprite(cardData.CardCode, false);
     }
 
     private void SetSprite(string cardCode, bool onBoard = false)

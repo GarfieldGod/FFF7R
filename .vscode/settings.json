@@ -76,6 +76,8 @@
     "cSpell.words": [
         "Behaviour",
         "Behaviours",
+        "Mathf",
+        "Tweener",
         "UGUI"
     ],
     "dotnet.preferCSharpExtension": false

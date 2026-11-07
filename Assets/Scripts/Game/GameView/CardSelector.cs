@@ -7,22 +7,28 @@ using UnityEngine;
 public class CardSelector : MonoBehaviour, IGameView
 {
     public List<Card> cards = new List<Card>();
-    public Card selectedCard;
+    public SeatAction Action => select.Action;
 
     [Header("设置")]
     [SerializeField] private Card cardPrefab;
     [SerializeField] private Transform DispenseCardSrc;
-    [SerializeField] private float CardSelectorLength = -25;
-    [SerializeField] private float CardSelectorHeight = 1;
-    [SerializeField] private float previewHeight = 2.5f;
-    [SerializeField] private float _grabDepth = 15;
     [SerializeField] private Camera cam;
+    [SerializeField] private CardLayout layout = new CardLayout();
+    [SerializeField] private CardSelect select = new CardSelect();
+    private CardHover hover = new CardHover();
+
+    public PlayerSeat seat = PlayerSeat.Player;
+    public bool faceUp = true;
 
     private IGameQuery _gameQuery;
-    private Vector3 _vel;
+    private Quaternion ForwardToCam;
 
     public void Start()
     {
+        ForwardToCam = seat == PlayerSeat.Player ? 
+            cam.transform.rotation * Quaternion.Euler(0, 180f, 0f) :
+            cam.transform.rotation * Quaternion.Euler(0, 180f, 180f);
+
         transform.rotation = ForwardToCam;
     }
 
@@ -40,13 +46,13 @@ public class CardSelector : MonoBehaviour, IGameView
     public void Resync()
     {
         if (_gameQuery == null) return;
-        UpdateHand(_gameQuery.Hand(PlayerSeat.Player));
+        UpdateHand(_gameQuery.Hand(seat));
     }
 
     public void OnEvents(GameEventBatch batch)
     {
         if (_gameQuery == null) return;
-        UpdateHand(_gameQuery.Hand(PlayerSeat.Player));
+        UpdateHand(_gameQuery.Hand(seat));
     }
 
     public void UpdateHand(HandSnapshot hand)
@@ -65,122 +71,59 @@ public class CardSelector : MonoBehaviour, IGameView
                 AddCard(view);
             else if (cards[i].CardCode != view.CardCode)
             {
-                cards[i].SetCardInHand(view);
+                cards[i].SetCardInHand(view, seat, faceUp);
             }
 
             cards[i].HandIndex = view.HandIndex;
         }
-
-        LayoutCards();
     }
 
     public void AddCard(CardView cardView)
     {
         Card card = Instantiate(cardPrefab, transform);
-        card.SetCardInHand(cardView);
-        card.SetPlayerSeat(PlayerSeat.Player);
+        card.SetCardInHand(cardView, seat, faceUp);
         cards.Add(card);
     }
 
-    void Update()
+    public void TickSelect()
     {
-        Selecting();
-
-        float k = 1f - Mathf.Exp(-12f * Time.deltaTime);
-        for (int i = 0; i < cards.Count; i++)
-        {
-            Card c = cards[i];
-            if (c == null || c == selectedCard) continue;
-            c.transform.localPosition = Vector3.Lerp(c.transform.localPosition, c.TargetPos, k);
-            c.transform.rotation = Quaternion.Slerp(c.transform.rotation, c.TargetRot, k);
+        if (seat == PlayerSeat.Player) {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            GameObject hitObj = null;
+            if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
+                hitObj = hit.collider.gameObject;
+            }
+            select.Tick(cards, hitObj, cam, ForwardToCam);
         }
     }
 
-    public bool Select(Card card)
+    public SeatAction TakeAction()
     {
-        if (!cards.Contains(card)) return false;
-
-        UnSelect();
-
-        selectedCard = card;
-        selectedCard.Collider.enabled = false;
-
-        LayoutCards();
-
-        return true;
+        var a = select.Action;
+        select.Action = SeatAction.None;
+        return a;
     }
 
-    public void UnSelect()
+    void LateUpdate()
     {
-        if (selectedCard == null) return;
+        if (seat == PlayerSeat.Player) {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            GameObject hitObj = null;
+            if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
+                hitObj = hit.collider.gameObject;
+            }
+            // select.Tick(cards, hitObj, cam, ForwardToCam);
+            hover.Tick(cards, hitObj, cam, select.Current != null);
+        }
 
-        selectedCard.Collider.enabled = true;
-        selectedCard = null;
-
-        LayoutCards();
+        layout.Refresh(cards, select.Current, hover.Current, ForwardToCam);
     }
 
-    public void DispenseCard()
+    public void OnInputSuccess()
     {
-        if (selectedCard == null) return;
-        Card card = selectedCard;
-        UnSelect();
+        if (select.Current == null) return;
+        Card card = select.Current;
+        select.UnSelect();
         card.transform.position = DispenseCardSrc.position;
-    }
-
-    void Selecting()
-    {
-        if (selectedCard == null) return;
-        if (Input.GetMouseButtonUp(1))
-        {
-            UnSelect();
-            return;
-        }
-
-        Vector3 screen = new Vector3(Input.mousePosition.x, Input.mousePosition.y, _grabDepth);
-        Vector3 targetPos = cam.ScreenToWorldPoint(screen);
-        Quaternion targetRot = ForwardToCam;
-
-        RaycastHit hitHover;
-        Ray rayHover = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(rayHover, out hitHover, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)
-            && hitHover.collider.CompareTag("GridInBoard")
-        ) {
-            targetPos = hitHover.transform.position + new Vector3(0, previewHeight, 0);
-            targetRot = hitHover.transform.rotation * Quaternion.Euler(-90, 0, 0);
-
-            // RejectReason reason;
-            // bool ret = _gameQuery.CanPlace(PlayerSeat.Player, selectedCard.HandIndex, hitHover.transform.GetComponent<BoardGrid>().Pos, out reason);
-        }
-
-        selectedCard.transform.position = Vector3.SmoothDamp(
-            selectedCard.transform.position, targetPos, ref _vel, 0.05f);
-        selectedCard.transform.rotation = Quaternion.Slerp(
-            selectedCard.transform.rotation, targetRot, 12f * Time.deltaTime);
-    }
-
-    private List<Card> _layoutBuffer = new List<Card>();
-    private Quaternion ForwardToCam => cam.transform.rotation * Quaternion.Euler(0, 180f, 0f);
-
-    void LayoutCards()
-    {
-        if (cards.Count == 0) return;
-
-        _layoutBuffer.Clear();
-        foreach (Card card in cards)
-        {
-            if (card != selectedCard) _layoutBuffer.Add(card);
-        }
-
-        float spacingX = CardSelectorLength / _layoutBuffer.Count;
-        float spacingZ = CardSelectorHeight / _layoutBuffer.Count;
-        for (int i = 0; i < _layoutBuffer.Count; i++)
-        {
-            float x = spacingX * i;
-            float y = 0;
-            float z = spacingZ * i;
-            _layoutBuffer[i].TargetPos = new Vector3(x, y, z);
-            _layoutBuffer[i].TargetRot = ForwardToCam;
-        }
     }
 }

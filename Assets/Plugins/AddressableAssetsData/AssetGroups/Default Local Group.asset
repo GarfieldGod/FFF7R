@@ -238,7 +238,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 44403c2387229c147816f9f8624dcd9d
-    m_Address: Assets/ArtAssets/CardGame_CardBack.png
+    m_Address: CardGame_CardBack
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
