@@ -24,8 +24,9 @@ namespace FFF7R
             get
             {
                 int ret = 0;
-                foreach(var num in PlayerScoreList) {
-                    ret += num;
+                for (int i = 0; i < PlayerScoreList.Count; i++)
+                {
+                    ret += PlayerScoreList[i] > RivalScoreList[i] ? PlayerScoreList[i] : 0;
                 }
                 return ret;
             }
@@ -36,8 +37,9 @@ namespace FFF7R
             get
             {
                 int ret = 0;
-                foreach(var num in RivalScoreList) {
-                    ret += num;
+                for (int i = 0; i < RivalScoreList.Count; i++)
+                {
+                    ret += PlayerScoreList[i] < RivalScoreList[i] ? RivalScoreList[i] : 0;
                 }
                 return ret;
             }
