@@ -8,6 +8,7 @@ public class CardSelector : MonoBehaviour, IGameView
 {
     public List<Card> cards = new List<Card>();
     public SeatAction Action => select.Action;
+    public Action<Card> FocusChanged;
 
     [Header("设置")]
     [SerializeField] private CardBoard board;
@@ -27,6 +28,7 @@ public class CardSelector : MonoBehaviour, IGameView
     private int  _lastHand = -1;
     private Int2 _lastPos  = Int2.Unknown;
     private bool _hadPreview;
+    private Card _lastFocus;
 
     public void Start()
     {
@@ -60,8 +62,6 @@ public class CardSelector : MonoBehaviour, IGameView
         UpdateHand(_gameQuery.Hand(seat));
     }
 
-    Card _consumed;
-
     public void UpdateHand(HandSnapshot hand)
     {
         var pool = new List<CardView>(hand.Cards);
@@ -74,6 +74,7 @@ public class CardSelector : MonoBehaviour, IGameView
             {
                 // 快照里没有 → 它已经不在这手牌里（打出了 / 被效果去掉）
                 if (c == select.Current) select.Current = null;   // 别走 UnSelect，它会碰 Collider
+                if (c == _lastFocus) { _lastFocus = null; FocusChanged?.Invoke(null); }
                 Destroy(c.gameObject);
                 continue;
             }
@@ -154,6 +155,13 @@ public class CardSelector : MonoBehaviour, IGameView
         }
 
         layout.Refresh(cards, select.Current, hover.Current, ForwardToCam);
+
+        Card focus = select.Current != null ? select.Current : hover.Current;
+        if (focus != _lastFocus)
+        {
+            _lastFocus = focus;
+            FocusChanged?.Invoke(focus);
+        }
     }
 
     public void OnInputSuccess()

@@ -15,6 +15,7 @@ public class Card : MonoBehaviour
 
     public string CardCode;
     public int HandIndex;
+    public string Description;
     public BoxCollider Collider;
 
     public CardMotion.CStatus Status
@@ -35,6 +36,7 @@ public class Card : MonoBehaviour
     {
         HandIndex = cardView.HandIndex;
         CardCode = cardView.Def.CardCode;
+        Description = cardView.Def.Description;
         Motion.MotionEnabled = true;
         Collider.enabled = true;
 
