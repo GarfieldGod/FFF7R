@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   num: {fileID: 8520972325463939377}
+  group: {fileID: 6904423127364736835}
 --- !u!1 &2567221664532979291
 GameObject:
   m_ObjectHideFlags: 0
@@ -159,8 +160,9 @@ GameObject:
   - component: {fileID: 5110926895151090698}
   - component: {fileID: 7554046206138247841}
   - component: {fileID: 8520972325463939377}
+  - component: {fileID: 6904423127364736835}
   m_Layer: 0
-  m_Name: PowerText
+  m_Name: ScoreText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -221,4 +223,15 @@ MonoBehaviour:
   digitHeightRate: 1.5
   digitOffset: 0
   spacing: 0
-  value: 0
+--- !u!225 &6904423127364736835
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4949697809788476192}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0

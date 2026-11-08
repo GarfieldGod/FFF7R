@@ -82,6 +82,9 @@ public class CardBoard : MonoBehaviour, IGameView
         {
             _playerScores[x].SetScore(board.PlayerScoreList[x]);
             _rivalScores[x].SetScore(board.RivalScoreList[x]);
+
+            _playerScores[x].Invalid = board.PlayerScoreList[x] <= board.RivalScoreList[x] ? true : false;
+            _rivalScores[x].Invalid = board.PlayerScoreList[x] >= board.RivalScoreList[x] ? true : false;
         }
     }
 
