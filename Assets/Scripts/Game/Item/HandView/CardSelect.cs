@@ -11,7 +11,8 @@ public sealed class CardSelect
     public SeatAction Action = SeatAction.None;
     public float PreviewHeight = 2.5f;
     public float GrabDepth = 20f;
-    public void Tick(IReadOnlyList<Card> cards, GameObject hit, Camera cam, Quaternion facing) {
+    public void Tick(IReadOnlyList<Card> cards, GameObject hit, Camera cam, Quaternion facing, out Int2 pos) {
+        pos = Int2.Unknown;
         if (Input.GetMouseButtonDown(0))
         {
             SelectUpdate(cards, hit);
@@ -23,7 +24,7 @@ public sealed class CardSelect
 
         if (Current == null) return;
 
-        Update(hit, cam, facing);
+        pos = Update(hit, cam, facing);
 
         if (Input.GetMouseButtonDown(1)) UnSelect();
     }
@@ -47,9 +48,10 @@ public sealed class CardSelect
         Current = null;
     }
 
-    void Update(GameObject hit, Camera cam, Quaternion facing)
+    Int2 Update(GameObject hit, Camera cam, Quaternion facing)
     {
-        if (Current == null) return;
+        Int2 pos = Int2.Unknown;
+        if (Current == null) return pos;
 
         Vector3 screen = new Vector3(Input.mousePosition.x, Input.mousePosition.y, GrabDepth);
         Vector3 worldPos = cam.ScreenToWorldPoint(screen);
@@ -58,11 +60,13 @@ public sealed class CardSelect
         if (hit != null && hit.CompareTag("GridInBoard")) {
             worldPos = hit.transform.position + new Vector3(0, PreviewHeight, 0);
             worldRot = hit.transform.rotation * Quaternion.Euler(-90, 0, 0);
+            pos = hit.GetComponent<BoardGrid>().Pos;
         }
 
         Current.Motion.TargetPos = worldPos;
         Current.Motion.TargetRot = worldRot;
         Current.Motion.TargetScale = Current.Motion.BaseScale;
+        return pos;
     }
 
     public void SelectUpdate(IReadOnlyList<Card> cards, GameObject hit)

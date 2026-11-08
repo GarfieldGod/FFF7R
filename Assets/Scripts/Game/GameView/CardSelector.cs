@@ -10,6 +10,7 @@ public class CardSelector : MonoBehaviour, IGameView
     public SeatAction Action => select.Action;
 
     [Header("设置")]
+    [SerializeField] private CardBoard board;
     [SerializeField] private Card cardPrefab;
     [SerializeField] private Transform DispenseCardSrc;
     [SerializeField] private Camera cam;
@@ -22,6 +23,10 @@ public class CardSelector : MonoBehaviour, IGameView
 
     private IGameQuery _gameQuery;
     private Quaternion ForwardToCam;
+
+    private int  _lastHand = -1;
+    private Int2 _lastPos  = Int2.Unknown;
+    private bool _hadPreview;
 
     public void Start()
     {
@@ -93,7 +98,31 @@ public class CardSelector : MonoBehaviour, IGameView
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
                 hitObj = hit.collider.gameObject;
             }
-            select.Tick(cards, hitObj, cam, ForwardToCam);
+            select.Tick(cards, hitObj, cam, ForwardToCam, out var pos);
+
+            bool want = select.Current != null && pos != Int2.Unknown;
+            if (!want)
+            {
+                if (_hadPreview) { board.ClearPreview(); _hadPreview = false; }
+                _lastHand = -1; _lastPos = Int2.Unknown;
+                return;
+            }
+
+            bool changed = !_hadPreview || pos != _lastPos || select.Current.HandIndex != _lastHand;
+            if (!changed) return;                       // 目标没变，什么都不做
+
+            var snapshot = _gameQuery.Preview(seat, select.Current.HandIndex, pos);
+            _lastHand = select.Current.HandIndex;
+            _lastPos  = pos;
+
+            if (snapshot == null)
+            {
+                _hadPreview = false;
+                board.ClearPreview();
+                return;
+            }
+            _hadPreview = true;
+            board.ShowPreview(_gameQuery.Preview(seat, _lastHand, pos));
         }
     }
 

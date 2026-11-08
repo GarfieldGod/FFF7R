@@ -22,6 +22,7 @@ public class CardBoard : MonoBehaviour, IGameView
     private List<List<BoardGrid>> _boardCells;
     private List<ScoreGrid> _playerScores;
     private List<ScoreGrid> _rivalScores;
+    private bool _previewing;
     // Start is called before the first frame update
     public void Bind(IGameQuery gameQuery)
     {
@@ -42,12 +43,28 @@ public class CardBoard : MonoBehaviour, IGameView
 
     public void OnEvents(GameEventBatch batch)
     {
+         _previewing = false;
         if (_gameQuery == null) return;
+        UpdateBoard(_gameQuery.Board);
+    }
+
+    public void ShowPreview(BoardSnapshot snapshot)
+    {
+        if (snapshot == null) return;
+        _previewing = true;
+        UpdateBoard(snapshot);
+    }
+
+    public void ClearPreview()
+    {
+        if (!_previewing) return;
+        _previewing = false;
         UpdateBoard(_gameQuery.Board);
     }
 
     private void UpdateBoard(BoardSnapshot board)
     {
+        if (board == null) return;
         UpdateBoardGrids(board);
         UpdateScoreGrids(board);
     }
@@ -74,6 +91,7 @@ public class CardBoard : MonoBehaviour, IGameView
         for (int i = parent.childCount - 1; i >= 0; i--)
         {
             Transform child = parent.GetChild(i);
+            child.SetParent(null);
             Destroy(child.gameObject);
         }
 
@@ -95,6 +113,7 @@ public class CardBoard : MonoBehaviour, IGameView
 
     private void UpdateBoardGrids(BoardSnapshot board)
     {
+        if (board == null) return;
         if (_boardCells == null || _boardCells.Count != board.Height || (_boardCells.Count > 0 && _boardCells[0].Count != board.Width))
         {
             GenerateBoardGirds(board);

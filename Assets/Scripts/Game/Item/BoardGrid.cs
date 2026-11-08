@@ -17,16 +17,6 @@ public class BoardGrid : MonoBehaviour
     public Card currentCard;
     List<GameObject> _balls = new List<GameObject>();
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public void UpdateBoardGrid(CellView cellView)
     {

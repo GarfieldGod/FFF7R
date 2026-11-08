@@ -23,9 +23,10 @@ public class Card : MonoBehaviour
         set => Motion.Status = value;
     }
 
-    public void Start()
+    public void Awake()
     {
         Collider = GetComponent<BoxCollider>();
+        Collider.enabled = false;
     }
 
     public void SetPower(int value) => Face.SetPower(value);
@@ -35,6 +36,7 @@ public class Card : MonoBehaviour
         HandIndex = cardView.HandIndex;
         CardCode = cardView.Def.CardCode;
         Motion.MotionEnabled = true;
+        Collider.enabled = true;
 
         if (!face) SetCardInvisible();
         else Face.SetCardInHand(cardView.Def, seat);
@@ -43,6 +45,7 @@ public class Card : MonoBehaviour
     public void SetCardOnBoard(string cardCode, PlayerSeat seat)
     {
         Motion.MotionEnabled = false;
+        Collider.enabled = false;
         Face.SetCardOnBoard(cardCode, seat);
     }
 
