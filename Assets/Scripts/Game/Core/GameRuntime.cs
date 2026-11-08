@@ -69,6 +69,14 @@ public class GameRuntime : ISeatCommands, IDisposable
         EventFlushed?.Invoke();
     }
 
+    public void Refresh()
+    {
+        if (_session == null) return;
+        for (int i = 0; i < _gameViews.Count; i++)
+            try { _gameViews[i].Resync(); }
+            catch (Exception ex) { Debug.LogException(ex); }
+    }
+
     public void Bind(IGameSession s)
     {
         Unbind();

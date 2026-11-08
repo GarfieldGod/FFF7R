@@ -21,9 +21,11 @@ public class GamingPanel : MonoBehaviour
     void Awake()
     {
         cardSelector.FocusChanged += OnFocusChanged;
+
         nextTurnButton.onClick.AddListener(PassTurn);
         next = nextTurnButton.GetComponent<NextTurnButton>();
         next.Hide();
+
         CardText.Show();
     }
 

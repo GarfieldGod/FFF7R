@@ -2,31 +2,54 @@ using System;
 using UnityEngine;
 using FFF7R;
 using FFF7R.Adapter;
+using System.Collections.Generic;
 
 public class GameBootstrap: IDisposable
 {
     public event Action<IGameSession> SessionCreated;
+    public event Action SessionDisposed;
     public IGameSession Session { get; private set; }
 
-    public void Start(GameSetup setup)
+    private GameSetup _setup;
+
+    public void Create(GameSetup setup)
     {
+        _setup = setup;
         Dispose();
 
         Session = new GameSession(setup);
+        SessionCreated?.Invoke(Session);
+    }
 
-        CommandResult started = Session.Start(setup.FirstSeat);
+    public void Restart(){}
+
+    public bool ReDispense(List<int> playerDiscardIndexes, List<int> rivalDiscardIndexes)
+    {
+        CommandResult reDispense = Session.ReDispense(playerDiscardIndexes, rivalDiscardIndexes);
+        if (!reDispense.Ok)
+        {
+            Debug.LogError($"重分配卡牌失败：{reDispense.Reason}（{reDispense}）");
+            Dispose();
+            return false;
+        }
+        return true;
+    }
+
+    public bool Start()
+    {
+        CommandResult started = Session.Start(_setup.FirstSeat);
         if (!started.Ok)
         {
             Debug.LogError($"开局失败：{started.Reason}（{started}）");
             Dispose();
-            return;
+            return false;
         }
 
         Debug.Log(
             $"开局成功 seed={Session.Seed} state={Session.State} " +
             $"手牌={Session.Hand(PlayerSeat.Player).Count} events={started.EventsRaised}");
 
-        SessionCreated?.Invoke(Session);
+        return true;
     }
 
     public void Dispose()
@@ -34,5 +57,6 @@ public class GameBootstrap: IDisposable
         if (Session == null) return;
         Session.Dispose();
         Session = null;
+        SessionDisposed?.Invoke();
     }
 }

@@ -16,8 +16,8 @@ public class CardLayout
     [SerializeField] private PlayerSeat seat = PlayerSeat.Player;
 
     [Header("Hover设置")]
-    [SerializeField] private float baseScale = 0.7f;
-    [SerializeField] private float hoverScale = 0.8f;
+    [SerializeField] public float baseScale = 0.7f;
+    [SerializeField] public float hoverScale = 0.8f;
     [SerializeField] private float hoverOffset = 0.5f;
     [SerializeField] private int   offsetStartCount = 5;
     [SerializeField] private int   offsetFullCount  = 10;

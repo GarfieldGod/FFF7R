@@ -1,6 +1,7 @@
 using UnityEngine;
 using FFF7R;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public sealed class GameHost : MonoBehaviour
 {
@@ -15,12 +16,13 @@ public sealed class GameHost : MonoBehaviour
     [SerializeField] private CardSelector[] hands;
     [SerializeField] private ResultPanel resultPanel;
     [SerializeField] private GamingPanel gamingPanel;
+    [SerializeField] private ReDispensePanel reDispensePanel;
 
     private GameBootstrap _boot;
     private GameRuntime _runtime;
     private TurnCoordinator _turn;
 
-    public void TestStartLocalGame()
+    public GameSetup TestStartLocalGame()
     {
         string[] DefaultPlayerPool =
         {
@@ -44,23 +46,13 @@ public sealed class GameHost : MonoBehaviour
         );
 
         PreLoadCardAssets(setup.PlayerPool, setup.RivalPool);
-        _boot.Start(setup);
+        return setup;
     }
 
     private static void PreLoadCardAssets(IReadOnlyList<string> PlayerPool, IReadOnlyList<string> RivalPool)
     {
         foreach (var code in PlayerPool) GameAssets.Sprites.Request(code, _ => { });
         foreach (var code in RivalPool)  GameAssets.Sprites.Request(code, _ => { });
-    }
-
-    private ISeatActionSource[] BuildSources()
-    {
-        return new ISeatActionSource[]
-        {
-            null,
-            new LocalPlayerActionSource(hands[0]), 
-            new DelayedActionSource(new AiActionSource(hands[1]), 3f)
-        };
     }
 
     void Awake()
@@ -79,17 +71,38 @@ public sealed class GameHost : MonoBehaviour
         _runtime.Register(hands[1]);
 
         _boot.SessionCreated += _runtime.Bind;
+        _boot.SessionDisposed += _runtime.Dispose;
 
         _turn.TurnBegan += gamingPanel.OnTurnBegin;
         _turn.MatchEnded += gamingPanel.OnMatchEnd;
         _turn.MatchEnded += resultPanel.OnMatchEnd;
 
         gamingPanel.PassRequested += localAct.RequestPass;
+        reDispensePanel.ReDispenseRequested += SubmitReDispense;
 
-        TestStartLocalGame();
+        _boot.Create(TestStartLocalGame());
+        reDispensePanel.OnStageChanged(MatchStatus.ReDispense);
+    }
+
+    public void SubmitReDispense()
+    {
+        if (_boot.Session == null) return;
+        if (_boot.Session.State.Status != MatchStatus.ReDispense) return;
+
+        if (!_boot.ReDispense(
+            hands[0].GetReDispense(), 
+            new List<int>() // AI 先不换
+            )) 
+            return;
+
+        hands[0].ClearReDispense();
+        _runtime.Refresh();        // ReDispense 不 raise 事件，必须手动刷新
+        if (!_boot.Start()) return;
+
+        reDispensePanel.OnStageChanged(MatchStatus.Gaming);
     }
 
     void Update() => _turn.Tick();          // 逻辑：先跑
     // LateUpdate 留给 view（CardSelector / CardMotion）
-    void OnDestroy() => _boot.Dispose();
+    void OnDestroy() { _boot.Dispose(); _runtime.Dispose(); }
 }
