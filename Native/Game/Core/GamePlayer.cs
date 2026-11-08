@@ -40,7 +40,7 @@ namespace FFF7RCore {
         /// </summary>
         public bool DiscardFromHand(int index) {
             if (!selector.RemoveAt(index)) return false;
-            GetCardFromCardPool();   // 牌池见底时补不进来，手牌自然变少
+            // GetCardFromCardPool();   // 牌池见底时补不进来，手牌自然变少
             return true;
         }
 

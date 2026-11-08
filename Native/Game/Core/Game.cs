@@ -67,6 +67,8 @@ namespace FFF7RCore {
 
         private readonly int seed_;
         private readonly int turnLimit_;
+        private readonly bool[] pendingDraw_ = new bool[2];   // 这一方消耗过手牌，下次回合开始补
+        private static int Idx(PlayerType t) => t == PlayerType.RIVAL ? 1 : 0;
     //----------------------------------------------------------------------------------------------------------------------------------INIT
         protected readonly GameConfig gameConfig_;
         protected ChessPad chessPad_ = null;
@@ -98,6 +100,7 @@ namespace FFF7RCore {
             rival_.InitDespense(5);
 
             gameStatus_ = skipReDispense? GameStatus.Ready : GameStatus.REDISPENSE_CHESS;
+            pendingDraw_[0] = pendingDraw_[1] = false;
         }
 
         protected virtual GamePlayer InitGamePlayer(PlayerType playerType, List<string> chessPool, List<Chess> chesses = null) {
@@ -152,8 +155,6 @@ namespace FFF7RCore {
 
             if (turnLimit_ > 0 && gameTurns_ >= turnLimit_) return false;
 
-            if (!player_.CanInput && !rival_.CanInput) return false;
-
             if (!HasAnyLegalMove(PlayerType.PLAYER) && !HasAnyLegalMove(PlayerType.RIVAL)) return false;
 
             return true;
@@ -163,13 +164,15 @@ namespace FFF7RCore {
         /// 这一方手里有没有任何一张牌能落在任何一格上。
         /// 只用来判定"还能不能行动"，因此不理会当前该谁走。
         /// </summary>
-        private bool HasAnyLegalMove(PlayerType playerType)
+        public bool HasAnyLegalMove(PlayerType playerType)
         {
             GamePlayer player = playerType == PlayerType.RIVAL ? rival_ : player_;
             if (player == null) return false;
 
             List<Chess> hand = player.ChessInHand;
-            if (hand == null || hand.Count == 0) return false;
+            // 手牌为空 ≠ 死局：可能刚打完牌，下回合开始会补
+            if (hand == null || hand.Count == 0)
+                return pendingDraw_[Idx(playerType)] && player.PoolCount > 0;
 
             for (int i = 0; i < hand.Count; i++)
             {
@@ -259,6 +262,13 @@ namespace FFF7RCore {
             gameTurns_++;
             chessPad_?.EventSystem?.RaiseTurnEnd(new EventSystem.TurnEndedEventArgs(endedPlayer, currentPlayer_, gameTurns_));
 
+            // 位置关键：必须在 CheckEnd() 之前，否则新玩家会被判成"手牌 0、动不了"
+            int i = Idx(currentPlayer_);
+            if (pendingDraw_[i]) {
+                pendingDraw_[i] = false;
+                (currentPlayer_ == PlayerType.RIVAL ? rival_ : player_).GetCardFromCardPool();
+            }
+
             CheckEnd();
         }
 
@@ -291,7 +301,8 @@ namespace FFF7RCore {
             if (!input.FromHand) return;
 
             GamePlayer player = input.playerType == PlayerType.RIVAL ? rival_ : player_;
-            player.DiscardFromHand(input.handIndex);
+            if (player.DiscardFromHand(input.handIndex))
+                pendingDraw_[Idx(input.playerType)] = true;      // 只记，不补
         }
 
         public virtual bool CheckInput(Input input) => CheckInput(input, out _);

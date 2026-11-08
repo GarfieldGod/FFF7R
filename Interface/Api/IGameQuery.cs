@@ -15,5 +15,8 @@ namespace FFF7R
 
         // 预览这一步下棋后的棋盘快照
         BoardSnapshot Preview(PlayerSeat seat, int handIndex, Int2 pos);
+
+        // 是否有手牌可以下
+        bool CanPlaceAny(PlayerSeat seat);
     }
 }

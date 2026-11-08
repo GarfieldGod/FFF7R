@@ -113,6 +113,8 @@ namespace FFF7R.Adapter
             return previewPad == null ? null : KernelMapping.ToBoard(previewPad);
         }
 
+        public bool CanPlaceAny(PlayerSeat seat) => game_.HasAnyLegalMove(seat.ToKernel());
+
         //-------------------------------------------------------------------- IGameCommand
 
         public CommandResult Start(PlayerSeat firstPlayer)
