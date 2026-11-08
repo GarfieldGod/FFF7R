@@ -1,49 +1,48 @@
-using UnityEngine;
 using FFF7R;
-using System.Collections;
+using System;
 
-public class TurnCoordinator : MonoBehaviour
+public class TurnCoordinator
 {
-    [SerializeField] GameRuntime _runtime;
-    SeatPlayer player;
-    SeatPlayer rival;
-
-    private ISeatActionSource _playerSource;
-    private ISeatActionSource _rivalSource;
-    public CardSelector cardSelector;
-    public TurnBanner turnBanner;
+    readonly GameRuntime _runtime;
+    readonly ISeatActionSource[] _sources;
+    readonly SeatPlayer[] _seats = new SeatPlayer[3];
 
     int _lastTurn = -1;
+    bool _ended = false;
 
-    void Awake()
+    public event Action<PlayerSeat> TurnBegan;
+    public event Action<IGameQuery> MatchEnded;
+
+    public TurnCoordinator(GameRuntime runtime, ISeatActionSource[] sources)
     {
-        player = new SeatPlayer(PlayerSeat.Player);
-        rival = new SeatPlayer(PlayerSeat.Rival);
-
-        _playerSource = new LocalPlayerActionSource(cardSelector);
-        var aiSource = new AiActionSource();
-        _rivalSource = new DelayedActionSource(aiSource, 3f);
+        _runtime = runtime;
+        _sources = sources;
+        _seats[(int)PlayerSeat.Player] = new SeatPlayer(PlayerSeat.Player);
+        _seats[(int)PlayerSeat.Rival]  = new SeatPlayer(PlayerSeat.Rival);
     }
 
-    void Update()
+    public void Tick()
     {
         if (_runtime == null || _runtime.IsBusy) return;
         if (_runtime.Query == null) return;
 
         var st = _runtime.Query.State;
-        if (!st.IsGaming) return;
 
-        var seat = st.Current == PlayerSeat.Player ? player : rival;
-        var actionSrc = st.Current == PlayerSeat.Player ? _playerSource : _rivalSource;
-        seat.Tick(_runtime.Query, _runtime, actionSrc);
-
-        st = _runtime.Query.State;
+        if (st.IsOver)
+        {
+            if (!_ended) { _ended = true; MatchEnded?.Invoke(_runtime.Query); }
+            return;
+        }
         if (!st.IsGaming) return;
 
         if (st.Turns != _lastTurn)
         {
             _lastTurn = st.Turns;
-            turnBanner.Show(st.Current);
+            TurnBegan?.Invoke(st.Current);
         }
+
+        var seat = _seats[(int)st.Current];
+        var actionSrc = _sources[(int)st.Current];
+        seat.Tick(_runtime.Query, _runtime, actionSrc);
     }
 }

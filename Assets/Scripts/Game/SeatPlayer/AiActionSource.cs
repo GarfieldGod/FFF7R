@@ -7,7 +7,7 @@ using FFF7R.Adapter;
 public sealed class AiActionSource: ISeatActionSource
 {
     public IAiBrain AiBrain { get; set; }
-    public AiActionSource()
+    public AiActionSource(CardSelector selector)
     {
         AiBrain = new AiBrain();
     }

@@ -60,39 +60,46 @@ public class CardSelector : MonoBehaviour, IGameView
         UpdateHand(_gameQuery.Hand(seat));
     }
 
+    Card _consumed;
+
     public void UpdateHand(HandSnapshot hand)
     {
-        while (cards.Count > hand.Count)
-        {
-            Destroy(cards[^1].gameObject);
-            cards.RemoveAt(cards.Count - 1);
-        }
+        var pool = new List<CardView>(hand.Cards);
+        var keep = new List<Card>(cards.Count);
 
-        for (int i = 0; i < hand.Count; i++)
+        foreach (Card c in cards)
         {
-            CardView view = hand.Cards[i];
-
-            if (i >= cards.Count)
-                AddCard(view);
-            else if (cards[i].CardCode != view.CardCode)
+            int idx = pool.FindIndex(v => v.CardCode == c.CardCode);
+            if (idx < 0)
             {
-                cards[i].SetCardInHand(view, seat, faceUp);
+                // 快照里没有 → 它已经不在这手牌里（打出了 / 被效果去掉）
+                if (c == select.Current) select.Current = null;   // 别走 UnSelect，它会碰 Collider
+                Destroy(c.gameObject);
+                continue;
             }
 
-            cards[i].HandIndex = view.HandIndex;
+            c.HandIndex = pool[idx].HandIndex;
+            pool.RemoveAt(idx);
+            keep.Add(c);
         }
+
+        cards.Clear();
+        cards.AddRange(keep);
+
+        foreach (CardView v in pool) AddCard(v);
     }
 
     public void AddCard(CardView cardView)
     {
         Card card = Instantiate(cardPrefab, transform);
         card.SetCardInHand(cardView, seat, faceUp);
+        card.transform.position = DispenseCardSrc.position;
         cards.Add(card);
     }
 
     public void TickSelect()
     {
-        if (seat == PlayerSeat.Player) {
+        if (seat == PlayerSeat.Player && _gameQuery.State.IsGaming) {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             GameObject hitObj = null;
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
@@ -135,6 +142,7 @@ public class CardSelector : MonoBehaviour, IGameView
 
     void LateUpdate()
     {
+        if (!_gameQuery.State.IsGaming) return;
         if (seat == PlayerSeat.Player) {
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             GameObject hitObj = null;
@@ -150,9 +158,6 @@ public class CardSelector : MonoBehaviour, IGameView
 
     public void OnInputSuccess()
     {
-        if (select.Current == null) return;
-        Card card = select.Current;
-        select.UnSelect();
-        card.transform.position = DispenseCardSrc.position;
+        if (select.Current != null) select.UnSelect();
     }
 }

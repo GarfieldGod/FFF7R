@@ -15,6 +15,7 @@ public class TurnBanner : MonoBehaviour
     public event Action OnComplete;
 
     Sequence _seq;
+    int _requestToken;
 
     void Awake()
     {
@@ -37,8 +38,6 @@ public class TurnBanner : MonoBehaviour
         textImage.color = new Color(textImage.color.r, textImage.color.g, textImage.color.b, 0f);
         textImage.transform.localScale = new Vector3(0.5f, 0.5f, 1);
     }
-
-    int _requestToken;
 
     public void Show(PlayerSeat seat)
     {

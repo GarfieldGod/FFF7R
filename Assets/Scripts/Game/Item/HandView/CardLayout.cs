@@ -59,11 +59,11 @@ public class CardLayout
 
         // 计算Hover时挤开距离，根据牌数线性插值
         float t = Mathf.InverseLerp(offsetStartCount, offsetFullCount, n);
-        float extra = Mathf.Abs(WidthStep) * (hoverScale - baseScale) * hoverOffset * t;
+        float extra = Mathf.Abs(WidthStep) * (baseScale - hoverScale) * hoverOffset * t;
 
         for (int i = 0; i < n; i++)
         {
-            float u = n > 1 ? i / (n - 1f) * 2f - 1f : 0f;   // 这张牌在整排里的相对位置，范围 -1 到 +1
+            float u = n > 1 ? 1f - i / (n - 1f) * 2f : 0f;   // 这张牌在整排里的相对位置，范围 -1 到 +1
             float x = u * (L * 0.5f);   // 映射真实位置
 
             if (hoverIndex >= 0 && i != hoverIndex)

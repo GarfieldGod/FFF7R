@@ -1,43 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using FFF7R;
 using System;
+using System.Collections.Generic;
+using FFF7R;
+using UnityEngine; // Debug.Log()
 
-public class GameRuntime : MonoBehaviour, ISeatCommands
+public class GameRuntime : ISeatCommands, IDisposable
 {
-    [SerializeField] GameBootstrap bootstrap;
-    [SerializeField] List<MonoBehaviour> viewBehaviours;
-
-    IGameSession _session;
     readonly List<IGameView> _gameViews = new();
     readonly List<GameEvent> _eventBuffer = new();
+    IGameSession _session;
     long _lastSeq;
     bool _lost;
-    public bool IsBusy;
 
+    public bool IsBusy;
     public IGameQuery Query => _session;
     public event Action<IGameSession> SessionBound;
     public event Action EventFlushed;
 
-    void Awake()
+    public void Register(IGameView v)
     {
-        foreach (var mb in viewBehaviours)
-            if (mb is IGameView v) _gameViews.Add(v);
-            else Debug.LogError($"{mb?.name} 未实现 IGameView");
-        if (bootstrap != null) bootstrap.SessionCreated += Bind;
+        if (v == null || _gameViews.Contains(v)) return;
+        _gameViews.Add(v);
+        if (_session != null) SafeBind(v);        // 已有会话就补一次
     }
 
-    void OnEnable()   // 晚于全部 Awake，补一次回放，消除 Awake 顺序竞态
-    {
-        if (bootstrap != null && bootstrap.Session != null) Bind(bootstrap.Session);
-    }
-
-    void OnDestroy()
-    {
-        if (bootstrap != null) bootstrap.SessionCreated -= Bind;
-        Unbind();
-    }
+    public void Unregister(IGameView v) => _gameViews.Remove(v);
 
     public CommandResult Execute(Func<IGameCommand, CommandResult> op)
     {
@@ -83,13 +69,13 @@ public class GameRuntime : MonoBehaviour, ISeatCommands
         EventFlushed?.Invoke();
     }
 
-    void Bind(IGameSession s)
+    public void Bind(IGameSession s)
     {
         Unbind();
         _session = s;
         _lastSeq = s.LastSequence;        // 基线：开局那批事件本来就没订阅，不该报跳号
         s.Raised += OnRaised;
-        for (int i = 0; i < _gameViews.Count; i++) _gameViews[i].Bind(s);   // 隐式转成 IGameQuery
+        for (int i = 0; i < _gameViews.Count; i++) SafeBind(_gameViews[i]);   // 隐式转成 IGameQuery
         SessionBound?.Invoke(_session);
     }
 
@@ -104,5 +90,12 @@ public class GameRuntime : MonoBehaviour, ISeatCommands
             try { _gameViews[i].Unbind(); }
             catch (Exception ex) { Debug.LogException(ex); }
     }
+
+    void SafeBind(IGameView v)
+    {
+        try { v.Bind(_session); } catch (Exception ex) { Debug.LogException(ex); }
+    }
+
+    public void Dispose() => Unbind();
 }
 
