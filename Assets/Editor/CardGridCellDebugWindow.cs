@@ -6,11 +6,11 @@ public class CardGridCellDebugWindow : EditorWindow
 {
     public GridLayoutGroup targetGo;
     // 输入项
-    public float panelW = 7f;
-    public float panelH = 10f;
-    public float GridSize = 2.1f;
+    public float panelW = 8f;
+    public float panelH = 11f;
+    public float GridSize = 2.5f;
     public float spacing = 0.1f;
-    public float offsetY = 6f;
+    public float offsetY = 6.45f;
     // 计算结果
     private bool _isOverFlow;
 

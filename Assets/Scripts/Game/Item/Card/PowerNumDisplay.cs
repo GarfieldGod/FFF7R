@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class PowerNumDisplay : MonoBehaviour
 {
+    [SerializeField] private int testValue = -1;
     [Header("0~9 精灵数组，顺序 0,1,2,3...9")]
     public Sprite[] digitSprites;
     [Header("数字的大小")]
@@ -15,6 +16,12 @@ public class PowerNumDisplay : MonoBehaviour
     public float spacing = 0;
 
     private List<Image> _spawnedDigits = new List<Image>();
+
+
+    private void Update()
+    {
+        if (testValue != -1) SetNumber(testValue);
+    }
 
     public void SetNumber(int value)
     {
