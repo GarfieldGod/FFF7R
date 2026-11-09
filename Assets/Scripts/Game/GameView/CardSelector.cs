@@ -111,7 +111,7 @@ public class CardSelector : MonoBehaviour, IGameView
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
                 hitObj = hit.collider.gameObject;
             }
-            select.Tick(cards, hitObj, cam, ForwardToCam, out var pos);
+            select.Tick(cards, hitObj, cam, ForwardToCam, out var pos, layout.baseScale);
 
             bool want = select.Current != null && pos != Int2.Unknown;
             if (!want)

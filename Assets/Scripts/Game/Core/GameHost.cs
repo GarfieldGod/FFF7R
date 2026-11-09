@@ -27,8 +27,8 @@ public sealed class GameHost : MonoBehaviour
         string[] DefaultPlayerPool =
         {
             "Card001", 
-            // "Card002", "Card003", "Card004", "Card005",
-            // "Card006", "Card007", "Card008", "Card009", "Card010",
+            "Card002", "Card003", "Card004", "Card005",
+            "Card006", "Card007", "Card008", "Card009", "Card010",
         };
         string[] DefaultRivalPool =
         {

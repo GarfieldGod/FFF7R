@@ -70,6 +70,7 @@ MonoBehaviour:
   LevelSpacing: 2
   LevelHeight: 1
   CardHeight: 0.5
+  cardSize: 0.55
   ballPrefab: {fileID: 938554682491469808, guid: 96b2ccb5ad2976847bb94fa382b71525, type: 3}
   ballMat:
   - {fileID: 2100000, guid: e50552a790e46f0408252a209823624c, type: 2}
@@ -94,7 +95,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3795470159738626607
 Transform:
   m_ObjectHideFlags: 0
@@ -105,7 +106,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.6, z: 0}
-  m_LocalScale: {x: 9, y: 9, z: 9}
+  m_LocalScale: {x: 5.816, y: 1, z: 8}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6552723028248474630}

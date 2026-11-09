@@ -46,9 +46,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cards: []
+  board: {fileID: 0}
   cardPrefab: {fileID: 7653390149079099122, guid: eb503a83f0778b04d93c8a363dca3e12, type: 3}
   DispenseCardSrc: {fileID: 3521716311768365173}
   cam: {fileID: 0}
+  reDispense:
+    Selected: []
+    AbList: {fileID: 0}
+    LayoutWidthSpace: 5
+    LayoutDepth: 0
   layout:
     LayoutWidthMax: -25
     LayoutWidthMin: -15
@@ -56,18 +62,19 @@ MonoBehaviour:
     WidthFullCount: 10
     LayoutDepth: 0.5
     seat: 1
-    baseScale: 0.7
-    hoverScale: 0.8
+    baseScale: 0.55
+    hoverScale: 0.7
     hoverOffset: 20
     offsetStartCount: 4
     offsetFullCount: 10
-    ArcHeight: 1
+    ArcHeight: 0.5
     ArcTilt: 1
   select:
     Current: {fileID: 0}
     PreviewHeight: 2.5
     GrabDepth: 20
   seat: 1
+  isLocal: 1
   faceUp: 1
 --- !u!1 &6783326031504209017
 GameObject:

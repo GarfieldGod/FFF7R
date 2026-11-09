@@ -11,6 +11,7 @@ public class BoardGrid : MonoBehaviour
     public float LevelHeight = 1f;
     public float CardHeight = 0.5f; 
 
+    [SerializeField] float cardSize = 0.7f;
     [SerializeField] GameObject ballPrefab;
     [SerializeField] Material[] ballMat;
     [SerializeField] Card CardPrefab;
@@ -42,6 +43,8 @@ public class BoardGrid : MonoBehaviour
         {
             currentCard.gameObject.SetActive(true);
         }
+
+        currentCard.transform.localScale = Vector3.one * cardSize;
 
         if (currentCard.CardCode != cellView.CardCode)
             currentCard.SetCardOnBoard(cellView.CardCode, cellView.Owner);

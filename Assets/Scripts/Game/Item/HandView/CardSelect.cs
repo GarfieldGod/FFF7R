@@ -11,7 +11,7 @@ public sealed class CardSelect
     public SeatAction Action = SeatAction.None;
     public float PreviewHeight = 2.5f;
     public float GrabDepth = 20f;
-    public void Tick(IReadOnlyList<Card> cards, GameObject hit, Camera cam, Quaternion facing, out Int2 pos) {
+    public void Tick(IReadOnlyList<Card> cards, GameObject hit, Camera cam, Quaternion facing, out Int2 pos, float baseScale) {
         pos = Int2.Unknown;
         if (Input.GetMouseButtonDown(0))
         {
@@ -24,7 +24,7 @@ public sealed class CardSelect
 
         if (Current == null) return;
 
-        pos = Update(hit, cam, facing);
+        pos = Update(hit, cam, facing, baseScale);
 
         if (Input.GetMouseButtonDown(1)) UnSelect();
     }
@@ -48,7 +48,7 @@ public sealed class CardSelect
         Current = null;
     }
 
-    Int2 Update(GameObject hit, Camera cam, Quaternion facing)
+    Int2 Update(GameObject hit, Camera cam, Quaternion facing, float baseScale)
     {
         Int2 pos = Int2.Unknown;
         if (Current == null) return pos;
@@ -65,7 +65,7 @@ public sealed class CardSelect
 
         Current.Motion.TargetPos = worldPos;
         Current.Motion.TargetRot = worldRot;
-        Current.Motion.TargetScale = Current.Motion.BaseScale;
+        Current.Motion.TargetScale = Vector3.one * baseScale;
         return pos;
     }
 

@@ -15,7 +15,7 @@ public class CardMotion : MonoBehaviour
     }
 
     public CStatus Status = CStatus.Idle;
-    public Vector3 BaseScale;
+    // public Vector3 BaseScale;
     public BoxCollider Collider;
 
     public Vector3 TargetPos = new Vector3();
@@ -26,7 +26,7 @@ public class CardMotion : MonoBehaviour
 
     void Start()
     {
-        BaseScale = transform.localScale;
+        // BaseScale = transform.localScale;
         Collider = GetComponent<BoxCollider>();
     }
 
