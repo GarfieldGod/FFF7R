@@ -18,6 +18,7 @@ namespace FFF7R.VFX
     /// 默认的升级时序（`ApplyUpgradePreset` 生成）：
     ///   Fill    0.00 s      1.50 s  卡牌实心（常量亮面）
     ///   Edge    0.00 s      1.50 s  卡牌边框（和实心拆成两层，节奏可以各走各的）
+    ///   Surge   0.02 s      0.62 s  从卡心涌到卡边（前 70% 推到边，然后整片熄灭）
     ///   Wall    0.06 s      1.40 s  涨 0.25 s、停到 0.83 s、消散到 1.46 s
     ///   Frame1  0.10 s      0.62 s  第一条框起飞
     ///   Frame2  跟随 Frame1 70%      0.62 s  第二条框
@@ -218,6 +219,7 @@ namespace FFF7R.VFX
 
             CellFXFill fill = null;
             CellFXEdge edge = null;
+            CellFXSurge surge = null;
             CellFXWall wall = null;
             CellFXSpread spread = null;
             var frames = new List<CellFXFrame>();
@@ -226,6 +228,7 @@ namespace FFF7R.VFX
             {
                 if (fill == null && parts[i] is CellFXFill) fill = parts[i] as CellFXFill;
                 else if (edge == null && parts[i] is CellFXEdge) edge = parts[i] as CellFXEdge;
+                else if (surge == null && parts[i] is CellFXSurge) surge = parts[i] as CellFXSurge;
                 else if (wall == null && parts[i] is CellFXWall) wall = parts[i] as CellFXWall;
                 else if (spread == null && parts[i] is CellFXSpread) spread = parts[i] as CellFXSpread;
                 else if (parts[i] is CellFXFrame) frames.Add(parts[i] as CellFXFrame);
@@ -236,6 +239,8 @@ namespace FFF7R.VFX
                 slots.Add(new Slot { part = fill, trigger = Trigger.Absolute, at = 0.00f, duration = 1.50f });
             if (edge != null)
                 slots.Add(new Slot { part = edge, trigger = Trigger.Absolute, at = 0.00f, duration = 1.50f });
+            if (surge != null)
+                slots.Add(new Slot { part = surge, trigger = Trigger.Absolute, at = 0.02f, duration = 0.62f });
             if (wall != null)
                 slots.Add(new Slot { part = wall, trigger = Trigger.Absolute, at = 0.06f, duration = 1.40f });
             if (frames.Count > 0)

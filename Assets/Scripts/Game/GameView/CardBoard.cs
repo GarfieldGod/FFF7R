@@ -64,24 +64,54 @@ public class CardBoard : MonoBehaviour, IGameView
     public void OnEvents(GameEventBatch batch)
     {
         if (_gameQuery == null) return;
-
         ClearPreview();
+        BoardSnapshot final = _gameQuery.Board;
+
+        // ① 预扫描：Grid 按落子位置分桶。用 Queue，防止同 Pos 出现两次
+        var gridByPos = new Dictionary<Int2, Queue<IAnimStep>>();
+        foreach (var e in batch.Events)
+        {
+            if (e is GridLevelsChangedEvent g)
+            {
+                if (!gridByPos.TryGetValue(g.Pos, out var q))
+                    gridByPos[g.Pos] = q = new Queue<IAnimStep>();
+                q.Enqueue(AnimDirector.EventToAnimStep(this, g, TranslateEvent(g)));
+            }
+        }
 
         foreach (var e in batch.Events)
         {
-            IAnimStep animStep = AnimDirector.EventToAnimStep(this, e, TranslateEvent(e));
-            Anim.Enqueue(animStep);
+            if (e is ChessPlacedEvent p)
+            {
+                var placed = AnimDirector.EventToAnimStep(this, p, TranslateEvent(p));
+                if (placed != null) Anim.Enqueue(placed);
+
+                if (gridByPos.TryGetValue(p.Pos, out var q))
+                    while (q.Count > 0) Anim.Enqueue(q.Dequeue());
+            }
+            else if (e is GridLevelsChangedEvent g)
+            {
+                continue;
+            }
+            else
+            {
+                var s = AnimDirector.EventToAnimStep(this, e, TranslateEvent(e));
+                if (s != null) Anim.Enqueue(s);
+            }
         }
 
-        SyncScoreGrids(_gameQuery.Board);
-        Anim.Enqueue(new ActionStep(() => ApplySnapshot(_gameQuery.Board)));
+        foreach (var q in gridByPos.Values)                   // ③ 兜底 flush
+            while (q.Count > 0) Anim.Enqueue(q.Dequeue());
+
+        SyncScoreGrids(final);
+        Anim.Enqueue(new ActionStep(() => ApplySnapshot(final)));
     }
 
     public Action TranslateEvent(GameEvent e)
     {
         switch (e) {
             case ChessPlacedEvent p:
-                return () => { this[p.Pos].SetGridCard(p.CardCode, p.Owner); this[p.Pos].SetPower(p.CurrentPower); };
+                return () => { this[p.Pos].SetGridCard(p.CardCode, p.Owner, p.BasePower); this[p.Pos].SetPower(p.CurrentPower); };
             case ChessBuffedEvent b:
                 return () => { this[b.Pos].SetPower(b.AfterPower); };
             case ChessDeadEvent d:
@@ -189,6 +219,7 @@ public class CardBoard : MonoBehaviour, IGameView
     // 棋盘格子 更新与创建
     private void GenerateBoardGirds(BoardSnapshot board)
     {
+        Debug.Log($"[Rebuild BoardGirds] {Time.frameCount} {board.Width}x{board.Height} cells={_boardCells?.Count}");
         int rowCount= board.Height; 
         int colCount= board.Width;
         MeshFilter mf = BoardModel.GetComponent<MeshFilter>();

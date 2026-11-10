@@ -13,9 +13,10 @@ namespace FFF7R.VFX.EditorTools
     ///   BoardCellUpgrade              ← BoardCellUpgradeGroup（时间表在这里）
     ///     Fill                        ← CellFXFill    卡牌实心（常量亮面）
     ///     Edge                        ← CellFXEdge    卡牌边框（更亮的那一圈）
+    ///     Surge                       ← CellFXSurge   内涌：从卡心扩散到卡边
     ///     Wall                        ← CellFXWall    光墙：涨 → 停 → 消散
     ///     Frame1 / Frame2             ← CellFXFrame   两条垂直边框
-    ///     Spread                      ← CellFXSpread  平面扩散
+    ///     Spread                      ← CellFXSpread  平面扩散（从卡边往外推）
     ///
     /// 形状不再跟格子走：全部按**卡牌** 0.32 × 0.44（8:11）+ 圆角 0.0174，
     /// 见 CellFXShape。所以这个组件挂在格子中心即可，位置就是卡牌中心。
@@ -26,6 +27,7 @@ namespace FFF7R.VFX.EditorTools
     {
         const string FillShaderName   = "FFF7/VFX/CellFX/Fill";
         const string EdgeShaderName   = "FFF7/VFX/CellFX/Edge";
+        const string SurgeShaderName  = "FFF7/VFX/CellFX/Surge";
         const string WallShaderName   = "FFF7/VFX/CellFX/Wall";
         const string SpreadShaderName = "FFF7/VFX/CellFX/Spread";
         const string FrameShaderName  = "FFF7/VFX/CellFX/Frame";
@@ -50,6 +52,7 @@ namespace FFF7R.VFX.EditorTools
             string missing = null;
             if (Shader.Find(FillShaderName) == null) missing = FillShaderName;
             else if (Shader.Find(EdgeShaderName) == null) missing = EdgeShaderName;
+            else if (Shader.Find(SurgeShaderName) == null) missing = SurgeShaderName;
             else if (Shader.Find(WallShaderName) == null) missing = WallShaderName;
             else if (Shader.Find(SpreadShaderName) == null) missing = SpreadShaderName;
             else if (Shader.Find(FrameShaderName) == null) missing = FrameShaderName;
@@ -87,12 +90,14 @@ namespace FFF7R.VFX.EditorTools
 
             var matFill   = GetOrCreateMaterial("CellFXFill",   FillShaderName);
             var matEdge   = GetOrCreateMaterial("CellFXEdge",   EdgeShaderName);
+            var matSurge  = GetOrCreateMaterial("CellFXSurge",  SurgeShaderName);
             var matWall   = GetOrCreateMaterial("CellFXWall",   WallShaderName);
             var matSpread = GetOrCreateMaterial("CellFXSpread", SpreadShaderName);
             var matFrame  = GetOrCreateMaterial("CellFXFrame",  FrameShaderName);
 
             MakePart<CellFXFill>(go, "Fill", matFill);
             MakePart<CellFXEdge>(go, "Edge", matEdge);
+            MakePart<CellFXSurge>(go, "Surge", matSurge);
             MakePart<CellFXWall>(go, "Wall", matWall);
             MakePart<CellFXFrame>(go, "Frame1", matFrame);
             MakePart<CellFXFrame>(go, "Frame2", matFrame);

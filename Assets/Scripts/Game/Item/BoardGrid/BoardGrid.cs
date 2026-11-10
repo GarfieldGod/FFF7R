@@ -20,6 +20,7 @@ public class BoardGrid : MonoBehaviour
 
     List<GameObject> _balls = new List<GameObject>();
     // Start is called before the first frame update
+    int _baseLevel;
 
     private void Awake()
     {
@@ -31,10 +32,10 @@ public class BoardGrid : MonoBehaviour
         switch (cellView.State)
         {
             case CellState.OccupiedPlayer:
-                SetGridCard(cellView.CardCode, PlayerSeat.Player);
+                SetGridCard(cellView.CardCode, PlayerSeat.Player, cellView.BaseLevel);
                 break;
             case CellState.OccupiedRival:
-                SetGridCard(cellView.CardCode, PlayerSeat.Rival);
+                SetGridCard(cellView.CardCode, PlayerSeat.Rival, cellView.BaseLevel);
                 break;
             case CellState.Empty:
                 SetGridLevel(0, PlayerSeat.None);
@@ -64,14 +65,15 @@ public class BoardGrid : MonoBehaviour
         SetPower(cellView.Level);
     }
 
-    public void SetGridCard(string cardCode, PlayerSeat owner)
+    public void SetGridCard(string cardCode, PlayerSeat owner, int baseLevel)
     {
+        _baseLevel = baseLevel;
+        SetBalls(0, owner);
         if (string.IsNullOrEmpty(cardCode))
         {
             if (currentCard != null) {currentCard.gameObject.SetActive(false);}
             return;
         }
-        SetGridLevel(0, owner);
 
         if (currentCard == null)
         {
@@ -91,9 +93,16 @@ public class BoardGrid : MonoBehaviour
 
     public void SetGridLevel(int level, PlayerSeat owner)
     {
-        if (level > 3) return;
-        if (level > 0) SetGridCard(null, owner);
 
+        if (level > 3) return;
+
+        _baseLevel = 0;
+        if (currentCard != null) currentCard.gameObject.SetActive(false);
+
+        SetBalls(level, owner);
+    }
+
+    void SetBalls(int level, PlayerSeat owner) { 
         while (_balls.Count < level)
         {
             var go = Instantiate(ballPrefab, transform, false);
@@ -111,7 +120,12 @@ public class BoardGrid : MonoBehaviour
         SetGridColor(owner);
     }
 
-    public void SetPower(int value) => currentCard?.SetPower(value);
+    public void SetPower(int value) {
+        currentCard?.SetPower(value);
+        bool on = _baseLevel > 0 && value != _baseLevel;
+        bool p = _baseLevel > 0 && value > _baseLevel;
+        currentCard?.Fx.SetActivePositive(on, p);
+    }
 
     private void SetGridColor(PlayerSeat owner)
     {

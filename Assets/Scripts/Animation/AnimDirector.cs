@@ -11,18 +11,14 @@ public class AnimDirector
             case ChessPlacedEvent p:
                 return new CardPlacedStep(board, p.Pos, p.CardCode, p.Owner, onBegin);
             case ChessBuffedEvent b:
+                return new CardUpgradeStep(board, b.Pos, b.Value, onBegin);
+            case GridLevelsChangedEvent g:
+                return new CellUpgradeStep(board, g.Cells, onBegin);
             case ChessDeadEvent d:
             case BuffsExpiredEvent x:
                 return new ActionStep(onBegin);
-            case GridLevelsChangedEvent g:
-                return new CellUpgradeStep(board, g.Cells, onBegin);
             case TurnEndedEvent t:
-                // if (!t.IsPass)                                  // 跳过的回合不播
-                    // _queue.Enqueue(new TurnStep(t.NextPlayer, t.Turns));
-                return null;
             case GameEndedEvent end:
-                // _queue.Enqueue(new EndStep(end.Winner, end.Turns));
-                return null;
             default:
                 return null;
         }

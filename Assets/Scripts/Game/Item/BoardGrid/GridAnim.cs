@@ -17,18 +17,22 @@ public class GridAnim
     [SerializeField] private float PlaceStart = 2;
     [SerializeField] private float PlaceLift = 4;
     [SerializeField] private float PlaceFinal = 0.5f;
+    [Header("Card Upgrade")]
+    [SerializeField] private BoardCellUpgradeGroup _cardUpgrade;
 
     private BoardGrid _boardGrid;
 
     public float CellUpgradeDuration => _cellUpgrade != null ? _cellUpgrade.TotalDuration : 0;
     public float FlightDuration => PlaceLiftSpeed + PlaceDownSpeed;
     public float PlaceVfxDuration => _cardPlaced != null ? _cardPlaced.TotalDuration : 0f;
+    public float CardUpgradeVfxDuration => _cardUpgrade != null ? _cardUpgrade.TotalDuration : 0f;
 
     public void SetBoardGrid(BoardGrid boardGrid)
     {
         _boardGrid = boardGrid;
     }
 
+    // ----------------------------------------------------------------------------------------CellUpgrade
     public void CellUpgradeVFX(CellDelta delta)
     {
         _cellUpgrade.colorTint = delta.Owner == PlayerSeat.Player ? Color.white : Color.red;
@@ -37,6 +41,7 @@ public class GridAnim
 
     public void StopCellUpgradeVFX() {}
 
+    // ----------------------------------------------------------------------------------------CardPlace
     public void CardPlaceVFX()
     {
         _cardPlaced.Play();
@@ -74,4 +79,14 @@ public class GridAnim
         if (_boardGrid == null || _boardGrid.currentCard == null) return;
         _boardGrid.currentCard.transform.localPosition = new Vector3(0, PlaceFinal, 0);
     }
+
+    // ----------------------------------------------------------------------------------------CardUpgrade
+
+    public void CardUpgradeVFX(int value)
+    {
+        _cardUpgrade.colorTint = value > 0 ? new Color(0, 1, 62/255f, 1) : new Color(1, 0, 1, 1);
+        _cardUpgrade.Play();
+    }
+
+    public void StopCardUpgradeVFX() {}
 }

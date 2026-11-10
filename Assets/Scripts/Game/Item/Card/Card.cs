@@ -1,9 +1,5 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using FFF7R;
 
 [RequireComponent(typeof(BoxCollider))]
@@ -12,6 +8,7 @@ public class Card : MonoBehaviour
     [SerializeField] private CardFace Face;
     [SerializeField] public CardMotion Motion;
     [SerializeField] private Image CardMask;
+    [SerializeField] public CardFx Fx = new CardFx();
 
     public string CardCode;
     public int HandIndex;
@@ -28,6 +25,12 @@ public class Card : MonoBehaviour
     {
         Collider = GetComponent<BoxCollider>();
         Collider.enabled = false;
+        Fx.Hide(true);
+    }
+
+    public void OnEnable()
+    {
+        Fx.Hide(true);
     }
 
     public void SetPower(int value) => Face.SetPower(value);
@@ -46,6 +49,7 @@ public class Card : MonoBehaviour
 
     public void SetCardOnBoard(string cardCode, PlayerSeat seat)
     {
+        CardCode = cardCode;
         Motion.MotionEnabled = false;
         Collider.enabled = false;
         Face.SetCardOnBoard(cardCode, seat);
