@@ -253,7 +253,7 @@ namespace FFF7RCore {
             if (padGrid.Status == PosStatus.OCCUPIED_PLAYER || padGrid.Status == PosStatus.OCCUPIED_RIVAL)
             {
                 PlayerType gridOwner = padGrid.Status == PosStatus.OCCUPIED_PLAYER ? PlayerType.PLAYER : PlayerType.RIVAL;
-                EventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, gridOwner, padGrid.Position, source ?? Int2D.Unknown));
+                EventSystem?.RaiseChessBuffed(new EventSystem.ChessBuffedEventArgs(buffValue, padGrid.Level, gridOwner, padGrid.Position, source ?? Int2D.Unknown));
             }
         }
 

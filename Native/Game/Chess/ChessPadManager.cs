@@ -49,7 +49,7 @@ namespace FFF7RCore {
             DoCardEffect(input, pad);
             DoPosEffect(input, pad);
 
-            pad.EventSystem.RaiseChessPlaced(input);
+            pad.EventSystem.RaiseChessPlaced(input, padGrid);
         }
 
         public PreviewResult PreviewDetail(Input input)

@@ -75,7 +75,7 @@ namespace FFF7R.Adapter
         private void HandlePlaced(object sender, EventSystem.ChessPlacedEventArgs e)
         {
             Dispatch(new ChessPlacedEvent(
-                e.Sequence, e.Position.ToContract(), e.Owner.ToContract(), e.CardCode));
+                e.Sequence, e.Position.ToContract(), e.Owner.ToContract(), e.CardCode, e.BaseLevel, e.AfterLevel));
         }
 
         private void HandleDead(object sender, EventSystem.ChessDeadEventArgs e)
@@ -91,7 +91,7 @@ namespace FFF7R.Adapter
         private void HandleBuffed(object sender, EventSystem.ChessBuffedEventArgs e)
         {
             Dispatch(new ChessBuffedEvent(
-                e.Sequence, e.Position.ToContract(), e.Owner.ToContract(), e.Value, e.Source.ToContract()));
+                e.Sequence, e.Position.ToContract(), e.Owner.ToContract(), e.Value, e.AfterPower, e.Source.ToContract()));
         }
 
         private void HandleBuffsExpired(object sender, EventSystem.BuffsExpiredEventArgs e)
@@ -123,11 +123,14 @@ namespace FFF7R.Adapter
                 {
                     EventSystem.GridLevelChange change = e.Changes[i];
                     // 地形等级变更没有“归属”概念，Owner 留给表现层按 After 自行判断
-                    cells.Add(new CellDelta(
-                        change.Position.ToContract(),
-                        ((FFF7RCore.Effect.PosStatus)change.After).ToContract().Owner(),
-                        change.Before,
-                        change.After));
+                    cells.Add(
+                        new CellDelta(
+                            change.Position.ToContract(),
+                            ((FFF7RCore.Effect.PosStatus)change.After).ToContract().Owner(),
+                            ((FFF7RCore.Effect.PosStatus)change.Before).ToContract().ToLevel(),
+                            ((FFF7RCore.Effect.PosStatus)change.After).ToContract().ToLevel()
+                        )
+                    );
                 }
             }
             Dispatch(new GridLevelsChangedEvent(e.Sequence, e.Input.pos.ToContract(), cells));

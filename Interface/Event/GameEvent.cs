@@ -33,13 +33,17 @@ namespace FFF7R
         public Int2 Pos { get; }
         public PlayerSeat Owner { get; }
         public string CardCode { get; }
+        public int BasePower { get; }
+        public int CurrentPower { get; }
 
-        public ChessPlacedEvent(long sequence, Int2 pos, PlayerSeat owner, string cardCode)
+        public ChessPlacedEvent(long sequence, Int2 pos, PlayerSeat owner, string cardCode, int basePower, int currentPower)
             : base(sequence)
         {
             Pos = pos;
             Owner = owner;
             CardCode = cardCode;
+            BasePower = basePower;
+            CurrentPower = currentPower;
         }
 
         public override GameEventKind Kind => GameEventKind.ChessPlaced;
@@ -74,17 +78,19 @@ namespace FFF7R
         /// <summary>等级的实际变化量（after - before），不是本次申请的 buff 值。
         /// 等级没变的写入（覆盖成同一个值、或被 scope 过滤）不会产生事件。</summary>
         public int Value { get; }
+        public int AfterPower { get; }
 
         /// <summary>施加者的位置；无法确定时为 <see cref="Int2.Unknown"/>。</summary>
         public Int2 Source { get; }
 
-        public ChessBuffedEvent(long sequence, Int2 pos, PlayerSeat owner, int value, Int2 source)
+        public ChessBuffedEvent(long sequence, Int2 pos, PlayerSeat owner, int value, int afterPower, Int2 source)
             : base(sequence)
         {
             Pos = pos;
             Owner = owner;
             Value = value;
             Source = source;
+            AfterPower = afterPower;
         }
 
         public override GameEventKind Kind => GameEventKind.ChessBuffed;

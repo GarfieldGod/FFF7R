@@ -58,13 +58,14 @@ namespace FFF7RCore {
         //     Unbind(EventType.Dead, pos);
         // }
 
-        public void RaiseChessPlaced(Input input)
+        public void RaiseChessPlaced(Input input, PadGrid padGrid)
         {
+            if (input.chess == null) return;
             sequence_++;
             Log.Test($"OnChessPlaced", TextColor.YELLOW);
             Log.Test(" were Invoked");
             Log.TestLine($" ({input})", TextColor.BLACK);
-            var e = new ChessPlacedEventArgs(input.pos, input.playerType, input.chess?.CardCode, sequence_);
+            var e = new ChessPlacedEventArgs(input.pos, input.playerType, input.chess.CardCode, sequence_, input.chess.Level, padGrid.Level);
             OnChessPlaced?.Invoke(this, e);
             SettlePlaced?.Invoke(e);
         }
@@ -141,13 +142,17 @@ namespace FFF7RCore {
             public Int2D Position;
             public PlayerType Owner;
             public string CardCode;
+            public int BaseLevel;
+            public int AfterLevel;
             public long Sequence;
-            public ChessPlacedEventArgs(Int2D position, PlayerType owner, string cardCode, long sequence)
+            public ChessPlacedEventArgs(Int2D position, PlayerType owner, string cardCode, long sequence, int baseLevel, int afterLevel)
             {
                 Position = position;
                 Owner = owner;
                 CardCode = cardCode;
                 Sequence = sequence;
+                BaseLevel = baseLevel;
+                AfterLevel = afterLevel;
             }
         }
 
@@ -170,13 +175,15 @@ namespace FFF7RCore {
             // 等级的实际变化量（Level 的 after - before），不是本次申请的 buff 值。
             // 保证非 0：等值覆盖与 scope 过滤掉的 buff 不会触发事件，见 ChessPad.AddBuff。
             public int Value;
+            public int AfterPower;
             public PlayerType Owner;
             public Int2D Position;
             public Int2D Source;     // buff 施加者位置；无法确定时为 Int2D.Unknown
             public long Sequence;
-            public ChessBuffedEventArgs(int value, PlayerType owner, Int2D position, Int2D source)
+            public ChessBuffedEventArgs(int value, int afterPower, PlayerType owner, Int2D position, Int2D source)
             {
                 Value = value;
+                AfterPower = afterPower;
                 Owner = owner;
                 Position = position;
                 Source = source;

@@ -42,5 +42,27 @@ namespace FFF7R
                     return PlayerSeat.None;
             }
         }
+
+        public static int ToLevel(this CellState state)
+        {
+            switch (state)
+            {
+                case CellState.LevelOnePlayer:
+                case CellState.LevelOneRival:
+                    return 1;
+                case CellState.LevelTwoPlayer:
+                case CellState.LevelTwoRival:
+                    return 2;
+                case CellState.LevelThreePlayer:
+                case CellState.LevelThreeRival:
+                    return 3;
+                case CellState.OccupiedPlayer:
+                case CellState.OccupiedRival:
+                case CellState.Empty:
+                    return 0;
+                default:
+                    return 0;
+            }
+        }
     }
 }
