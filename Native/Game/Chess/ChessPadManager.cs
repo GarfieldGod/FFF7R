@@ -3,6 +3,7 @@ namespace FFF7RCore {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using static FFF7RCore.EventSystem;
 
     public class ChessPadManager
     {
@@ -45,11 +46,14 @@ namespace FFF7RCore {
             padGrid.Chess = input.chess;
             padGrid.Status = input.playerType == PlayerType.PLAYER ? PosStatus.OCCUPIED_PLAYER : PosStatus.OCCUPIED_RIVAL;
 
+            var e = new ChessPlacedEventArgs(input.pos, input.playerType, input.chess.CardCode, 0, input.chess.Level, input.chess.Level);
+            pad.EventSystem.RaiseChessPlaced(e);
+
             DoSelfPower(input, pad);
             DoCardEffect(input, pad);
             DoPosEffect(input, pad);
 
-            pad.EventSystem.RaiseChessPlaced(input, padGrid);
+            pad.EventSystem.SettleChessPlaced(e);
         }
 
         public PreviewResult PreviewDetail(Input input)
