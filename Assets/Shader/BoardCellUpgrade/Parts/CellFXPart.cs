@@ -140,7 +140,7 @@ namespace FFF7R.VFX
         /// <summary>组级的统一配色，乘在本部件的 tint 上。</summary>
         public void SetExternalTint(Color c)
         {
-            if (_external == c) return;
+            // if (_external == c) return;
             _external = c;
             Apply(Mathf.Max(_p, 0f), true);
         }
@@ -152,7 +152,7 @@ namespace FFF7R.VFX
 
             if (_mr == null) return;
             _mr.enabled = p > 1e-4f;      // 进度归零 = 彻底关掉，不留在场景里
-            if (p <= 1e-4f) return;
+            // if (p <= 1e-4f) return;
 
             if (_mpb == null) _mpb = new MaterialPropertyBlock();
             _mr.GetPropertyBlock(_mpb);

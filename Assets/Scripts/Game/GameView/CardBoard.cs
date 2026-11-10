@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FFF7R;
 using UnityEngine.SocialPlatforms.Impl;
+using System;
 
 public class CardBoard : MonoBehaviour, IGameView
 {
@@ -23,34 +24,80 @@ public class CardBoard : MonoBehaviour, IGameView
     private List<ScoreGrid> _playerScores;
     private List<ScoreGrid> _rivalScores;
     private bool _previewing;
+    private BoardSnapshot _previewBase;
+
+    public AnimQueue Anim;
+
+    public BoardGrid this[Int2 p]
+    {
+        get { return _boardCells[p.X][p.Y]; }
+    }
+
     // Start is called before the first frame update
     public void Bind(IGameQuery gameQuery)
     {
+        Anim.Clear();
         _gameQuery = gameQuery;
         Resync();
     }
 
     public void Unbind()
     {
+        Anim.Clear();
         _gameQuery = null;
     }
 
     public void Resync()
     {
-        if (_gameQuery == null) return;
-        UpdateBoard(_gameQuery.Board);
+        ApplySnapshot(_gameQuery.Board);
+    }
+
+    public void ApplySnapshot(BoardSnapshot s)
+    {
+        if (s == null) return;
+        _previewing = false;
+        _previewBase = null;
+        UpdateBoard(s);
     }
 
     public void OnEvents(GameEventBatch batch)
     {
-         _previewing = false;
         if (_gameQuery == null) return;
-        UpdateBoard(_gameQuery.Board);
+
+        ClearPreview();
+
+        foreach (var e in batch.Events)
+        {
+            Anim.Enqueue(AnimDirector.EventToAnimStep(this, e, TranslateEvent(e)));
+        }
+
+        Anim.Enqueue(new ActionStep(() => ApplySnapshot(_gameQuery.Board), 1));
+    }
+
+    public Action TranslateEvent(GameEvent e)
+    {
+        switch (e) {
+            case ChessPlacedEvent p:
+                return () => { this[p.Pos].SetGridCard(p.CardCode, p.Owner); this[p.Pos].SetPower(p.CurrentPower); };
+            case ChessBuffedEvent b:
+                return () => { this[b.Pos].SetPower(b.AfterPower); };
+            case ChessDeadEvent d:
+                return () => { this[d.Pos].SetGridLevel(1, d.Owner); };
+            case GridLevelsChangedEvent g:
+                return () => { foreach (var c in g.Cells) {int level = c.After; this[c.Pos].SetGridLevel(c.After, c.Owner);} };
+            case BuffsExpiredEvent x:
+                return () => { foreach (var c in x.Cells) this[c.Pos].SetPower(c.After); };
+            case TurnEndedEvent t:
+            case GameEndedEvent end:
+            default:
+                return null;
+        }
     }
 
     public void ShowPreview(BoardSnapshot snapshot)
     {
         if (snapshot == null) return;
+        if (!_previewing) _previewBase = _gameQuery.Board;
         _previewing = true;
         UpdateBoard(snapshot);
     }
@@ -59,13 +106,17 @@ public class CardBoard : MonoBehaviour, IGameView
     {
         if (!_previewing) return;
         _previewing = false;
-        UpdateBoard(_gameQuery.Board);
+
+        BoardSnapshot back = _previewBase;
+        _previewBase = null;
+        if (back != null) UpdateBoard(back);
+        else if (_gameQuery != null) UpdateBoard(_gameQuery.Board);   // 兜底
     }
 
     private void UpdateBoard(BoardSnapshot board)
     {
         if (board == null) return;
-        UpdateBoardGrids(board);
+        SyncGrids(board);
         UpdateScoreGrids(board);
     }
 
@@ -114,7 +165,7 @@ public class CardBoard : MonoBehaviour, IGameView
         }
     }
 
-    private void UpdateBoardGrids(BoardSnapshot board)
+    private void SyncGrids(BoardSnapshot board)
     {
         if (board == null) return;
         if (_boardCells == null || _boardCells.Count != board.Height || (_boardCells.Count > 0 && _boardCells[0].Count != board.Width))
@@ -127,11 +178,10 @@ public class CardBoard : MonoBehaviour, IGameView
             for (int y = 0; y < board.Width; y++)
             {
                 CellView cellView = board[x, y];
-                _boardCells[x][y].UpdateBoardGrid(cellView);
+                _boardCells[x][y].SyncGrid(cellView);
             }
         }
     }
-
 
     // 棋盘格子 更新与创建
     private void GenerateBoardGirds(BoardSnapshot board)

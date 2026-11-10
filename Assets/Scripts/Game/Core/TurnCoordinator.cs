@@ -26,6 +26,8 @@ public class TurnCoordinator
         if (_runtime == null || _runtime.IsBusy) return;
         if (_runtime.Query == null) return;
 
+        if (_runtime.Anim == null || _runtime.Anim.IsBusy) return;
+
         var st = _runtime.Query.State;
 
         if (st.IsOver)

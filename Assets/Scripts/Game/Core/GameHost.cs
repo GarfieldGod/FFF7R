@@ -80,6 +80,7 @@ public sealed class GameHost : MonoBehaviour
 
         gamingPanel.PassRequested += localAct.RequestPass;
         reDispensePanel.ReDispenseRequested += SubmitReDispense;
+        board.Anim = _runtime.Anim;
 
         _boot.Create(TestStartLocalGame());
         reDispensePanel.OnStageChanged(MatchStatus.ReDispense);
@@ -103,7 +104,10 @@ public sealed class GameHost : MonoBehaviour
         reDispensePanel.OnStageChanged(MatchStatus.Gaming);
     }
 
-    void Update() => _turn.Tick();          // 逻辑：先跑
+    void Update() {
+        _runtime.Anim.Tick(Time.deltaTime);
+        _turn.Tick(); // 逻辑：先跑
+    }
     // LateUpdate 留给 view（CardSelector / CardMotion）
     void OnDestroy() { _boot.Dispose(); _runtime.Dispose(); }
 }

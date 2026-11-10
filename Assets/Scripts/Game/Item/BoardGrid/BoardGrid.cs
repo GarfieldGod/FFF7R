@@ -10,29 +10,63 @@ public class BoardGrid : MonoBehaviour
     public float LevelSpacing = 2f;
     public float LevelHeight = 1f;
     public float CardHeight = 0.5f; 
+    public Card currentCard;
+    public GridAnim Anim = new GridAnim();
 
     [SerializeField] float cardSize = 0.7f;
     [SerializeField] GameObject ballPrefab;
     [SerializeField] Material[] ballMat;
     [SerializeField] Card CardPrefab;
-    public Card currentCard;
+
     List<GameObject> _balls = new List<GameObject>();
     // Start is called before the first frame update
 
-    public void UpdateBoardGrid(CellView cellView)
+    public void SyncGrid(CellView cellView)
     {
-        SetGridState(cellView.State);
-        SetGridCard(cellView);
-        if (currentCard != null) currentCard.SetPower(cellView.Level);
+        switch (cellView.State)
+        {
+            case CellState.OccupiedPlayer:
+                SetGridCard(cellView.CardCode, PlayerSeat.Player);
+                break;
+            case CellState.OccupiedRival:
+                SetGridCard(cellView.CardCode, PlayerSeat.Rival);
+                break;
+            case CellState.Empty:
+                SetGridLevel(0, PlayerSeat.None);
+                break;
+            case CellState.LevelOnePlayer:
+                SetGridLevel(1, PlayerSeat.Player);
+                break;
+            case CellState.LevelTwoPlayer:
+                SetGridLevel(2, PlayerSeat.Player);
+                break;
+            case CellState.LevelThreePlayer:
+                SetGridLevel(3, PlayerSeat.Player);
+                break;
+            case CellState.LevelOneRival:
+                SetGridLevel(1, PlayerSeat.Rival);
+                break;
+            case CellState.LevelTwoRival:
+                SetGridLevel(2, PlayerSeat.Rival);
+                break;
+            case CellState.LevelThreeRival:
+                SetGridLevel(3, PlayerSeat.Rival);
+                break;
+            default:
+                break;
+        }
+
+        SetPower(cellView.Level);
     }
 
-    public void SetGridCard(CellView cellView)
+    public void SetGridCard(string cardCode, PlayerSeat owner)
     {
-        if (cellView.CardCode == null)
+        if (string.IsNullOrEmpty(cardCode))
         {
             if (currentCard != null) {currentCard.gameObject.SetActive(false);}
             return;
         }
+        SetGridLevel(0, owner);
 
         if (currentCard == null)
         {
@@ -46,57 +80,14 @@ public class BoardGrid : MonoBehaviour
 
         currentCard.transform.localScale = Vector3.one * cardSize;
 
-        if (currentCard.CardCode != cellView.CardCode)
-            currentCard.SetCardOnBoard(cellView.CardCode, cellView.Owner);
+        if (currentCard.CardCode != cardCode)
+            currentCard.SetCardOnBoard(cardCode, owner);
     }
 
-    public void SetGridState(CellState cellState)
-    {
-        switch (cellState)
-        {
-            case CellState.OccupiedPlayer:
-            case CellState.OccupiedRival:
-            case CellState.Empty:
-                SetGridLevel(0);
-                break;
-            case CellState.LevelOnePlayer:
-                SetGridLevel(1);
-                SetGridColor(0);
-                break;
-            case CellState.LevelTwoPlayer:
-                SetGridLevel(2);
-                SetGridColor(0);
-                break;
-            case CellState.LevelThreePlayer:
-                SetGridLevel(3);
-                SetGridColor(0);
-                break;
-            case CellState.LevelOneRival:
-                SetGridLevel(1);
-                SetGridColor(1);
-                break;
-            case CellState.LevelTwoRival:
-                SetGridLevel(2);
-                SetGridColor(1);
-                break;
-            case CellState.LevelThreeRival:
-                SetGridLevel(3);
-                SetGridColor(1);
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void SetGridColor(int i)
-    {
-        var mat = ballMat[i];
-        foreach (var ball in _balls) ball.GetComponent<MeshRenderer>().sharedMaterial = mat;
-    }
-
-    public void SetGridLevel(int level)
+    public void SetGridLevel(int level, PlayerSeat owner)
     {
         if (level > 3) return;
+        if (level > 0) SetGridCard(null, owner);
 
         while (_balls.Count < level)
         {
@@ -111,6 +102,17 @@ public class BoardGrid : MonoBehaviour
             _balls[i].SetActive(true);
             _balls[i].transform.localPosition = BollPos(level, i);
         }
+
+        SetGridColor(owner);
+    }
+
+    public void SetPower(int value) => currentCard?.SetPower(value);
+
+    private void SetGridColor(PlayerSeat owner)
+    {
+        if (owner == PlayerSeat.None) return;
+        var mat = ballMat[owner == PlayerSeat.Player ? 0 : 1];
+        foreach (var ball in _balls) ball.GetComponent<MeshRenderer>().sharedMaterial = mat;
     }
 
     static readonly Vector3[][] Layout =

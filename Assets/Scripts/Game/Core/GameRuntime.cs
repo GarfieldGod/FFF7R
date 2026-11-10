@@ -8,11 +8,13 @@ public class GameRuntime : ISeatCommands, IDisposable
     readonly List<IGameView> _gameViews = new();
     readonly List<GameEvent> _eventBuffer = new();
     IGameSession _session;
+    AnimQueue _anim = new AnimQueue();
     long _lastSeq;
     bool _lost;
 
     public bool IsBusy;
     public IGameQuery Query => _session;
+    public AnimQueue Anim => _anim;
     public event Action<IGameSession> SessionBound;
     public event Action EventFlushed;
 
