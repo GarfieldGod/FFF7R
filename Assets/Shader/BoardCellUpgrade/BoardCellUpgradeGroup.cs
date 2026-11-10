@@ -132,7 +132,7 @@ namespace FFF7R.VFX
         }
 
         /// <summary>从头播一次。</summary>
-        public void Play(int lv)
+        public void Play(int lv = 1)
         {
             level = Mathf.Clamp(lv, 0, 3);
             _t0 = Now;

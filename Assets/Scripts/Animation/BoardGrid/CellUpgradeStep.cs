@@ -19,7 +19,7 @@ sealed class CellUpgradeStep : IAnimStep
         {
             var cell = p.Key;
             _pendingAnim.Add(cell.Anim);
-            cell.Anim.Play(GridAnimType.Upgrade, p.Value);
+            cell.Anim.CellUpgrade(p.Value);
             _duration = Mathf.Max(_duration, cell.Anim.Duration);
         }
 

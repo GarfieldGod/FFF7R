@@ -4,6 +4,7 @@ using UnityEngine;
 using FFF7R;
 using UnityEngine.SocialPlatforms.Impl;
 using System;
+using System.Linq;
 
 public class CardBoard : MonoBehaviour, IGameView
 {
@@ -60,18 +61,30 @@ public class CardBoard : MonoBehaviour, IGameView
         UpdateBoard(s);
     }
 
+    static int Order(GameEvent e) => e switch
+    {
+        BuffsExpiredEvent      => 0,   // 覆盖前的清理，叙事上确实在落子之前
+        ChessPlacedEvent       => 1,
+        GridLevelsChangedEvent => 2,
+        ChessBuffedEvent       => 3,
+        ChessDeadEvent         => 4,
+        _                      => 5,
+    };
+
     public void OnEvents(GameEventBatch batch)
     {
         if (_gameQuery == null) return;
 
         ClearPreview();
 
-        foreach (var e in batch.Events)
+        var ordered = new List<GameEvent>(batch.Events).OrderBy(Order);
+        foreach (var e in ordered)
         {
             Anim.Enqueue(AnimDirector.EventToAnimStep(this, e, TranslateEvent(e)));
         }
 
-        Anim.Enqueue(new ActionStep(() => ApplySnapshot(_gameQuery.Board), 1));
+        SyncScoreGrids(_gameQuery.Board);
+        Anim.Enqueue(new ActionStep(() => ApplySnapshot(_gameQuery.Board)));
     }
 
     public Action TranslateEvent(GameEvent e)
@@ -117,11 +130,11 @@ public class CardBoard : MonoBehaviour, IGameView
     {
         if (board == null) return;
         SyncGrids(board);
-        UpdateScoreGrids(board);
+        SyncScoreGrids(board);
     }
 
     // 分数格子 更新与创建
-    private void UpdateScoreGrids(BoardSnapshot board)
+    private void SyncScoreGrids(BoardSnapshot board)
     {
         if (_playerScores == null || _playerScores.Count != board.Height || 
             _rivalScores == null || _rivalScores.Count != board.Height)

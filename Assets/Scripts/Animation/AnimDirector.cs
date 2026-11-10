@@ -9,10 +9,11 @@ public class AnimDirector
         switch (e)
         {
             case ChessPlacedEvent p:
+                return new CardPlacedStep(board[p.Pos], p.CardCode, p.Owner, onBegin);
             case ChessBuffedEvent b:
             case ChessDeadEvent d:
             case BuffsExpiredEvent x:
-                return new ActionStep(onBegin, 3);
+                return new ActionStep(onBegin);
             case GridLevelsChangedEvent g:
                 var dict = new Dictionary<BoardGrid, CellDelta>();
                 foreach (var c in g.Cells)
