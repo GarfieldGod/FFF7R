@@ -21,6 +21,11 @@ public class BoardGrid : MonoBehaviour
     List<GameObject> _balls = new List<GameObject>();
     // Start is called before the first frame update
 
+    private void Awake()
+    {
+        Anim.SetBoardGrid(this);
+    }
+
     public void SyncGrid(CellView cellView)
     {
         switch (cellView.State)

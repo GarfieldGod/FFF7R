@@ -5,25 +5,30 @@ using UnityEngine;
 
 sealed class CellUpgradeStep : IAnimStep
 {
-    readonly Dictionary<BoardGrid, CellDelta> _ap;
+    readonly CardBoard _board;
+    readonly IReadOnlyList<CellDelta> _deltas;
     List<GridAnim> _pendingAnim = new List<GridAnim>();
     readonly Action _onBegin;
     float _duration = 0;
     float _t;
 
-    public CellUpgradeStep(Dictionary<BoardGrid, CellDelta> ap, Action onBegin) { _ap = ap; _onBegin = onBegin; }
+    public CellUpgradeStep(CardBoard board, IReadOnlyList<CellDelta> deltas, Action onBegin) {
+        _board = board;
+        _deltas = deltas;
+        _onBegin = onBegin; 
+    }
 
     public void Begin()
     {
-        foreach (var p in _ap)
-        {
-            var cell = p.Key;
-            _pendingAnim.Add(cell.Anim);
-            cell.Anim.CellUpgrade(p.Value);
-            _duration = Mathf.Max(_duration, cell.Anim.Duration);
-        }
-
         _onBegin?.Invoke();
+
+        foreach (var d in _deltas)
+        {
+            var cell = _board[d.Pos];
+            _pendingAnim.Add(cell.Anim);
+            cell.Anim.CellUpgradeVFX(d);
+            _duration = Mathf.Max(_duration, cell.Anim.CellUpgradeDuration);
+        }
     }
 
     public bool Tick(float dt) { 
@@ -33,10 +38,9 @@ sealed class CellUpgradeStep : IAnimStep
 
     public void Finish()
     {
-        // 保险：跳到终态
         foreach(var anim in _pendingAnim)
         {
-            anim.Stop();
+            anim.StopCellUpgradeVFX();
         }
     }
 }

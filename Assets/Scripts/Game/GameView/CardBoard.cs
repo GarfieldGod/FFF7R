@@ -61,26 +61,16 @@ public class CardBoard : MonoBehaviour, IGameView
         UpdateBoard(s);
     }
 
-    static int Order(GameEvent e) => e switch
-    {
-        BuffsExpiredEvent      => 0,   // 覆盖前的清理，叙事上确实在落子之前
-        ChessPlacedEvent       => 1,
-        GridLevelsChangedEvent => 2,
-        ChessBuffedEvent       => 3,
-        ChessDeadEvent         => 4,
-        _                      => 5,
-    };
-
     public void OnEvents(GameEventBatch batch)
     {
         if (_gameQuery == null) return;
 
         ClearPreview();
 
-        var ordered = new List<GameEvent>(batch.Events).OrderBy(Order);
-        foreach (var e in ordered)
+        foreach (var e in batch.Events)
         {
-            Anim.Enqueue(AnimDirector.EventToAnimStep(this, e, TranslateEvent(e)));
+            IAnimStep animStep = AnimDirector.EventToAnimStep(this, e, TranslateEvent(e));
+            Anim.Enqueue(animStep);
         }
 
         SyncScoreGrids(_gameQuery.Board);

@@ -9,18 +9,13 @@ public class AnimDirector
         switch (e)
         {
             case ChessPlacedEvent p:
-                return new CardPlacedStep(board[p.Pos], p.CardCode, p.Owner, onBegin);
+                return new CardPlacedStep(board, p.Pos, p.CardCode, p.Owner, onBegin);
             case ChessBuffedEvent b:
             case ChessDeadEvent d:
             case BuffsExpiredEvent x:
                 return new ActionStep(onBegin);
             case GridLevelsChangedEvent g:
-                var dict = new Dictionary<BoardGrid, CellDelta>();
-                foreach (var c in g.Cells)
-                {
-                    dict[board[c.Pos]] = c;
-                }
-                return new CellUpgradeStep(dict, onBegin);
+                return new CellUpgradeStep(board, g.Cells, onBegin);
             case TurnEndedEvent t:
                 // if (!t.IsPass)                                  // 跳过的回合不播
                     // _queue.Enqueue(new TurnStep(t.NextPlayer, t.Turns));

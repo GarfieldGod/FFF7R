@@ -106,9 +106,13 @@ MonoBehaviour:
   CardHeight: 0.5
   currentCard: {fileID: 0}
   Anim:
-    Duration: 0
     _cellUpgrade: {fileID: 4062779016061934054}
     _cardPlaced: {fileID: 6619536467795586319}
+    PlaceLiftSpeed: 0.2
+    PlaceDownSpeed: 0.2
+    PlaceStart: 2
+    PlaceLift: 4
+    PlaceFinal: 0.5
   cardSize: 0.55
   ballPrefab: {fileID: 938554682491469808, guid: 96b2ccb5ad2976847bb94fa382b71525, type: 3}
   ballMat:
