@@ -11,6 +11,8 @@ public sealed class SeatPlayer
         Seat = seat;
     }
 
+    public void OnTurnStart(ISeatActionSource src) => src.OnTurnStart(Seat);
+
     public void Tick(IGameQuery q, ISeatCommands cmd, ISeatActionSource src)
     {
         GameStateView st = q.State;
@@ -28,4 +30,6 @@ public sealed class SeatPlayer
 
         src.OnResult(r);
     }
+
+    public void OnTurnEnd(ISeatActionSource src) => src.OnTurnEnd(Seat);
 }

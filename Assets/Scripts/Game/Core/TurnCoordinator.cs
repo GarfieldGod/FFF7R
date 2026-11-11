@@ -11,6 +11,7 @@ public class TurnCoordinator
     bool _ended = false;
 
     public event Action<PlayerSeat> TurnBegan;
+    public event Action<PlayerSeat> TurnEnd;
     public event Action<IGameQuery> MatchEnded;
 
     public TurnCoordinator(GameRuntime runtime, ISeatActionSource[] sources)
@@ -37,14 +38,23 @@ public class TurnCoordinator
         }
         if (!st.IsGaming) return;
 
+        var seat = _seats[(int)st.Current];
+        var actionSrc = _sources[(int)st.Current];
+
         if (st.Turns != _lastTurn)
         {
             _lastTurn = st.Turns;
             TurnBegan?.Invoke(st.Current);
+            seat.OnTurnStart(actionSrc);
         }
 
-        var seat = _seats[(int)st.Current];
-        var actionSrc = _sources[(int)st.Current];
         seat.Tick(_runtime.Query, _runtime, actionSrc);
+
+        var newSt = _runtime.Query.State;
+        if (st.Turns != newSt.Turns)
+        {
+            TurnEnd?.Invoke(st.Current);
+            seat.OnTurnEnd(actionSrc);
+        }
     }
 }

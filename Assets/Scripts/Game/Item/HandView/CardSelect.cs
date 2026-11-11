@@ -11,12 +11,16 @@ public sealed class CardSelect
     public SeatAction Action = SeatAction.None;
     public float PreviewHeight = 2.5f;
     public float GrabDepth = 20f;
-    public void Tick(IReadOnlyList<Card> cards, GameObject hit, Camera cam, Quaternion facing, out Int2 pos, float baseScale) {
+    public void Tick(IReadOnlyList<Card> cards, List<Card> canInput,
+        GameObject hit, Camera cam, Quaternion facing, out Int2 pos, float baseScale,
+        Action RefreshPlayableFx = null) 
+    {
         pos = Int2.Unknown;
         if (Input.GetMouseButtonDown(0))
         {
-            SelectUpdate(cards, hit);
-            ActionUpdate(hit);   
+            SelectUpdate(cards, canInput, hit);
+            ActionUpdate(hit);
+            RefreshPlayableFx?.Invoke();
         } else
         {
             Action = SeatAction.None;
@@ -26,7 +30,10 @@ public sealed class CardSelect
 
         pos = Update(hit, cam, facing, baseScale);
 
-        if (Input.GetMouseButtonDown(1)) UnSelect();
+        if (Input.GetMouseButtonDown(1)) {
+            UnSelect();
+            RefreshPlayableFx?.Invoke();
+        }
     }
 
     public bool Select(Card card)
@@ -69,10 +76,12 @@ public sealed class CardSelect
         return pos;
     }
 
-    public void SelectUpdate(IReadOnlyList<Card> cards, GameObject hit)
+    public void SelectUpdate(IReadOnlyList<Card> cards, List<Card> canInput, GameObject hit)
     {
         if (hit != null && hit.CompareTag("CardInHand") && hit.TryGetComponent(out Card card) && cards.Contains(card)) {
-            Select(card);
+            if (canInput.Contains(card)) {
+                Select(card);
+            }
         }
     }
 

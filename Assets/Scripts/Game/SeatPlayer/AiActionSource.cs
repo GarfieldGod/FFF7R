@@ -17,7 +17,8 @@ public sealed class AiActionSource: ISeatActionSource
     SeatAction _cached;
 
     public void OnResult(CommandResult r) { if (!r.Ok) _failedTurn = _decidedTurn; }
-
+    public void OnTurnStart(PlayerSeat seat) {}
+    public void OnTurnEnd(PlayerSeat seat) {}
     public bool TryTake(IGameQuery query, PlayerSeat seat, out SeatAction action)
     {
         int turn = query.State.Turns;

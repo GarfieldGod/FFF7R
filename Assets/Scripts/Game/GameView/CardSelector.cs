@@ -33,6 +33,7 @@ public class CardSelector : MonoBehaviour, IGameView
     private Int2 _lastPos  = Int2.Unknown;
     private bool _hadPreview;
     private Card _lastFocus;
+    private List<Card> _canInput = new List<Card>();
 
     public void Start()
     {
@@ -103,6 +104,7 @@ public class CardSelector : MonoBehaviour, IGameView
         cards.Add(card);
     }
 
+    // --------------------------------------------------------------------------------------------------------TickSelect
     public void TickSelect()
     {
         if (isLocal && _gameQuery.State.IsGaming) {
@@ -111,7 +113,10 @@ public class CardSelector : MonoBehaviour, IGameView
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
                 hitObj = hit.collider.gameObject;
             }
-            select.Tick(cards, hitObj, cam, ForwardToCam, out var pos, layout.baseScale);
+            select.Tick(cards, _canInput, 
+                hitObj, cam, ForwardToCam, out var pos, layout.baseScale, 
+                RefreshPlayableFx
+            );
 
             bool want = select.Current != null && pos != Int2.Unknown;
             if (!want)
@@ -139,8 +144,23 @@ public class CardSelector : MonoBehaviour, IGameView
         }
     }
 
+    public SeatAction TakeAction()
+    {
+        var a = select.Action;
+        select.Action = SeatAction.None;
+        return a;
+    }
+
+    public void OnInputSuccess() => select.UnSelect();
+
+    // --------------------------------------------------------------------------------------------------------TickReDispense
     public void TickReDispense()
     {
+        if (!isLocal)
+        {
+            layout.Refresh(cards, null, null, ForwardToCam);
+            return;
+        }
         if (_gameQuery.State.Status != MatchStatus.ReDispense) return;
 
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
@@ -156,18 +176,58 @@ public class CardSelector : MonoBehaviour, IGameView
         foreach (var c in cards) if (!reDispense.Selected.Contains(c)) _unselected.Add(c);
 
         layout.Refresh(_unselected, null, hover.Current, ForwardToCam);   // ← 第三个参数不再传 null
+        UpdateFocus();
     }
 
     public List<int> GetReDispense() => reDispense.Selected.Select(c => c.HandIndex).ToList();
     public void ClearReDispense() => reDispense.Selected.Clear();
 
-    public SeatAction TakeAction()
+    // --------------------------------------------------------------------------------------------------------TickHover
+    public void TickHover()
     {
-        var a = select.Action;
-        select.Action = SeatAction.None;
-        return a;
+        if (isLocal) {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            GameObject hitObj = null;
+            if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
+                hitObj = hit.collider.gameObject;
+            }
+
+            hover.Tick(cards, hitObj, cam, select.Current != null);
+        }
     }
 
+    //--------------------------------------------------------------------------------------------------------Tick
+    public void TurnStart()
+    {
+        if (_gameQuery == null) return;
+        _canInput.Clear();
+
+        var st = _gameQuery.State;
+        bool active = isLocal && faceUp && st.IsGaming && st.Current == seat;
+
+        for (int i = 0; i < cards.Count; i++)
+        {
+            var c = cards[i];
+            bool ok = active
+                && c.CardCode != "__back"
+                && HasAnyLegalPos(c.HandIndex);
+
+            if (ok) _canInput.Add(c);
+        }
+
+        RefreshPlayableFx();
+    }
+
+    public void TurnTick()
+    {
+        TickSelect();
+    }
+    public void TurnEnd()
+    {
+        ClearPlayableFx();
+    }
+
+    // 非己方回合也Tick的事件
     void LateUpdate()
     {
         if (_gameQuery == null) return;
@@ -175,24 +235,14 @@ public class CardSelector : MonoBehaviour, IGameView
 
         if (st.Status == MatchStatus.ReDispense)
         {
-            if(isLocal) { TickReDispense(); UpdateFocus(); }  // 选牌 + 排选中的牌
-            else layout.Refresh(cards, null, null, ForwardToCam);   // 别人的牌
+            TickReDispense();
             return;
         }
 
         if (!st.IsGaming) return;
-        if (isLocal) {
-            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-            GameObject hitObj = null;
-            if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
-                hitObj = hit.collider.gameObject;
-            }
-            // select.Tick(cards, hitObj, cam, ForwardToCam);
-            hover.Tick(cards, hitObj, cam, select.Current != null);
-        }
+        TickHover();
 
         layout.Refresh(cards, select.Current, hover.Current, ForwardToCam);
-
         UpdateFocus();
     }
 
@@ -204,8 +254,26 @@ public class CardSelector : MonoBehaviour, IGameView
         FocusChanged?.Invoke(focus);
     }
 
-    public void OnInputSuccess()
+    void RefreshPlayableFx()
     {
-        if (select.Current != null) select.UnSelect();
+        foreach(var c in cards) {
+            if (c != select.Current && _canInput.Contains(c)) c.Fx.SetActive(true);
+            else c.Fx.SetActive(false);
+        }
+    }
+
+    void ClearPlayableFx()
+    {
+        for (int i = 0; i < cards.Count; i++) cards[i].Fx.SetActive(false);
+    }
+
+    bool HasAnyLegalPos(int handIndex)
+    {
+        var b = _gameQuery.Board;
+        for (int x = 0; x < b.Width; x++)
+            for (int y = 0; y < b.Height; y++)
+                if (_gameQuery.CanPlace(seat, handIndex, new Int2(x, y), out _))
+                    return true;
+        return false;
     }
 }

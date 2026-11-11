@@ -12,7 +12,8 @@ public sealed class DelayedActionSource : ISeatActionSource
 
     public DelayedActionSource(ISeatActionSource inner, float delay)
     => (_inner, _delay) = (inner, delay);
-
+    public void OnTurnStart(PlayerSeat seat) => _inner.OnTurnStart(seat);
+    public void OnTurnEnd(PlayerSeat seat) => _inner.OnTurnEnd(seat);
     public bool TryTake(IGameQuery q, PlayerSeat seat, out SeatAction action)
     {
         int turn = q.State.Turns;

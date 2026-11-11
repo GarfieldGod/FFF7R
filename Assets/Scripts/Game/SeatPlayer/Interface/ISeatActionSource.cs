@@ -4,6 +4,8 @@ public interface ISeatActionSource
 {
     bool TryTake(IGameQuery query, PlayerSeat seat, out SeatAction action);
     void OnResult(CommandResult result);
+    void OnTurnStart(PlayerSeat seat);
+    void OnTurnEnd(PlayerSeat seat);
 }
 
 public struct SeatAction

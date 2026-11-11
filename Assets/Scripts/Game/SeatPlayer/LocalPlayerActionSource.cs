@@ -15,6 +15,10 @@ public sealed class LocalPlayerActionSource: ISeatActionSource
 
     public void RequestPass() => _passRequested = true;
 
+    public void OnTurnStart(PlayerSeat seat) => cardSelector.TurnStart();
+
+    public void OnTurnEnd(PlayerSeat seat) => cardSelector.TurnEnd();
+
     public bool TryTake(IGameQuery query, PlayerSeat seat, out SeatAction action)
     {
         if (_passRequested)                       // ← 优先级最高，先于选牌
@@ -24,7 +28,7 @@ public sealed class LocalPlayerActionSource: ISeatActionSource
             return true;
         }
 
-        cardSelector.TickSelect();
+        cardSelector.TurnTick();
         action = cardSelector.TakeAction();
         return action.ActionKind != SeatAction.Kind.None;
     }
