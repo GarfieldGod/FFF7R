@@ -25,12 +25,12 @@ public class Card : MonoBehaviour
     {
         Collider = GetComponent<BoxCollider>();
         Collider.enabled = false;
-        Fx.Hide(true);
+        Fx.SetAuraFx(false);
     }
 
     public void OnEnable()
     {
-        Fx.Hide(true);
+        Fx.SetAuraFx(false);
     }
 
     public void SetPower(int value) => Face.SetPower(value);

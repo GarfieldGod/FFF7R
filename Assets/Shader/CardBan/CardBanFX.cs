@@ -1,0 +1,592 @@
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace FFF7R.VFX
+{
+    /// <summary>
+    /// 卡牌禁止 · 3D 世界版。挂在卡牌**中心正上方**（Y ≈ 0.0265），
+    /// 卡面中央会出现一个「禁止」标（圆环 + 斜杠），整张卡轻微压暗，表示这张牌不可用。
+    ///
+    /// 用法（菜单 GameObject / VFX / Card Ban 一键建）：
+    ///   1. 把对象放到卡牌中心，Y 抬到卡牌顶面以上（卡牌顶 0.020 → 放 0.0265）
+    ///   2. 外观只在材质（CardBan.mat）上改颜色和亮度
+    ///   3. 符号大小 / 粗细 / 角度 / 呼吸都在本组件上，不进材质（多个实例可以各不相同）
+    ///
+    /// **尺寸由组件拥有，但写在网格里，不写在 Transform 上**：
+    /// 它按 cardSize / padding 建一张"就是这么大"的 quad 网格，Transform.scale 恒为 (1,1,1)。
+    /// 所以 1,1,1 就是正确比例，想改大小只改 cardSize / padding（网格顶点跟着改）。
+    ///
+    /// 这是"状态型"特效（被禁用），挂上就在，不吃进度条。两种播放方式：
+    ///   · 持续到关闭 —— SetOn(true) / SetOn(false)，或勾 on，一直亮或一直不亮，生命周期归调用方
+    ///   · 亮一会儿自己消失 —— PlayFor(seconds)，满亮度保持 seconds 秒后自己淡出
+    /// 两者共用同一个平滑包络（fadeSpeed），shader 不用变。
+    /// 呼吸（pulse）只属于"持续到关闭"：一次性弹一下就走的东西不该还在起伏。
+    ///
+    /// 编辑器注意：**任何给 sharedMesh 赋值的代码都不能在 OnValidate / OnEnable 里同步执行**，
+    /// 详见 ScheduleRefresh 的注释（预制体里 m_Mesh 永远是空的，每次导入都会重赋一次）。
+    /// </summary>
+    [ExecuteAlways]
+    [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+    [AddComponentMenu("FFF7R/VFX/Card Ban FX")]
+    public class CardBanFX : MonoBehaviour
+    {
+        [Header("外观")]
+        [Tooltip("色调，乘在材质颜色上。多张卡要统一换色就改这里")]
+        public Color tint = Color.white;
+        [Tooltip("亮度，乘在材质亮度上。调低会同时变淡（发光物变暗 = 变更透明）")]
+        [Range(0f, 4f)] public float intensity = 1f;
+        [Tooltip("等级 0-3，只影响亮度，不改形状")]
+        [Range(0, 3)] public int level = 1;
+
+        [Header("卡牌形状（8:11 + 圆角）")]
+        [Tooltip("卡牌尺寸（米）。0.32 × 0.44 就是卡牌本身的尺寸")]
+        public Vector2 cardSize = new Vector2(0.32f, 0.44f);
+        [Tooltip("圆角半径（米）。0.0174 就是卡牌几何上的那个圆角。符号会被这个轮廓裁掉，不会溢到卡外")]
+        public float cornerRadius = 0.0174f;
+        [Tooltip("quad 比卡牌每边大多少（按卡牌短边的比例）。符号本身不出卡，留这点余量只是为了辉光")]
+        [Range(0f, 1.5f)] public float padding = 0.10f;
+
+        [Header("禁止符号")]
+        [Tooltip("符号直径 ÷ 卡牌短边。0.52 ≈ 16.6 cm（卡宽 0.32 时），参考图那个大小")]
+        [Range(0.05f, 1.2f)] public float symbolSize = 0.52f;
+        [Tooltip("环厚 ÷ 符号直径。0.085 ≈ 1.4 cm。太大就像甜甜圈，太小远看会断线")]
+        [Range(0.02f, 0.3f)] public float ringThickness = 0.085f;
+        [Tooltip("斜杠厚度 ÷ 环厚。1 = 和环一样粗")]
+        [Range(0.2f, 2f)] public float barScale = 1f;
+        [Tooltip("斜杠方向（度）。42 ≈ 「/」（参考图）；-42 ≈ 「\\」（标准禁止符）")]
+        [Range(-180f, 180f)] public float slashAngle = 42f;
+        [Tooltip("符号不透明度。0.85 = 暗红压上去、还能看出下面的人物轮廓；1 = 完全盖死；0.6 以下就成薄雾了")]
+        [Range(0f, 1f)] public float opacity = 0.85f;
+        [Tooltip("符号中心的偏移（按卡牌短边的比例）。卡面上有角标 / 文字时可以用它避开")]
+        public Vector2 centerOffset = Vector2.zero;
+
+        [Header("卡面压暗")]
+        [Tooltip("整张卡压暗多少。0.12 = 很轻微（只是让符号更突出）；0 = 完全不压；0.4 以上就明显发黑了")]
+        [Range(0f, 1f)] public float dim = 0.12f;
+
+        [Header("辉光")]
+        [Tooltip("符号外沿的柔光宽度（按卡牌短边的比例）。0.045 ≈ 1.4 cm")]
+        [Range(0f, 0.4f)] public float glowWidth = 0.045f;
+        [Tooltip("辉光亮度。辉光是加色、不遮挡，所以调高只会更亮，不会挡住卡面")]
+        [Range(0f, 3f)] public float glowGain = 0.40f;
+
+        [Header("呼吸")]
+        [Tooltip("呼吸幅度。0.10 = 亮度在 90%~100% 之间轻轻起伏；0 = 完全静止（贴纸感）")]
+        [Range(0f, 1f)] public float pulse = 0.10f;
+        [Tooltip("呼吸周期（秒）。2.4 = 还在生效的节奏；超过 4 s 会像在闪烁")]
+        [Range(0.2f, 10f)] public float period = 2.4f;
+
+        [Header("开关")]
+        [Tooltip("勾上 = 正在禁止（永久，持续到 SetOn(false)）。取消 = 淡出到完全不可见（渲染器也会关掉）")]
+        public bool on = true;
+        [Tooltip("淡入淡出速度（每秒走多少 0..1）。6 ≈ 0.17 s 亮起来；40 ≈ 一帧就满（看着像硬切）")]
+        [Range(0.5f, 40f)] public float fadeSpeed = 6f;
+        [Tooltip("PlayFor() 不带参数时用这个时长（秒）。这是**满亮度保持**的时长，淡出还要再花 1/fadeSpeed")]
+        [Range(0f, 10f)] public float holdSeconds = 1.2f;
+
+        [Header("材质")]
+        [Tooltip("留空 = 自动找同目录 Materials/CardBan.mat，找不到就建一个运行时临时材质")]
+        public Material material;
+
+        // 尺寸烘在网格里，Transform 必须是 1 —— 老实例若带着旧 scale 会双重重缩。这个标记只让迁移跑一次。
+        [SerializeField, HideInInspector] bool _layoutBaked;
+
+        static readonly int TintId       = Shader.PropertyToID("_Tint");
+        static readonly int IntensityId  = Shader.PropertyToID("_Intensity");
+        static readonly int LevelId      = Shader.PropertyToID("_Level");
+        static readonly int OnId         = Shader.PropertyToID("_On");
+        static readonly int SymSizeId    = Shader.PropertyToID("_SymSize");
+        static readonly int ThickId      = Shader.PropertyToID("_Thick");
+        static readonly int BarScaleId   = Shader.PropertyToID("_BarScale");
+        static readonly int SlashAngleId = Shader.PropertyToID("_SlashAngle");
+        static readonly int OpacityId    = Shader.PropertyToID("_Opacity");
+        static readonly int DimId        = Shader.PropertyToID("_Dim");
+        static readonly int GlowId       = Shader.PropertyToID("_Glow");
+        static readonly int GlowGainId   = Shader.PropertyToID("_GlowGain");
+        static readonly int CenterId     = Shader.PropertyToID("_Center");
+        static readonly int PulseId      = Shader.PropertyToID("_Pulse");
+        static readonly int PeriodId     = Shader.PropertyToID("_Period");
+        static readonly int HalfWId      = Shader.PropertyToID("_HalfW");
+        static readonly int HalfDId      = Shader.PropertyToID("_HalfD");
+        static readonly int CornerId     = Shader.PropertyToID("_Corner");
+        static readonly int QuadWId      = Shader.PropertyToID("_QuadW");
+        static readonly int QuadHId      = Shader.PropertyToID("_QuadH");
+        static readonly int UnitId       = Shader.PropertyToID("_Unit");
+
+        const string QuadName = "CardBan_Quad";
+        const string ShaderName = "FFF7/VFX/CardBan";
+
+        // 每个组件一张自己的 quad，尺寸烘在顶点里 —— 不共享，省得拖 padding 时按尺寸
+        // 堆出一大堆网格；也不在 MeshFilter 换引用，所以改尺寸不会发 OnMeshFilterChanged。
+        Mesh _quad;
+
+        MeshFilter _mf;
+        MeshRenderer _mr;
+        MaterialPropertyBlock _mpb;
+        Material _runtimeMat;              // 只在找不到 .mat 资产时才有（不落盘）
+
+        float _on;                         // 平滑后的开关值（写进 shader）
+        float _lastPushedOn = -1f;
+        float _quadW = -1f, _quadH = -1f;  // 想要的目标尺寸（米）
+        bool _dirty = true;
+
+        // 限时播放。**故意不序列化**：域重载后自然回到"无限期"，是安全方向
+        // （存下来可能一进 Play 就已经过期，表现为"刚出现就消失"）。
+        // on 永远只表示"永久状态"，限时不用它 —— 否则对象被禁用 / 池化复用时，
+        // 上一张牌留下的临时状态会跟到下一张牌身上。
+        bool _timed;
+        float _until;                      // 到期时刻（_timed 为 true 时才有意义）
+
+        // ---- 生命周期 -------------------------------------------------
+
+        protected virtual void OnEnable()
+        {
+            // 生命周期起点：上次的限时状态不带过来（对象池复用 / 卡牌重激活都靠这条），
+            // 回到 Inspector 上 on 决定的永久状态。
+            _timed = false;
+            _until = 0f;
+
+            _on = on ? 1f : 0f;            // 挂上就亮，不要让新对象从全黑淡进来
+            _dirty = true;
+
+#if UNITY_EDITOR
+            // 编辑器里 OnEnable 也可能是场景加载 / 预制体导入顺带触发的，
+            // 那一刻同样还在 CheckConsistency 阶段，碰 sharedMesh 会报错。统一走延迟。
+            if (!Application.isPlaying)
+            {
+                ScheduleRefresh();
+                return;
+            }
+#endif
+            FitQuad();                     // 先把尺寸算出来，网格才知道该建多大
+            EnsureMesh();
+            Apply(true);
+        }
+
+#if UNITY_EDITOR
+        void OnValidate()
+        {
+            // 不能在 OnValidate 里碰 sharedMesh：Unity 会立刻发 OnMeshFilterChanged，
+            // 而 Awake / CheckConsistency / OnValidate 期间禁止 SendMessage ——
+            // 报 "SendMessage cannot be called during Awake, CheckConsistency, or OnValidate"。
+            // 挪到下一次编辑器 tick（那时已经不在回调里了），顺带把拖滑块的连续重建合并成一次。
+            _dirty = true;
+            ScheduleRefresh();
+        }
+
+        void ScheduleRefresh()
+        {
+            UnityEditor.EditorApplication.delayCall -= DelayedRefresh;
+            UnityEditor.EditorApplication.delayCall += DelayedRefresh;
+        }
+
+        void DelayedRefresh()
+        {
+            if (this == null) return;      // 拖参数时可能已经把物体删了
+
+            // 预制体资产上不建网格：那个网格是 HideAndDontSave，存不进 .prefab
+            // （存下来也只有 m_Mesh: fileID 0），每次导入都白建一份，还会把资产弄脏。
+            if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(gameObject))
+            {
+                FitQuad();
+                Apply(true);
+                return;
+            }
+
+            FitQuad();
+            EnsureMesh();
+            Apply(true);
+        }
+#endif
+
+        protected virtual void Update()
+        {
+            // 兜底：域重载会清空字段，MeshFilter 上的网格也可能被销毁。
+            // Update 一定不在禁发消息的阶段里，在这里补建最安全；只补 null / 尺寸不对的那张，
+            // 不抢别人塞的网格。注意顺序：先 FitQuad 把目标尺寸算出来。
+            FitQuad();
+            if (NeedsMesh()) EnsureMesh();
+
+            StepEnvelope();
+            Apply(false);
+        }
+
+        protected virtual void OnDisable()
+        {
+            // 组件关掉后不会再 Apply，renderer 还挂着、材质冻在最后一帧 —— 一并关掉
+            if (_mr != null) _mr.enabled = false;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            if (_runtimeMat != null)                    // 临时材质要自己收，否则每次重建都漏一个
+            {
+                if (Application.isPlaying) Destroy(_runtimeMat);
+                else DestroyImmediate(_runtimeMat);
+                _runtimeMat = null;
+            }
+
+            // 网格是 HideAndDontSave 的，不随物体销毁，得自己收
+            if (_quad != null)
+            {
+                if (Application.isPlaying) Destroy(_quad);
+                else DestroyImmediate(_quad);
+                _quad = null;
+            }
+        }
+
+        // ---- 对外接口 ------------------------------------------------
+
+        /// <summary>
+        /// 永久开 / 关（平滑淡入淡出，不会硬切）。**会清掉任何正在进行的限时播放** ——
+        /// 这层只有一个状态，"后写的赢"。想在限时播放中途改主意就调它。
+        /// </summary>
+        public void SetOn(bool value)
+        {
+            on = value;
+
+            // 退出限时 → 呼吸要跟着回来。这里必须置脏：_on 可能压根没变
+            // （限时播到一半转永久），Apply 一短路 _Pulse 就还停在 0。
+            if (_timed)
+            {
+                _timed = false;
+                _until = 0f;
+                _dirty = true;
+            }
+
+            // 组件关着的时候没人调 Update，过渡跑不起来 —— 直接到位
+            if (!isActiveAndEnabled) SnapOn(value);
+        }
+
+        /// <summary>立即到位，不做过渡（切场景、跳过动画时用）。同样会清掉限时播放。</summary>
+        public void SnapOn(bool value)
+        {
+            on = value;
+            _timed = false;
+            _until = 0f;
+            _on = value ? 1f : 0f;
+            _dirty = true;
+            FitQuad();
+            EnsureMesh();
+            Apply(true);
+        }
+
+        /// <summary>
+        /// 亮一段时间后自己淡出：**满亮度保持 seconds 秒**，之后按 fadeSpeed 淡出
+        /// （所以从亮起到完全消失 ≈ seconds + 1/fadeSpeed）。
+        ///
+        /// · 连续调用 = 续期（覆盖到期时刻），不会排队播多次
+        /// · seconds &lt;= 0 等价于 SetOn(false)
+        /// · **会取消"永久开启"**：on 为 true 时调它，到点照样会关
+        /// · 播放期间**不呼吸**（`_Pulse` 推 0），结束后才回到 pulse 的设置
+        /// · 组件不在运行（对象/组件被禁用）时无效 —— 没有 Update 就没人推进倒计时；
+        ///   要"立刻显示"请用 SnapOn(true)
+        /// </summary>
+        /// <param name="snap">true = 不做淡入，第一帧就满亮（播完仍然淡出）。</param>
+        public void PlayFor(float seconds, bool snap)
+        {
+            if (seconds <= 0f) { SetOn(false); return; }
+            if (!isActiveAndEnabled) return;
+
+            _timed = true;
+            _until = CurrentTime() + seconds;
+
+            // 必须置脏：_on 可能本来就是 1（从永久状态切过来），Apply 一短路
+            // 就还是推着老的 _Pulse —— 表现正是"PlayFor 期间照样在呼吸"。
+            _dirty = true;
+
+            if (snap) _on = 1f;            // 只抬包络，不碰 on：到期后照样能淡出，也不污染永久状态
+        }
+
+        /// <summary>带快照开关的重载（默认淡入）。</summary>
+        public void PlayFor(float seconds)
+        {
+            PlayFor(seconds, false);
+        }
+
+        /// <summary>用 Inspector 上的 holdSeconds。</summary>
+        public void PlayFor()
+        {
+            PlayFor(holdSeconds, false);
+        }
+
+        /// <summary>当前"应该亮着"吗（限时模式看有没有到期，否则看永久开关 on）。去重判断用这个，别看 on。</summary>
+        public bool IsOn
+        {
+            get { return _timed ? CurrentTime() < _until : on; }
+        }
+
+        /// <summary>
+        /// 实际推给 shader 的呼吸幅度。**只有"永久开启"才呼吸**：
+        /// 限时播放是"弹一下就走"，1.2 s 里装不满 2.4 s 的一个周期，看起来像在闪；
+        /// 关闭淡出的过程也不该还在起伏。`_Pulse = 0` 时 shader 里 `pulse` 恒为 1（静止）。
+        /// </summary>
+        float PulseNow
+        {
+            get { return (on && !_timed) ? Mathf.Clamp01(pulse) : 0f; }
+        }
+
+        /// <summary>整套配色换色。0-3 级只影响亮度。</summary>
+        public void SetTint(Color c, int lv = -1)
+        {
+            tint = c;
+            if (lv >= 0) level = Mathf.Clamp(lv, 0, 3);
+            _dirty = true;
+        }
+
+        /// <summary>改完 cardSize / padding 之后需要立刻重算时调一次（Update 里也会追）。</summary>
+        public void Refit()
+        {
+            FitQuad();
+            EnsureMesh();          // 尺寸变了要就地改顶点（没建过就建一张）
+            Apply(true);
+        }
+
+        // ---- 内部 ----------------------------------------------------
+
+        void StepEnvelope()
+        {
+            bool want = IsOn;
+
+            // 限时播完：收敛成"永久关"。不收敛的话 _timed 会一直悬在 true ——
+            // 呼吸永远回不来，Inspector 上勾 on 也会被无视。
+            if (_timed && !want)
+            {
+                _timed = false;
+                _until = 0f;
+                on = false;
+                _dirty = true;
+            }
+
+            float target = want ? 1f : 0f;
+            if (Mathf.Approximately(_on, target)) return;
+            _on = Mathf.MoveTowards(_on, target, Mathf.Max(fadeSpeed, 1e-3f) * Time.deltaTime);
+            _dirty = true;
+        }
+
+        /// <summary>
+        /// 限时播放的时钟。Play 模式用 Time.time：受 timeScale 影响，
+        /// 游戏暂停时倒计时也停（"禁止提示还挂在场上"是对的）。
+        /// 编辑器里（[ExecuteAlways] 非 Play）Time.time 基本不动，改用 realtimeSinceStartup，
+        /// 否则在 Inspector 里预览永远等不到"自己消失"。
+        /// </summary>
+        static float CurrentTime()
+        {
+#if UNITY_EDITOR
+            if (!Application.isPlaying) return Time.realtimeSinceStartup;
+#endif
+            return Time.time;
+        }
+
+        /// <summary>目标 quad 尺寸 = 卡牌尺寸 × (1 + 2·padding)。只记数字，网格在 EnsureMesh 里改。</summary>
+        void FitQuad()
+        {
+            BakeLayoutOnce();
+
+            float k = 1f + 2f * Mathf.Max(padding, 0f);
+            float w = Mathf.Max(cardSize.x, 1e-3f) * k;
+            float h = Mathf.Max(cardSize.y, 1e-3f) * k;
+
+            if (Mathf.Abs(w - _quadW) < 1e-5f && Mathf.Abs(h - _quadH) < 1e-5f) return;
+            _quadW = w;
+            _quadH = h;
+            _dirty = true;
+        }
+
+        /// <summary>
+        /// 把尺寸从 Transform 迁到网格上，只做一次。
+        /// 万一这个对象是从旧版（1×1 quad + localScale）复制来的，scale 不是 1 就会双重重缩。
+        /// </summary>
+        void BakeLayoutOnce()
+        {
+            if (_layoutBaked) return;
+            _layoutBaked = true;
+            if (transform.localScale != Vector3.one) transform.localScale = Vector3.one;
+        }
+
+        /// <summary>把参数写进渲染器。force = 忽略"没变化"的短路。</summary>
+        public void Apply(bool force)
+        {
+            if (_mr == null) _mr = GetComponent<MeshRenderer>();
+            if (_mr == null) return;
+
+            if (!force && !_dirty && Mathf.Approximately(_on, _lastPushedOn)) return;
+            _dirty = false;
+            _lastPushedOn = _on;
+
+            var mat = ResolveMaterial();
+            if (mat != null && _mr.sharedMaterial != mat) _mr.sharedMaterial = mat;
+
+            if (_mpb == null) _mpb = new MaterialPropertyBlock();
+            _mr.GetPropertyBlock(_mpb);
+
+            float unit = Mathf.Max(Mathf.Min(cardSize.x, cardSize.y), 1e-4f);
+            _mpb.SetColor(TintId, tint);
+            _mpb.SetFloat(IntensityId, intensity);
+            _mpb.SetFloat(LevelId, level);
+            _mpb.SetFloat(OnId, _on);
+            _mpb.SetFloat(SymSizeId, Mathf.Max(symbolSize, 0.01f));
+            _mpb.SetFloat(ThickId, Mathf.Clamp(ringThickness, 0.01f, 0.5f));
+            _mpb.SetFloat(BarScaleId, Mathf.Max(barScale, 0.05f));
+            _mpb.SetFloat(SlashAngleId, slashAngle);
+            _mpb.SetFloat(OpacityId, Mathf.Clamp01(opacity));
+            _mpb.SetFloat(DimId, Mathf.Clamp01(dim));
+            _mpb.SetFloat(GlowId, Mathf.Max(glowWidth, 0f));
+            _mpb.SetFloat(GlowGainId, Mathf.Max(glowGain, 0f));
+            _mpb.SetVector(CenterId, new Vector4(centerOffset.x, centerOffset.y, 0f, 0f));
+            _mpb.SetFloat(PulseId, PulseNow);
+            _mpb.SetFloat(PeriodId, Mathf.Max(period, 0.05f));
+            _mpb.SetFloat(HalfWId, Mathf.Max(cardSize.x, 1e-3f) * 0.5f);
+            _mpb.SetFloat(HalfDId, Mathf.Max(cardSize.y, 1e-3f) * 0.5f);
+            _mpb.SetFloat(CornerId, Mathf.Max(cornerRadius, 1e-5f));
+            _mpb.SetFloat(QuadWId, Mathf.Max(_quadW, 1e-3f));
+            _mpb.SetFloat(QuadHId, Mathf.Max(_quadH, 1e-3f));
+            _mpb.SetFloat(UnitId, unit);
+
+            _mr.SetPropertyBlock(_mpb);
+            _mr.enabled = _on > 1e-3f;      // 全透明就彻底不画，不留在场景里
+        }
+
+        bool NeedsMesh()
+        {
+            if (_mf == null) _mf = GetComponent<MeshFilter>();
+            if (_mf == null) return false;
+            var m = _mf.sharedMesh;
+            if (!IsOurMesh(m)) return true;
+            return !SizeMatches(m, _quadW, _quadH);
+        }
+
+        void EnsureMesh()
+        {
+            if (_mf == null) _mf = GetComponent<MeshFilter>();
+            if (_mr == null) _mr = GetComponent<MeshRenderer>();
+            if (_mf == null) return;
+
+            ConfigureRenderer(_mr);
+
+#if UNITY_EDITOR
+            // 预制体资产上不建网格：那个网格是 HideAndDontSave，存不进 .prefab
+            // （存下来也只有 m_Mesh: fileID 0），每次导入都白建一份，还会把资产弄脏。
+            if (!Application.isPlaying && UnityEditor.PrefabUtility.IsPartOfPrefabAsset(gameObject)) return;
+#endif
+
+            var existing = _mf.sharedMesh;
+            if (IsOurMesh(existing))
+            {
+                // 域重载会把字段清空，但网格对象本身还挂在 MeshFilter 上 —— 认回来，别再赋一次
+                // （赋值 = 又一次 OnMeshFilterChanged）。尺寸不对时**就地改顶点**，也不换引用。
+                _quad = existing;
+                ReshapeQuad(_quad, _quadW, _quadH);
+                return;
+            }
+
+            _quad = BuildQuad(_quadW, _quadH);
+            _mf.sharedMesh = _quad;        // 只有这一行会发 OnMeshFilterChanged
+        }
+
+        static bool IsOurMesh(Mesh m)
+        {
+            return m != null && m.name.StartsWith(QuadName, System.StringComparison.Ordinal);
+        }
+
+        /// <summary>网格自带的尺寸对不对得上。quad 躺在 XZ 平面，所以看 bounds 的 x / z。</summary>
+        static bool SizeMatches(Mesh m, float w, float h)
+        {
+            var s = m.bounds.size;
+            return Mathf.Abs(s.x - w) < 1e-4f && Mathf.Abs(s.z - h) < 1e-4f;
+        }
+
+        static Vector3[] QuadVerts(float w, float h)
+        {
+            float hw = w * 0.5f, hh = h * 0.5f;
+            return new[]
+            {
+                new Vector3(-hw, 0f, -hh),
+                new Vector3( hw, 0f, -hh),
+                new Vector3( hw, 0f,  hh),
+                new Vector3(-hw, 0f,  hh),
+            };
+        }
+
+        /// <summary>改尺寸只改顶点（渲染器重新读几何，不发消息，也不会把预制体弄脏）。</summary>
+        static void ReshapeQuad(Mesh m, float w, float h)
+        {
+            if (SizeMatches(m, w, h)) return;
+            m.vertices = QuadVerts(w, h);
+            m.RecalculateBounds();
+        }
+
+        static Mesh BuildQuad(float w, float h)
+        {
+            // 网格**本身就是目标尺寸**（不是 1×1 再靠 scale 拉），所以 Transform 是 1,1,1。
+            var m = new Mesh
+            {
+                name = QuadName + "_" + w.ToString("F3") + "x" + h.ToString("F3"),
+                hideFlags = HideFlags.HideAndDontSave,
+            };
+
+            m.vertices = QuadVerts(w, h);          // 中心在原点，躺在 XZ 平面，法线 +Y
+            m.uv = new[]
+            {
+                new Vector2(0f, 0f), new Vector2(1f, 0f),
+                new Vector2(1f, 1f), new Vector2(0f, 1f),
+            };
+            m.colors = new[] { Color.white, Color.white, Color.white, Color.white };
+            m.normals = new[] { Vector3.up, Vector3.up, Vector3.up, Vector3.up };
+            m.triangles = new[] { 0, 2, 1, 0, 3, 2 };   // 这个绕序才是 +Y 朝上
+            m.RecalculateBounds();
+
+            return m;
+        }
+
+        static void ConfigureRenderer(MeshRenderer r)
+        {
+            if (r == null) return;
+            r.shadowCastingMode = ShadowCastingMode.Off;
+            r.receiveShadows = false;
+            r.lightProbeUsage = LightProbeUsage.Off;
+            r.reflectionProbeUsage = ReflectionProbeUsage.Off;
+        }
+
+        // ---- 材质 ----------------------------------------------------
+
+        Material ResolveMaterial()
+        {
+            if (material != null) return material;
+
+#if UNITY_EDITOR
+            var asset = FindMaterialAsset();
+            if (asset != null) { material = asset; return asset; }   // 落进字段，此后就能在 Inspector 上改
+#endif
+            if (_runtimeMat == null) _runtimeMat = FallbackMaterial();
+            return _runtimeMat;
+        }
+
+        Material FallbackMaterial()
+        {
+            var sh = Shader.Find(ShaderName);
+            if (sh == null)
+            {
+                Debug.LogWarning("[CardBan] 找不到 shader " + ShaderName +
+                                 "，请确认它已导入工程，或用菜单 GameObject/VFX/Card Ban 生成。");
+                return null;
+            }
+            return new Material(sh) { name = ShaderName + "_Runtime", hideFlags = HideFlags.HideAndDontSave };
+        }
+
+#if UNITY_EDITOR
+        static Material FindMaterialAsset()
+        {
+            var guids = UnityEditor.AssetDatabase.FindAssets("CardBan t:Material");
+            for (int i = 0; i < guids.Length; i++)
+            {
+                var path = UnityEditor.AssetDatabase.GUIDToAssetPath(guids[i]);
+                if (System.IO.Path.GetFileNameWithoutExtension(path) != "CardBan") continue;
+                var m = UnityEditor.AssetDatabase.LoadAssetAtPath<Material>(path);
+                if (m != null && m.shader != null && m.shader.name == ShaderName) return m;
+            }
+            return null;
+        }
+#endif
+    }
+}

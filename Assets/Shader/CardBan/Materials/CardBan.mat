@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: CardBan
+  m_Shader: {fileID: 4800000, guid: 81643e39f3248ee4d8a2cc026e802d1d, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BanGain: 1
+    - _BarScale: 1
+    - _Corner: 0.0174
+    - _Dim: 0.12
+    - _Glow: 0.045
+    - _GlowGain: 0.4
+    - _HalfD: 0.22
+    - _HalfW: 0.16
+    - _Intensity: 1
+    - _Level: 1
+    - _On: 1
+    - _Opacity: 0.85
+    - _Period: 2.4
+    - _Pulse: 0.1
+    - _QuadH: 0.528
+    - _QuadW: 0.384
+    - _SlashAngle: 42
+    - _SymSize: 0.52
+    - _Thick: 0.085
+    - _Unit: 0.32
+    - _ZTest: 4
+    m_Colors:
+    - _BanColor: {r: 0.58, g: 0.05, b: 0.09, a: 1}
+    - _Center: {r: 0, g: 0, b: 0, a: 0}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+  m_BuildTextureStacks: []

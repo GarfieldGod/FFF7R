@@ -102,9 +102,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c159520df360f2b438ec241cc8226758, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LevelSpacing: 2
-  LevelHeight: 1
-  CardHeight: 0.5
   currentCard: {fileID: 0}
   Anim:
     _cellUpgrade: {fileID: 4062779016061934054}
@@ -115,12 +112,15 @@ MonoBehaviour:
     PlaceLift: 4
     PlaceFinal: 0.5
     _cardUpgrade: {fileID: 5391209552406662941}
+  CardHeight: 0.5
   cardSize: 0.55
-  ballPrefab: {fileID: 938554682491469808, guid: 96b2ccb5ad2976847bb94fa382b71525, type: 3}
-  ballMat:
-  - {fileID: 2100000, guid: e50552a790e46f0408252a209823624c, type: 2}
-  - {fileID: 2100000, guid: 19b909ba9455580459194e9defc57b5c, type: 2}
   CardPrefab: {fileID: 7653390149079099122, guid: eb503a83f0778b04d93c8a363dca3e12, type: 3}
+  LevelSpacing: 2
+  LevelHeight: 0.32
+  ballPrefab: {fileID: 3849349294910608439, guid: 45d3bfc6e84e73543a7d41d279c60db8, type: 3}
+  GemSlot: 3
+  PlayerGem: {fileID: 2100000, guid: 437121260de556f478fee300e081e89e, type: 2}
+  RivalGem: {fileID: 2100000, guid: 8b5795b7a99ad074fbd38258cc5f3097, type: 2}
 --- !u!1001 &2157169612361048116
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -415,7 +415,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2799337802891978364, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3785716143086318626, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: loopPreview
@@ -427,15 +427,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4936568941800639926, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6240932133991887966, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8337054826533961295, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8525967635269431645, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: m_LocalPosition.x
@@ -479,7 +479,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9157664472568397719, guid: eff95fb64e6edfa43bff533802f1efc8, type: 3}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

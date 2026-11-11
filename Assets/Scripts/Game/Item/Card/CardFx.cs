@@ -7,37 +7,40 @@ using UnityEngine;
 public class CardFx
 {
     [SerializeField] private CardAuraFX AuraFX;
-    int _active = -1;
+    [SerializeField] private CardBanFX BanFX;
+
+    int _auraFxActive = -1;
     static readonly Color Negative = new Color(1, 0, 1, 1);
     static readonly Color Positive = new Color(0, 1, 84/255f, 1);
 
-    public void Hide(bool immediately = false)
+    public void SetAuraFx(bool active, bool positive = true, bool immediately = false)
     {
-        if (_active == 0) return;
-        _active = 0;
+        if (active)
+        {
+            if (_auraFxActive == 1) return;
+            _auraFxActive = 1;
+            AuraFX.tint = positive ? Positive : Negative;
 
-        if (immediately) AuraFX.SnapOn(false);
-        else AuraFX.SetOn(false);
+            if (immediately) AuraFX.SnapOn(true);
+            else AuraFX.SetOn(true);
+        }
+        else
+        {
+            if (_auraFxActive == 0) return;
+            _auraFxActive = 0;
+
+            if (immediately) AuraFX.SnapOn(false);
+            else AuraFX.SetOn(false);
+        }
     }
 
-    public void Show(bool immediately = false)
+    public void SetBanFx(bool active)
     {
-        if (_active == 1) return;
-        _active = 1;
-
-        if (immediately) AuraFX.SnapOn(true);
-        else AuraFX.SetOn(true);
+        BanFX.SetOn(active);
     }
 
-    public void SetActivePositive(bool active, bool positive, bool immediately = false)
+    public void PlayBanFxOnce(float seconds = 0)
     {
-        AuraFX.tint = positive ? Positive : Negative;
-        SetActive(active, immediately);
-    }
-
-    public void SetActive(bool active, bool immediately = false)
-    {
-        if (active) Show(immediately);
-        else Hide(immediately);
+        BanFX.PlayFor();
     }
 }

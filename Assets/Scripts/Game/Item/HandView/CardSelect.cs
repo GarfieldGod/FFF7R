@@ -7,20 +7,31 @@ using System;
 [Serializable]
 public sealed class CardSelect
 {
+    public struct TickContext
+    {
+        public IGameQuery gameQuery;
+        public IReadOnlyList<Card> cards;
+        public List<Card> canInput;
+        public GameObject hit;
+        public Camera cam;
+        public Quaternion facing;
+        public float baseScale;
+        public Action RefreshPlayableFx;
+        public PlayerSeat seat;
+    }
+
     public Card Current;
     public SeatAction Action = SeatAction.None;
     public float PreviewHeight = 2.5f;
     public float GrabDepth = 20f;
-    public void Tick(IReadOnlyList<Card> cards, List<Card> canInput,
-        GameObject hit, Camera cam, Quaternion facing, out Int2 pos, float baseScale,
-        Action RefreshPlayableFx = null) 
+    public void Tick(TickContext ctx, out Int2 pos) 
     {
         pos = Int2.Unknown;
         if (Input.GetMouseButtonDown(0))
         {
-            SelectUpdate(cards, canInput, hit);
-            ActionUpdate(hit);
-            RefreshPlayableFx?.Invoke();
+            SelectUpdate(ctx.cards, ctx.canInput, ctx.hit);
+            ActionUpdate(ctx.hit);
+            ctx.RefreshPlayableFx?.Invoke();
         } else
         {
             Action = SeatAction.None;
@@ -28,11 +39,11 @@ public sealed class CardSelect
 
         if (Current == null) return;
 
-        pos = Update(hit, cam, facing, baseScale);
+        pos = Update(ctx.gameQuery, ctx.seat, ctx.hit, ctx.cam, ctx.facing, ctx.baseScale);
 
         if (Input.GetMouseButtonDown(1)) {
             UnSelect();
-            RefreshPlayableFx?.Invoke();
+            ctx.RefreshPlayableFx?.Invoke();
         }
     }
 
@@ -55,7 +66,7 @@ public sealed class CardSelect
         Current = null;
     }
 
-    Int2 Update(GameObject hit, Camera cam, Quaternion facing, float baseScale)
+    Int2 Update(IGameQuery gameQuery, PlayerSeat seat, GameObject hit, Camera cam, Quaternion facing, float baseScale)
     {
         Int2 pos = Int2.Unknown;
         if (Current == null) return pos;
@@ -68,6 +79,9 @@ public sealed class CardSelect
             worldPos = hit.transform.position + new Vector3(0, PreviewHeight, 0);
             worldRot = hit.transform.rotation * Quaternion.Euler(-90, 0, 0);
             pos = hit.GetComponent<BoardGrid>().Pos;
+
+            bool canInput = gameQuery.CanPlace(seat, Current.HandIndex, pos, out var _);
+            Current.Fx.SetBanFx(!canInput);
         }
 
         Current.Motion.TargetPos = worldPos;
@@ -81,6 +95,8 @@ public sealed class CardSelect
         if (hit != null && hit.CompareTag("CardInHand") && hit.TryGetComponent(out Card card) && cards.Contains(card)) {
             if (canInput.Contains(card)) {
                 Select(card);
+            } else {
+                card.Fx.PlayBanFxOnce();
             }
         }
     }

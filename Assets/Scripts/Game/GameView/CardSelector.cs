@@ -113,10 +113,20 @@ public class CardSelector : MonoBehaviour, IGameView
             if (Physics.Raycast(ray, out var hit, Mathf.Infinity, ~0, QueryTriggerInteraction.Collide)) {
                 hitObj = hit.collider.gameObject;
             }
-            select.Tick(cards, _canInput, 
-                hitObj, cam, ForwardToCam, out var pos, layout.baseScale, 
-                RefreshPlayableFx
-            );
+
+            CardSelect.TickContext ctx = new CardSelect.TickContext {
+                gameQuery = _gameQuery,
+                cards = cards,
+                canInput = _canInput,
+                hit = hitObj,
+                cam = cam,
+                facing = ForwardToCam,
+                baseScale = layout.baseScale,
+                RefreshPlayableFx = RefreshPlayableFx,
+                seat = seat
+            };
+
+            select.Tick(ctx, out var pos);
 
             bool want = select.Current != null && pos != Int2.Unknown;
             if (!want)
@@ -257,14 +267,14 @@ public class CardSelector : MonoBehaviour, IGameView
     void RefreshPlayableFx()
     {
         foreach(var c in cards) {
-            if (c != select.Current && _canInput.Contains(c)) c.Fx.SetActive(true);
-            else c.Fx.SetActive(false);
+            if (c != select.Current && _canInput.Contains(c)) c.Fx.SetAuraFx(true);
+            else c.Fx.SetAuraFx(false);
         }
     }
 
     void ClearPlayableFx()
     {
-        for (int i = 0; i < cards.Count; i++) cards[i].Fx.SetActive(false);
+        for (int i = 0; i < cards.Count; i++) cards[i].Fx.SetAuraFx(false);
     }
 
     bool HasAnyLegalPos(int handIndex)

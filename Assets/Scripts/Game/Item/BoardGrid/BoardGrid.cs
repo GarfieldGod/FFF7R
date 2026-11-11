@@ -7,20 +7,24 @@ using UnityEngine.PlayerLoop;
 public class BoardGrid : MonoBehaviour
 {
     public Int2 Pos;
-    public float LevelSpacing = 2f;
-    public float LevelHeight = 1f;
-    public float CardHeight = 0.5f; 
     public Card currentCard;
     public GridAnim Anim = new GridAnim();
 
+    [Header("卡牌")]
+    [SerializeField] float CardHeight = 0.5f; 
     [SerializeField] float cardSize = 0.7f;
-    [SerializeField] GameObject ballPrefab;
-    [SerializeField] Material[] ballMat;
     [SerializeField] Card CardPrefab;
+    [Header("棋子")]
+    [SerializeField] float LevelSpacing = 2f;
+    [SerializeField] float LevelHeight = 0.32f;
+    [SerializeField] GameObject ballPrefab;
+    [SerializeField] int GemSlot = 3;
+    [SerializeField] Material PlayerGem;
+    [SerializeField] Material RivalGem;
 
-    List<GameObject> _balls = new List<GameObject>();
-    // Start is called before the first frame update
-    int _baseLevel;
+    private readonly Dictionary<GameObject, Material[]> _matCache = new();
+    private List<GameObject> _balls = new List<GameObject>();
+    private int _baseLevel;
 
     private void Awake()
     {
@@ -124,14 +128,31 @@ public class BoardGrid : MonoBehaviour
         currentCard?.SetPower(value);
         bool on = _baseLevel > 0 && value != _baseLevel;
         bool p = _baseLevel > 0 && value > _baseLevel;
-        currentCard?.Fx.SetActivePositive(on, p);
+        currentCard?.Fx.SetAuraFx(on, p);
     }
 
-    private void SetGridColor(PlayerSeat owner)
+    void SetGridColor(PlayerSeat owner)
     {
         if (owner == PlayerSeat.None) return;
-        var mat = ballMat[owner == PlayerSeat.Player ? 0 : 1];
-        foreach (var ball in _balls) ball.GetComponent<MeshRenderer>().sharedMaterial = mat;
+
+        var gem = owner == PlayerSeat.Player ? PlayerGem : RivalGem;
+        if (gem == null) return;
+
+        for (int i = 0; i < _balls.Count; i++)
+        {
+            var go = _balls[i];
+            var mr = go.GetComponent<MeshRenderer>();
+            if (mr == null) continue;
+
+            if (!_matCache.TryGetValue(go, out var mats))
+                _matCache[go] = mats = mr.sharedMaterials;
+
+            if (GemSlot >= mats.Length) continue;
+            if (mats[GemSlot] == gem) continue;
+
+            mats[GemSlot] = gem;
+            mr.sharedMaterials = mats;
+        }
     }
 
     static readonly Vector3[][] Layout =
