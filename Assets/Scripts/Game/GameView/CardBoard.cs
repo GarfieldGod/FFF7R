@@ -146,6 +146,20 @@ public class CardBoard : MonoBehaviour, IGameView
         else if (_gameQuery != null) UpdateBoard(_gameQuery.Board);   // 兜底
     }
 
+    public void RefreshSelectedCard(PlayerSeat seat, int handIndex){
+        if (_gameQuery == null) return;
+        Debug.Log($"RefreshSelectedCard");
+
+        foreach (var line in _boardCells)
+        {
+            foreach(var cell in line)
+            {
+                bool active = handIndex > 0 ? _gameQuery.CanPlace(seat, handIndex, cell.Pos, out var _) : false;
+                cell.Anim.SetCardPlayableVFX(active);
+            }
+        }
+    }
+
     private void UpdateBoard(BoardSnapshot board)
     {
         if (board == null) return;

@@ -19,6 +19,8 @@ public class GridAnim
     [SerializeField] private float PlaceFinal = 0.5f;
     [Header("Card Upgrade")]
     [SerializeField] private BoardCellUpgradeGroup _cardUpgrade;
+    [Header("Card Playable")]
+    [SerializeField] private GameObject _cardPlayable;
 
     private BoardGrid _boardGrid;
 
@@ -89,4 +91,8 @@ public class GridAnim
     }
 
     public void StopCardUpgradeVFX() {}
+
+    // ----------------------------------------------------------------------------------------CardPlayable
+
+    public void SetCardPlayableVFX(bool active) =>  _cardPlayable.SetActive(active);
 }

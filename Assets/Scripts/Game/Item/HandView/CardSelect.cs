@@ -18,20 +18,23 @@ public sealed class CardSelect
         public float baseScale;
         public Action RefreshPlayableFx;
         public PlayerSeat seat;
+        public CardBoard board;
     }
 
     public Card Current;
     public SeatAction Action = SeatAction.None;
     public float PreviewHeight = 2.5f;
     public float GrabDepth = 20f;
+
+    private TickContext _context;
     public void Tick(TickContext ctx, out Int2 pos) 
     {
+        _context = ctx;
         pos = Int2.Unknown;
         if (Input.GetMouseButtonDown(0))
         {
-            SelectUpdate(ctx.cards, ctx.canInput, ctx.hit);
+            SelectUpdate(ctx.board, ctx.cards, ctx.canInput, ctx.hit);
             ActionUpdate(ctx.hit);
-            ctx.RefreshPlayableFx?.Invoke();
         } else
         {
             Action = SeatAction.None;
@@ -43,7 +46,6 @@ public sealed class CardSelect
 
         if (Input.GetMouseButtonDown(1)) {
             UnSelect();
-            ctx.RefreshPlayableFx?.Invoke();
         }
     }
 
@@ -53,17 +55,23 @@ public sealed class CardSelect
 
         Current = card;
         Current.Collider.enabled = false;
+    
+        _context.board.RefreshSelectedCard(_context.seat, Current.HandIndex);
+        _context.RefreshPlayableFx?.Invoke();
 
         return true;
     }
 
     public void UnSelect()
     {
+        _context.board.RefreshSelectedCard(_context.seat, -1);
         if (Current == null) return;
 
         var card = Current;
         Current.Collider.enabled = true;
         Current = null;
+    
+        _context.RefreshPlayableFx?.Invoke();
     }
 
     Int2 Update(IGameQuery gameQuery, PlayerSeat seat, GameObject hit, Camera cam, Quaternion facing, float baseScale)
@@ -90,7 +98,7 @@ public sealed class CardSelect
         return pos;
     }
 
-    public void SelectUpdate(IReadOnlyList<Card> cards, List<Card> canInput, GameObject hit)
+    public void SelectUpdate(CardBoard cardBoard, IReadOnlyList<Card> cards, List<Card> canInput, GameObject hit)
     {
         if (hit != null && hit.CompareTag("CardInHand") && hit.TryGetComponent(out Card card) && cards.Contains(card)) {
             if (canInput.Contains(card)) {

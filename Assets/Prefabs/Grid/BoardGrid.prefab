@@ -112,6 +112,7 @@ MonoBehaviour:
     PlaceLift: 4
     PlaceFinal: 0.5
     _cardUpgrade: {fileID: 5391209552406662941}
+    _cardPlayable: {fileID: 8153721496470962010}
   CardHeight: 0.5
   cardSize: 0.55
   CardPrefab: {fileID: 7653390149079099122, guid: eb503a83f0778b04d93c8a363dca3e12, type: 3}
@@ -185,6 +186,11 @@ PrefabInstance:
 --- !u!4 &5087443478084548734 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6590442695990663242, guid: e2127ed630254304c81e1eba39fc87e6, type: 3}
+  m_PrefabInstance: {fileID: 2157169612361048116}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8153721496470962010 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7838542456215969646, guid: e2127ed630254304c81e1eba39fc87e6, type: 3}
   m_PrefabInstance: {fileID: 2157169612361048116}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3454322299928229757

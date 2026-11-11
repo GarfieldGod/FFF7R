@@ -123,7 +123,8 @@ public class CardSelector : MonoBehaviour, IGameView
                 facing = ForwardToCam,
                 baseScale = layout.baseScale,
                 RefreshPlayableFx = RefreshPlayableFx,
-                seat = seat
+                seat = seat,
+                board = board
             };
 
             select.Tick(ctx, out var pos);
@@ -183,7 +184,11 @@ public class CardSelector : MonoBehaviour, IGameView
             hover.Current, layout.baseScale, layout.hoverScale);          // 点击切换选中
 
         _unselected.Clear();                                     // ← 复用成员 List，别每帧 Where().ToList()
-        foreach (var c in cards) if (!reDispense.Selected.Contains(c)) _unselected.Add(c);
+        foreach (var c in cards) {
+            bool selected = reDispense.Selected.Contains(c);
+            if (!selected) _unselected.Add(c);
+            c.Fx.SetBanFx(selected);
+        }
 
         layout.Refresh(_unselected, null, hover.Current, ForwardToCam);   // ← 第三个参数不再传 null
         UpdateFocus();
