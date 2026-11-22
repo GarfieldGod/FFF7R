@@ -20,27 +20,26 @@ public class MainMenuItem : MonoBehaviour, IPointerEnterHandler
 
     private RectTransform _textRect;
     private RectTransform _rect;
-    private MainMenu _mainMenu;
+    private MainMenuController _mainMenuController;
     private int _index = -1;
     private Button _btn;
 
-    void Start()
+    void Awake()
     {
         _rect = GetComponent<RectTransform>();
         _btn = GetComponent<Button>();
-        _btn.onClick.AddListener(Activate);
+        _btn.onClick.AddListener(OnClick);
 
         _textRect = text.GetComponent<RectTransform>();
     }
 
-    public void Init(MainMenu mainMenu, int index)
+    public void Init(MainMenuController mainMenu, int index)
     {
-        _mainMenu = mainMenu;
+        if (_mainMenuController != null && _mainMenuController != mainMenu) return;
+        _mainMenuController = mainMenu;
         _index = index;
 
         Clear();
-
-        
     }
 
     private void Clear()
@@ -76,12 +75,22 @@ public class MainMenuItem : MonoBehaviour, IPointerEnterHandler
         text.fontSharedMaterial = selected ? glowMat : normalMat;
     }
 
-    public void Activate()
+    public void InsertSelectedInto(Sequence seq, float at, bool selected, float dur)
     {
-        Debug.Log($"[MenuItem] {_index} Activate");
+        float x      = selected ? 10f : 0f;
+        float alphaN = selected ? 0f : 107f / 255f;
+        float alphaS = selected ? 1f : 0f;
+        float alphaT = selected ? 1f : 107f / 255f;
 
-        
+        seq.Insert(at, _textRect.DOAnchorPosX(x, dur).SetEase(Ease.OutCubic));
+        seq.Insert(at, cursor.DOFade(alphaN, dur));
+        seq.Insert(at, cursorSelected.DOFade(alphaS, dur));
+        seq.Insert(at, text.DOFade(alphaT, dur));
+
+        text.fontSharedMaterial = selected ? glowMat : normalMat;
     }
 
-    public void OnPointerEnter(PointerEventData eventData) => _mainMenu.Hover(_index);
+    public void OnClick() => _mainMenuController.Click(_index);
+
+    public void OnPointerEnter(PointerEventData eventData) => _mainMenuController.Hover(_index);
 }
