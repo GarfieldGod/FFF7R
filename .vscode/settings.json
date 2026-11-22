@@ -74,11 +74,13 @@
         "**/Logs/**": true
     },
     "cSpell.words": [
+        "Addressables",
         "Behaviour",
         "Behaviours",
         "interactable",
         "Lerp",
         "Mathf",
+        "Scriptable",
         "Tweener",
         "UGUI"
     ],

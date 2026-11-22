@@ -47,6 +47,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 089e165ba35e4fd4a90539ad6e3d77ca
+    m_Address: U_Icon_Minigame_Rank8_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 09617d0aea6d47a4e9bfe701a38a3745
+    m_Address: U_Icon_Minigame_RankScenario1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0abedce59f365fd4db2ff071ce0401fb
     m_Address: Card138_OnBoard
     m_ReadOnly: 0
@@ -69,6 +79,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0e1e5a59361c585408e8b0ff7f85a53d
     m_Address: Card054
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 13f4a242b9bbedd4d8c6bd7f25d9f0a6
+    m_Address: U_Icon_Minigame_Rank10_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -137,6 +152,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 24c58a4faa5814b43b3641e6e2ee664c
+    m_Address: U_Icon_Minigame_Rank11_Cloud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 27a820159d2c7db468c22e1d258a591c
     m_Address: Card028
     m_ReadOnly: 0
@@ -144,6 +164,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 283be7e499a725240b4395cbfd97fb20
     m_Address: Card118
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2aeeb83d99e96f54f9eef382cfa0ac84
+    m_Address: U_Icon_Minigame_Rank2_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -159,6 +184,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 2e6cae3d8a939814eab410419f4d5cff
     m_Address: Card036
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2e8ee93c0272ff8468462b983120f08b
+    m_Address: U_Icon_Minigame_Rank5_00
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -302,6 +332,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 564fc76dd81718b4aac8f89223fb1f0a
+    m_Address: U_Icon_Minigame_Rank9_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5a522ec31079379448019d7c8ec24491
     m_Address: Card078
     m_ReadOnly: 0
@@ -329,6 +364,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 5ec4d59d2b6e153489ffad80e6b3ca9d
     m_Address: Card119
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ef587fae8b973e449f1719baa94bbff
+    m_Address: U_Icon_Minigame_Rank7_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -362,6 +402,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69a04ed84cc0807498d3334eca0949b7
+    m_Address: U_Icon_Minigame_Rank1_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 69a8a9e4b6e41ed44802100576fd0529
     m_Address: Card080
     m_ReadOnly: 0
@@ -377,8 +422,18 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6e14f6e1eb1eac141984fcbe3c8a8267
+    m_Address: Map_Grasa
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6e9349009033353478b56438883c0b55
     m_Address: Card127
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7099b920ac71a444ca15b51c7ef4d510
+    m_Address: U_Icon_Minigame_Rank4_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -407,6 +462,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75738b32bed368442b58790a42e54a3e
+    m_Address: U_Icon_Minigame_Rank2_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 758af7edf12908d45be4b1dd42a1e037
+    m_Address: U_Icon_Minigame_Rank4_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7814dc520e8db3d47a4b10d8924e4759
     m_Address: Card088
     m_ReadOnly: 0
@@ -414,6 +479,16 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7915f92bb7de98c49b3b081b92a1d669
     m_Address: Card086
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 79b1eb60a96e0a047a5a7543dae3bb2b
+    m_Address: U_Icon_Minigame_Rank9_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7a2990c92d766dd4f97ad7e8ec67ea45
+    m_Address: U_Icon_Minigame_Rank10_00
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -429,6 +504,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 7d3ededfd51925048815453a3e1d1395
     m_Address: Card140
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7d707d20b20b7964a9a5b30e14a1f0c9
+    m_Address: U_Icon_Minigame_Rank6_00
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -542,13 +622,28 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a53bd1a09178aa4499685fee195ecaea
+    m_Address: U_Icon_Minigame_RankScenario2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a68d205c05d613e478e395f51e712094
     m_Address: Card137_OnBoard
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a9f08d0ed10f9f941bb4f710c7bdaf90
+    m_Address: U_Icon_Minigame_Rank5_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: abbe0cb3bd265be44b006e0dcbbbcb3e
     m_Address: Card037
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: acdbc6fb3949bbe4eaee4f6966aa06bb
+    m_Address: U_Icon_Minigame_Rank7_00
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -589,6 +684,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b5b5fdb47f48e994dac07d5dc9d1f5c3
     m_Address: Card007
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b5c879c796432784fb9598206e8ebaaf
+    m_Address: U_Icon_Minigame_Rank11_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -657,6 +757,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c898c5b75b41d8d41b83f8006eaf7374
+    m_Address: U_Icon_Minigame_Rank8_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ca33c3252255fb145bf8282ee4b37754
     m_Address: Card006
     m_ReadOnly: 0
@@ -684,6 +789,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d20e5c2a62e807e439fb989000ddbd60
     m_Address: Card020
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d4838d4ba7a553f4998fad1d15472206
+    m_Address: U_Icon_Minigame_Rank3_00
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -739,6 +849,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e0af28cc76be29e4eaef6aeda7d11760
     m_Address: Card107
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e204f1064951fab45b62823351e47c8f
+    m_Address: U_Icon_Minigame_Rank6_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -802,6 +917,16 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f59ce3f0e118116449695cb03ef05d7a
+    m_Address: U_Icon_Minigame_Rank11_00
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f5fad6dda0f840b439814c6e87965410
+    m_Address: U_Icon_Minigame_Rank3_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f776ec7c27c3a81488b8b0eab39b1ba3
     m_Address: Card133
     m_ReadOnly: 0
@@ -829,6 +954,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: fd5b180267d89894dbd28879175e5875
     m_Address: Card023
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fdbafa8efa2a73d47ba6a09f7ad6587b
+    m_Address: U_Icon_Minigame_Rank1_01
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
