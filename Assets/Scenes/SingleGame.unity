@@ -1234,11 +1234,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mapRoot: {fileID: 840661099}
   viewport: {fileID: 1569738230}
+  zoomSpeed: 6
   miniZoomMul: 2
+  focusZoomMul: 2
   maxZoomMul: 3
   wheelZoomStep: 1.12
   dragRangeRatio: 0.5
-  focusZoomMul: 2
+  moveSpeed: 6
+  slideFactor: 12
   clickBlockDistance: 8
 --- !u!1 &1611908667
 GameObject:
