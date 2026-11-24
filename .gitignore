@@ -116,3 +116,6 @@ steam_appid.txt
 #   .vscode/                 含 dotnet.defaultSolution，指向 FFF7.sln
 #   Tools/                   工程生成脚本与终端宿主工程
 # ============================================================
+
+// 忽略8192*8192大地图
+Assets/ArtAssets/UI/MainPage/MapPage/Map/MapPicture
