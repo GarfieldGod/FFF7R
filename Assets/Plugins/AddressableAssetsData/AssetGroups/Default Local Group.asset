@@ -22,11 +22,6 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 01d4c93b1145f534993f219f9dd39764
-    m_Address: CardBorderFull
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 024a8750882b1054cb0573e4f1995d0b
     m_Address: Card024
     m_ReadOnly: 0
@@ -52,6 +47,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 091c74cf9a92bd04e91a14e2f0ce53d0
+    m_Address: U_CardGame_Base
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 09617d0aea6d47a4e9bfe701a38a3745
     m_Address: U_Icon_Minigame_RankScenario1
     m_ReadOnly: 0
@@ -74,6 +74,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 0cef346d2ae12694bb8e002c560976ef
     m_Address: Card022
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 0da3e3cc3d118924c8dccec809a2f488
+    m_Address: U_CardGame_CardFrame_Hand_Normal_Radius
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -127,6 +132,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1ccb74b9e0cc74344b973061f226e2c2
+    m_Address: U_CardGame_CardFrame_Hand_Special
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 1e8a9b731b7e86749b59212dcf87c0e5
     m_Address: Card014
     m_ReadOnly: 0
@@ -142,6 +152,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 22257fb5759570940bb06b41e4c4b709
+    m_Address: U_CardGame_CardFrame_Hand_Special_Radius
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 24767d7ff24e4da4d9f9ac6d5ec7fc70
     m_Address: Card082
     m_ReadOnly: 0
@@ -154,6 +169,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 24c58a4faa5814b43b3641e6e2ee664c
     m_Address: U_Icon_Minigame_Rank11_Cloud
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 263557026deaa164183ac337ac8f3ef9
+    m_Address: U_CardGame_CardFrame_Board_Special_Radius
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -273,7 +293,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 44403c2387229c147816f9f8624dcd9d
-    m_Address: CardGame_CardBack
+    m_Address: U_CardGame_CardBack
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -577,8 +597,8 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 941a0c6dacdf6d54080f8f3d96cb6d16
-    m_Address: Assets/ArtAssets/CardGame_Base_02.png
+  - m_GUID: 94071e3b71790c64ab552c24e505a7a4
+    m_Address: U_CardGame_CardFrame_Board_Normal_Radius
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -702,6 +722,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b71be67782af8ed4c83a0bd02dace994
+    m_Address: U_CardGame_CardFrame_Hand_Normal
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b7f6e9091f84027488ec1acb39315b3a
     m_Address: Card128
     m_ReadOnly: 0
@@ -792,6 +817,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d3e81a776538c444ab97de2e1705659f
+    m_Address: U_CardGame_CardFrame_Board_Normal
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: d4838d4ba7a553f4998fad1d15472206
     m_Address: U_Icon_Minigame_Rank3_00
     m_ReadOnly: 0
@@ -832,6 +862,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: dde1272af2e728f4b85fdcc56c1baff3
+    m_Address: U_CardGame_CostIcon
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: df5b153598ef20a47aa81b330009bc65
     m_Address: Card129
     m_ReadOnly: 0
@@ -864,6 +899,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: e5372383cfe94604891bc7da62998cce
     m_Address: Card098
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e6ae1cd925b376149b4812dc364dc66d
+    m_Address: U_CardGame_CardFrame_Board_Special
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
@@ -929,6 +969,11 @@ MonoBehaviour:
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: f776ec7c27c3a81488b8b0eab39b1ba3
     m_Address: Card133
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f8f828148f0a852428154d58971b1332
+    m_Address: U_CardGame_PowerFrame
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
