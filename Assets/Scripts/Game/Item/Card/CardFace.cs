@@ -21,8 +21,10 @@ public class CardFace : MonoBehaviour
     [SerializeField] private GridCellOnCard gridCellPrefab;
     private GridCellOnCard[,] gridCells = null;
 
-    private static readonly string borderSprites = "CardBorder";
-    private static readonly string borderSpritesFull = "CardBorderFull";
+    private static readonly string CardFrameBoardNormal = "U_CardGame_CardFrame_Board_Normal_Radius";
+    private static readonly string CardFrameBoardSpecial = "U_CardGame_CardFrame_Board_Special_Radius";
+    private static readonly string CardFrameHandNormal = "U_CardGame_CardFrame_Hand_Normal_Radius";
+    private static readonly string CardFrameHandSpecial = "U_CardGame_CardFrame_Hand_Special_Radius";
     private string _cardCode;
 
     public void SetCardInHand(CardDefView cardDef, PlayerSeat seat)
@@ -82,7 +84,7 @@ public class CardFace : MonoBehaviour
     private void SetSprite(string cardCode, bool onBoard = false)
     {
         BorderImage.enabled = false;
-        GameAssets.Sprites.Request(onBoard ? borderSprites : borderSpritesFull, (s) => {
+        GameAssets.Sprites.Request(onBoard ? CardFrameBoardNormal : CardFrameHandNormal, (s) => {
             if (BorderImage != null && s != null) {
                 BorderImage.sprite = s;
                 BorderImage.enabled = true;

@@ -20,8 +20,11 @@ public class MapView : MonoBehaviour,
 
     [Header("移动")]
     [SerializeField] float dragSpeedRatio = 0.8f;
-    [SerializeField] float moveSpeed = 6f; // 仅影响聚焦时的速度，越大越快
-    [SerializeField] float slideTime = 0.2f; // 拖动结束后的速度，越大越快
+    [SerializeField] float focusSpeed = 6f; // 仅影响聚焦时的速度，越大越快
+    [SerializeField] float friction            = 6f;    // 惯性摩擦，越大滑得越近
+    [SerializeField] float stopSpeed           = 30f;   // 低于此速度视为停止
+    [SerializeField] float slideDistanceRatio  = 1.4f;  // 滑行距离 ≤ 拖动距离 × 该值
+    [SerializeField] float slideIdleCutoff     = 0.06f;
 
     [Header("点击保护")]
     [SerializeField] float clickBlockDistance = 8f; // 拖动距离超过此值时，本帧点击无效
@@ -46,6 +49,8 @@ public class MapView : MonoBehaviour,
 
     Vector2 _lastDelta;
     Vector2 _velocity;
+    float _lastDragMoveTime;
+    bool _inertia;
 
     // ---------------- 其他 ----------------
     int _clickBlockedFrame = -1;
@@ -94,18 +99,45 @@ public class MapView : MonoBehaviour,
             if (Mathf.Abs(_scale - _targetScale) < 0.0005f) _scale = _targetScale;
         }
 
-        // 位移逼近（拖动时跳过，直接跟手）
+        // // 位移逼近（拖动时跳过，直接跟手）
+        // if (!_dragging)
+        // {
+        //     if ((_pos - _targetPos).sqrMagnitude > 0.01f)
+        //     {
+        //         float k = 1f - Mathf.Exp(-focusSpeed * dt);
+        //         _pos = Vector2.Lerp(_pos, _targetPos, k);
+        //     }
+        //     else
+        //     {
+        //         _pos = _targetPos;
+        //     }
+        // }
+
         if (!_dragging)
         {
-            if ((_pos - _targetPos).sqrMagnitude > 0.01f)
+            if (_inertia)
             {
-                float k = 1f - Mathf.Exp(-moveSpeed * dt);
+                _pos += _velocity * dt;
+                _velocity *= Mathf.Exp(-friction * dt);
+
+                // 撞墙：夹住位置，并抹掉朝墙外的速度分量
+                Vector2 lim = GetLimit(_scale);
+                if (Mathf.Abs(_pos.x) > lim.x) { _pos.x = Mathf.Sign(_pos.x) * lim.x; _velocity.x = 0f; }
+                if (Mathf.Abs(_pos.y) > lim.y) { _pos.y = Mathf.Sign(_pos.y) * lim.y; _velocity.y = 0f; }
+
+                if (_velocity.sqrMagnitude < stopSpeed * stopSpeed)
+                {
+                    _velocity = Vector2.zero;
+                    _inertia  = false;
+                    _targetPos = _pos;
+                }
+            }
+            else if ((_pos - _targetPos).sqrMagnitude > 0.01f)
+            {
+                float k = 1f - Mathf.Exp(-focusSpeed * dt);
                 _pos = Vector2.Lerp(_pos, _targetPos, k);
             }
-            else
-            {
-                _pos = _targetPos;
-            }
+            else _pos = _targetPos;
         }
 
         ApplyTransform();
@@ -124,8 +156,10 @@ public class MapView : MonoBehaviour,
     {
         if (!IsReady) return;
 
-        float focusScale = Mathf.Clamp(_minScale * focusZoomMul, _minScale, _maxScale);
+        _inertia  = false;
+        _velocity = Vector2.zero;
 
+        float focusScale = Mathf.Clamp(_minScale * focusZoomMul, _minScale, _maxScale);
         _targetScale = focusScale;
         _targetPos   = ClampPos(-mapLocalPos * focusScale + screenOffset, focusScale);
     }
@@ -182,14 +216,19 @@ public class MapView : MonoBehaviour,
     // 限制范围，使地图始终在视口内
     Vector2 ClampPos(Vector2 pos, float s)
     {
-        Vector2 v = _viewport.rect.size;
-        // 地图中心的可移动范围
-        Vector2 lim = new Vector2(
-            Mathf.Max(0f, (_mapSize.x * s - v.x) * 0.5f * dragRangeRatio),
-            Mathf.Max(0f, (_mapSize.y * s - v.y) * 0.5f * dragRangeRatio));
+        Vector2 lim = GetLimit(s);
         return new Vector2(
             Mathf.Clamp(pos.x, -lim.x, lim.x),
             Mathf.Clamp(pos.y, -lim.y, lim.y));
+    }
+
+    // 地图中心的可移动范围
+    Vector2 GetLimit(float s)
+    {
+        Vector2 v = _viewport.rect.size;
+        return new Vector2(
+            Mathf.Max(0f, (_mapSize.x * s - v.x) * 0.5f * dragRangeRatio),
+            Mathf.Max(0f, (_mapSize.y * s - v.y) * 0.5f * dragRangeRatio));
     }
 
     /// <summary>底图加载完成后由 MapPage 调用。</summary>
@@ -220,11 +259,13 @@ public class MapView : MonoBehaviour,
         if (!IsReady || !ToLocal(e, out var p)) return;
         _dragging = true;
         _dragStartPointer = p;
-        _dragStartPos     = mapRoot.anchoredPosition;
+        _dragStartPos     = _pos;
         _dragDistance     = 0f;
 
         _velocity = Vector2.zero;
         _lastDelta = Vector2.zero;
+        _lastDragMoveTime = Time.unscaledTime;
+        _inertia = false;
         _targetScale = _scale; // 拖动时取消缩放过渡
     }
 
@@ -236,8 +277,9 @@ public class MapView : MonoBehaviour,
         if (delta.magnitude > _dragDistance) _dragDistance = delta.magnitude;
 
         float dt = Mathf.Max(Time.unscaledDeltaTime, 0.0001f);
-        _velocity = Vector2.Lerp(_velocity, (delta - _lastDelta) / dt, 0.5f);
+        _velocity = Vector2.Lerp(_velocity, (delta - _lastDelta) / dt, 1f - Mathf.Exp(-20f * dt));  // 约 50ms 平均
         _lastDelta = delta;
+        _lastDragMoveTime = Time.unscaledTime;
 
         _targetPos = ClampPos(_dragStartPos + delta, _scale);
         _pos = _targetPos;      // 跟手：不平滑
@@ -246,13 +288,23 @@ public class MapView : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData e)
     {
-        if (!IsReady || !ToLocal(e, out var p)) return;
-
-        var totalDelta = _dragStartPos - p;
         _dragging = false;
-        _targetPos = ClampPos(_pos + _velocity * slideTime, _scale);
+
+        if (Time.unscaledTime - _lastDragMoveTime > slideIdleCutoff)
+            _velocity = Vector2.zero;
+
+        // 鼠标滑动的距离
+        float dragLen = (_pos - _dragStartPos).magnitude;
+
+        // 地图惯性的滑动距离
+        float maxSlide = dragLen * slideDistanceRatio * friction;
+        _velocity = Vector2.ClampMagnitude(_velocity, maxSlide);
+
+        _inertia = _velocity.sqrMagnitude > stopSpeed * stopSpeed;
+        _targetPos = _pos;
+
         if (_dragDistance > clickBlockDistance)
-            _clickBlockedFrame = Time.frameCount;   // 只挡本帧，自动过期
+            _clickBlockedFrame = Time.frameCount;
     }
 
     // ---------------- 缩放事件 ----------------
