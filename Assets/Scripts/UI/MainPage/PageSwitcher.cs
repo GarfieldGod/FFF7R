@@ -9,8 +9,11 @@ public class PageSwitcher : MonoBehaviour
     [SerializeField] private NavUI nav;
     [SerializeField] private int defaultPageIndex = 0;
     [SerializeField] private CanvasGroup[] pages;
+    [SerializeField] private float pageFadeTime = 0.2f;
+    [SerializeField] private bool pageSwitchMix = false;
 
     private CanvasGroup _current = null;
+    Sequence _seq;
 
     void Start()
     {
@@ -25,6 +28,11 @@ public class PageSwitcher : MonoBehaviour
         OnPageChange(defaultPageIndex);
     }
 
+    void Update()
+    {
+        App.Save.Flush();
+    }
+
     void OnPageChange(int index)
     {
         if (index >= pages.Length || index < 0) return;
@@ -32,18 +40,31 @@ public class PageSwitcher : MonoBehaviour
         var page = pages[index];
         if (page == null || page == _current) return;
 
+        if (!pageSwitchMix)
+        {
+            _seq?.Kill();
+            _seq = DOTween.Sequence();
+            if (_current != null) _seq.Append(_current.DOFade(0, pageFadeTime));
+            _seq.Append(page.DOFade(1, pageFadeTime));
+        } else
+        {
+            if (_current != null)
+            {
+                _current.DOKill();
+                _current.DOFade(0, pageFadeTime); 
+            }
+            page.DOKill();
+            page.DOFade(1, pageFadeTime);
+        }
+
         if (_current != null)
         {
-            // _current.alpha = 0;
-            _current.DOFade(0, 0.5f);
             _current.interactable = false;
             _current.blocksRaycasts = false;
         }
-
-        // page.alpha = 1;
-        page.DOFade(1, 0.5f);
         page.interactable = true;
         page.blocksRaycasts = true;
+
         _current = page;
     }
 }

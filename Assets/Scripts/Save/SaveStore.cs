@@ -40,6 +40,7 @@ public static class SaveStore
 
     public static bool Save(SaveData data)
     {
+        Debug.Log($"[Save] 写入 {Path}");
         if (data == null) return false;
 
         try

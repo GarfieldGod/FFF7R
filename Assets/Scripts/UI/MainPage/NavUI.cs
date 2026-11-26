@@ -17,7 +17,10 @@ public class NavUI : MonoBehaviour
             button.Deselect(false);
             button.OnSelect += SelectButton;
         }
+    }
 
+    void Start()
+    {
         if (navButtons.Length > defaultIndex)
             SelectButton(navButtons[defaultIndex]);
     }

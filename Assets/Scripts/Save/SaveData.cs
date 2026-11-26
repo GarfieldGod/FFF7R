@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 [Serializable]
 public class SaveData
@@ -18,29 +19,52 @@ public class SaveData
 [Serializable]
 public class PlayerCardData
 {
-    private readonly List<string> _owned = new List<string>();
-    private readonly List<List<string>> _decks = new List<List<string>>();
-    public static readonly int DECK_COUNT = 6;
+    public const int DECK_COUNT = 6;
+
+    public List<string>   owned = new List<string>();
+    public List<DeckSlot> decks = new List<DeckSlot>();
+
     public PlayerCardData()
     {
         for (int i = 0; i < DECK_COUNT; i++)
-            _decks.Add(new List<string>());
+            decks.Add(new DeckSlot());
     }
 
     public IReadOnlyList<string> GetDeck(int index)
     {
         if (index < 0 || index >= DECK_COUNT) return null;
-        return _decks[index].AsReadOnly();
+        return decks[index].AsReadOnly();
     }
 
     public void SetDeck(int index, List<string> cards)
     {
         if (index < 0 || index >= DECK_COUNT) return;
 
-        _decks[index].Clear();
-        foreach (var card in cards) _decks[index].Add(card);
+        decks[index].Set(cards);
     }
 
-    public IReadOnlyList<string> OwnedCards => _owned.AsReadOnly();
-    public void ObtainCard(string cardCode) => _owned.Add(cardCode);
+    public IReadOnlyList<string> OwnedCards => owned.AsReadOnly();
+    public void ObtainCard(string cardCode) => owned.Add(cardCode);
+}
+
+[Serializable]
+public class DeckSlot
+{
+    public const int DECK_SIZE  = 15;
+
+    public string name = string.Empty;
+    public List<string> cards = new List<string>();
+    public DeckSlot()
+    {
+        for (int i = 0; i < DECK_SIZE; i++)
+            cards.Add(string.Empty);
+    }
+
+    public void Set(List<string> newList)
+    {
+        cards.Clear();
+        foreach (var card in newList) cards.Add(card);
+    }
+
+    public ReadOnlyCollection<string> AsReadOnly() => cards.AsReadOnly();
 }
