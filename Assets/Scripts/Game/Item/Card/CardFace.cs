@@ -117,18 +117,28 @@ public class CardFace : MonoBehaviour
     {
         EnsureGrids();
 
-        ApplyPattern(cardData.PosEffect,  c => c.SetPosEffect());
-        ApplyPattern(cardData.EffectScope, c => c.SetCardEffect());
+        ApplyPattern(cardData.PosEffect,  cardData.EffectScope);
 
-        gridCells[2,2].SetCenter();
+        gridCells[2,2].SetState(GridCellOnCard.State.Center);
     }
 
-    void ApplyPattern(GridPattern p, System.Action<GridCellOnCard> mark)
+    void ApplyPattern(GridPattern pe, GridPattern ce)
     {
-        if (p == null) return;
-        for (int y = 0; y < p.Height; y++)
-            for (int x = 0; x < p.Width; x++)
-                if (p[x, y] != 0) mark(gridCells[x, y]);
+        if (pe != null)
+        {
+            for (int y = 0; y < pe.Height; y++)
+                for (int x = 0; x < pe.Width; x++)
+                {
+                    bool hasPosEffect = pe[x, y] != 0;
+                    bool hasCardEffect = ce != null && ce[x, y] != 0;
+                    GridCellOnCard.State state = GridCellOnCard.State.Empty;
+                    if (hasPosEffect && !hasCardEffect) state = GridCellOnCard.State.PosEffect;
+                    else if (!hasPosEffect && hasCardEffect) state = GridCellOnCard.State.CardEffect;
+                    else if (hasPosEffect && hasCardEffect) state = GridCellOnCard.State.PosEffectAndCardEffect;
+
+                    gridCells[x, y].SetState(state);
+                }
+        }
     }
 
     public void EnsureGrids()
@@ -152,6 +162,6 @@ public class CardFace : MonoBehaviour
                 cell.Init();
             }
         }
-        gridCells[2,2].SetCenter();
+        gridCells[2,2].SetState(GridCellOnCard.State.Center);
     }
 }
