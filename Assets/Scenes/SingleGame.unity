@@ -1628,10 +1628,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (5)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3298,10 +3294,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3691,10 +3683,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (11)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -3799,10 +3787,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (14)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
@@ -4507,10 +4491,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (2)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
@@ -5326,10 +5306,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (7)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
@@ -7446,10 +7422,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (8)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
@@ -10052,10 +10024,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (13)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11006,10 +10974,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (6)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11373,10 +11337,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (10)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -11481,10 +11441,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (12)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
@@ -13144,10 +13100,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (4)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -13252,10 +13204,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (9)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
@@ -14695,10 +14643,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardUI (3)
       objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
-      objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -15968,10 +15912,6 @@ PrefabInstance:
     - target: {fileID: 944313563269606046, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Name
       value: CardUI (0)
-      objectReference: {fileID: 0}
-    - target: {fileID: 6245030683122092269, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 475
       objectReference: {fileID: 0}
     - target: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
       propertyPath: m_Pivot.x

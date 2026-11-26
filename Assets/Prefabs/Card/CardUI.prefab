@@ -64,12 +64,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   face: {fileID: 7864515522810214153}
   faceFadeTime: 0.2
-  hasFrame: 1
+  showFrame: 1
   frame: {fileID: 4472148300906879776}
   frameHighLight: {fileID: 353884621718306720}
   frameHighLightFadeTime: 0.2
   Background: {fileID: 1003863609611020964}
-  hasCursor: 1
+  showCursor: 1
   Cursor: {fileID: 5082717524140315593}
   cursorMoveLength: 180
   cursorMoveTime: 0.5
@@ -108,7 +108,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 365, y: 475}
+  m_SizeDelta: {x: 370, y: 480}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4311806586068191969
 CanvasRenderer:
@@ -183,7 +183,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 365, y: 475}
+  m_SizeDelta: {x: 370, y: 480}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &514177131043349051
 CanvasRenderer:

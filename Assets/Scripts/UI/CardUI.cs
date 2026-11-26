@@ -97,7 +97,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (showFrame)
         {
             frameHighLight.DOKill();
-            frameHighLight.DOFade(0, frameHighLightFadeTime).SetLink(gameObject);;
+            frameHighLight.DOFade(0, frameHighLightFadeTime).SetLink(gameObject);
         }
         if (showCursor)
         {

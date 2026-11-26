@@ -14,6 +14,9 @@ public class CardDetailPanel : MonoBehaviour
     [SerializeField] private CardUI cardUI;
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private float fadeTime = 0.2f;
+
+    void Start() => canvasGroup.alpha = 0;
+
     public void ShowCardDetail(string cardCode)
     {
         if (cardCode == null) {
@@ -43,7 +46,14 @@ public class CardDetailPanel : MonoBehaviour
 
         cardUI.Bind(def);
         codeText.text = "卡片No." + def.CardCode.Substring(4);
-        // typeText.text = def.Type.ToString();
+        switch (def.Type) {
+            case CardType.Advance:
+                typeText.text = "传说";
+                break;
+            default:
+                typeText.text = "普通";
+                break;
+        }
         nameText.text = def.Name;
         detailText.text = def.Description;
     }

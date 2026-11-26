@@ -34,7 +34,7 @@ public class CardFace : MonoBehaviour
         NameText.enabled = true;
         SetCardData(cardDef);
 
-        SetSprite(cardDef.CardCode, false);
+        SetSprite(cardDef, false);
         SetPlayerSeat(seat);
         _cardCode = cardDef.CardCode;
     }
@@ -43,9 +43,11 @@ public class CardFace : MonoBehaviour
     {
         if (_cardCode == cardCode) return;
 
+        var def = App.Cards.Get(cardCode);
+
         NameText.enabled = false;
 
-        SetSprite(cardCode, true);
+        SetSprite(def, true);
         SetPlayerSeat(seat);
         _cardCode = cardCode;
     }
@@ -81,10 +83,14 @@ public class CardFace : MonoBehaviour
         SetScope(cardData);
     }
 
-    private void SetSprite(string cardCode, bool onBoard = false)
+    private void SetSprite(CardDefView def, bool onBoard = false)
     {
         BorderImage.enabled = false;
-        GameAssets.Sprites.Request(onBoard ? CardFrameBoardNormal : CardFrameHandNormal, (s) => {
+        bool ad = def.Type == CardType.Advance;
+        string cardFrame = onBoard ? 
+            ad ? CardFrameBoardSpecial : CardFrameBoardNormal : 
+            ad ? CardFrameHandSpecial : CardFrameHandNormal;
+        GameAssets.Sprites.Request(cardFrame, (s) => {
             if (BorderImage != null && s != null) {
                 BorderImage.sprite = s;
                 BorderImage.enabled = true;
@@ -92,7 +98,7 @@ public class CardFace : MonoBehaviour
         });
 
         CardImage.enabled = false;
-        GameAssets.Sprites.Request(cardCode, (s) => {
+        GameAssets.Sprites.Request(def.CardCode, (s) => {
             if (CardImage != null && s != null) {
                 CardImage.sprite = s;
                 CardImage.enabled = true;
