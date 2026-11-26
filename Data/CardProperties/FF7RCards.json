@@ -3640,6 +3640,7 @@
     "Description": "此卡片配置中，特殊效果方格我方·对手卡片的威力提升2。"
   },
   {
+    "Type": "Advance",
     "CardCode": "Card145",
     "Name": "Shadowblood Queen",
     "Level": 3,

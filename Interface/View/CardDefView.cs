@@ -1,11 +1,13 @@
 namespace FFF7R
 {
+    public enum CardType { Normal, Advance, Special }
     /// <summary>
     /// 卡牌静态定义（只读视图）。对应内核的 ChessProperty，但剥掉了 PosOffsetDict 之类的内部缓存。
     /// 由 <see cref="ICardCatalog"/> 提供，生命周期与对局无关，可缓存。
     /// </summary>
     public sealed class CardDefView
     {
+        public CardType Type { get; }
         public string CardCode { get; }
         public string Name { get; }
 
@@ -27,6 +29,7 @@ namespace FFF7R
         public string EffectSummary { get; }
 
         public CardDefView(
+            CardType type,
             string cardCode,
             string name,
             int level,
@@ -36,6 +39,7 @@ namespace FFF7R
             GridPattern effectScope,
             string effectSummary)
         {
+            Type = type;
             CardCode = cardCode;
             Name = name;
             Level = level;

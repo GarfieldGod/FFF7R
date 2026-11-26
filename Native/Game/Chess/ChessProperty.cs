@@ -2,11 +2,18 @@ namespace FFF7RCore {
     using Effect;
     using System.Collections.Generic;
 
+    public enum ChessType {
+        Normal,
+        Advance,
+        Special
+    }
+
     public class ChessProperty {
         public string CardCode;
         public string Name;
         public int Level;
         public int Cost;
+        public ChessType Type = ChessType.Normal;
         public List<List<int>> PosEffect;
         public CardEffectEntry CardEffect;
         public CardEffectEntry CardEffectAlt;
@@ -17,6 +24,7 @@ namespace FFF7RCore {
         public Dictionary<Int2D, int> CardOffsetDict;
         public ChessProperty() {}
         public ChessProperty(ChessProperty chessProperty){
+            Type = chessProperty.Type;
             CardCode = chessProperty.CardCode;
             Name = chessProperty.Name;
             Level = chessProperty.Level;

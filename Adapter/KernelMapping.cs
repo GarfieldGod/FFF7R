@@ -104,11 +104,23 @@ namespace FFF7R.Adapter
             return new GridPattern(cols, rows, columns);
         }
 
+        public static CardType ToType(ChessType v)
+        {
+            switch (v)
+            {
+                case ChessType.Normal: return CardType.Normal;
+                case ChessType.Advance: return CardType.Advance;
+                case ChessType.Special: return CardType.Special;
+                default: return CardType.Normal;
+            }
+        }
+
         public static CardDefView ToCardDef(ChessProperty property)
         {
             if (property == null) return null;
 
             return new CardDefView(
+                ToType(property.Type),
                 property.CardCode,
                 property.Name,
                 property.Level,
