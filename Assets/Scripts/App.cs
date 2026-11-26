@@ -5,8 +5,17 @@ using UnityEngine;
 public static class App
 {
     static CardCatalog _cards;
+    static PlayerData  _save;
 
     public static ICardCatalog Cards => _cards ??= CreateCardCatalog();
+    public static PlayerData Save => _save ??= CreateSave();
+
+    static PlayerData CreateSave()
+    {
+        var p = new PlayerData();
+        p.Load();
+        return p;
+    }
 
     static CardCatalog CreateCardCatalog()
     {
