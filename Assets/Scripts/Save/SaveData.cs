@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 [Serializable]
 public class SaveData
@@ -19,28 +20,27 @@ public class SaveData
 [Serializable]
 public class PlayerCardData
 {
-    public const int DECK_COUNT = 6;
-
     public List<string>   owned = new List<string>();
     public List<DeckSlot> decks = new List<DeckSlot>();
 
     public PlayerCardData()
     {
-        for (int i = 0; i < DECK_COUNT; i++)
-            decks.Add(new DeckSlot());
+        for (int i = 0; i < DeckRules.DECK_COUNT; i++)
+            decks.Add(new DeckSlot(i + 1));
     }
 
     public IReadOnlyList<string> GetDeck(int index)
     {
-        if (index < 0 || index >= DECK_COUNT) return null;
+        if (index < 0 || index >= DeckRules.DECK_COUNT) return null;
         return decks[index].AsReadOnly();
     }
 
-    public void SetDeck(int index, List<string> cards)
+    public bool SetDeck(int index, List<string> cards)
     {
-        if (index < 0 || index >= DECK_COUNT) return;
+        if (index < 0 || index >= DeckRules.DECK_COUNT) return false;
 
         decks[index].Set(cards);
+        return true;
     }
 
     public IReadOnlyList<string> OwnedCards => owned.AsReadOnly();
@@ -50,15 +50,20 @@ public class PlayerCardData
 [Serializable]
 public class DeckSlot
 {
-    public const int DECK_SIZE  = 15;
-
+    public int index;
     public string name = string.Empty;
     public List<string> cards = new List<string>();
-    public DeckSlot()
+    public DeckSlot(int index)
     {
-        for (int i = 0; i < DECK_SIZE; i++)
-            cards.Add(string.Empty);
+        this.index = index;
     }
+
+    public void Add(string cardCode)
+    {
+        if (App.VerifyCadeCode(cardCode)) cards.Add(cardCode);
+    }
+
+    public void Remove(string cardCode) => cards.Remove(cardCode);
 
     public void Set(List<string> newList)
     {
@@ -67,4 +72,5 @@ public class DeckSlot
     }
 
     public ReadOnlyCollection<string> AsReadOnly() => cards.AsReadOnly();
+    public int Count => cards.Count;
 }

@@ -27,7 +27,9 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [SerializeField] float cursorMoveTime = 0.5f;
 
     public CardDefView Def { get; private set; }
+    public string CardCode => Def != null ? Def.CardCode : null;
     public event Action<string> Selected;
+    public event Action<string> Clicked;
 
     private CanvasGroup faceCG;
 
@@ -73,7 +75,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         Def = def;
     }
 
-    public void OnPointerClick(PointerEventData e) => Selected?.Invoke(Def != null ? Def.CardCode : null);
+    public void OnPointerClick(PointerEventData e) => Clicked?.Invoke(Def != null ? Def.CardCode : null);
 
     public void OnPointerEnter(PointerEventData e)
     {

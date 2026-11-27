@@ -34,7 +34,7 @@ public sealed class PlayerData
         Flush();
     }
 
-    public void SetDeck(int index, List<string> cards) => _data.cardData.SetDeck(index, cards);
+    public bool SetDeck(int index, List<string> cards) => _data.cardData.SetDeck(index, cards);
 
     public bool IsOwned(string code) =>
         DebugUnlockAll || OwnedCards.Contains(code);
@@ -42,7 +42,7 @@ public sealed class PlayerData
     public void ObtainCard(string code)
     {
         if (string.IsNullOrEmpty(code)) return;
-        if (!App.Cards.AllCodes.Contains(code)) return;
+        if (!App.VerifyCadeCode(code)) return;
 
         _data.cardData.ObtainCard(code);
         _dirty = true;

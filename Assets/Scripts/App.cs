@@ -1,3 +1,4 @@
+using System.Linq;
 using FFF7R;
 using FFF7R.Adapter;
 using UnityEngine;
@@ -9,6 +10,7 @@ public static class App
 
     public static ICardCatalog Cards => _cards ??= CreateCardCatalog();
     public static PlayerData Save => _save ??= CreateSave();
+    public static bool VerifyCadeCode(string cardCode) => Cards.AllCodes.Contains(cardCode);
 
     static PlayerData CreateSave()
     {
