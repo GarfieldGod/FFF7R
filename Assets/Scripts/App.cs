@@ -14,7 +14,10 @@ public static class App
 
     static PlayerData CreateSave()
     {
-        var p = new PlayerData();
+        var p = new PlayerData
+        {
+            DebugUnlockAll = true
+        };
         p.Load();
         return p;
     }

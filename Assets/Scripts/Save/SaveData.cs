@@ -44,7 +44,14 @@ public class PlayerCardData
     }
 
     public IReadOnlyList<string> OwnedCards => owned.AsReadOnly();
-    public void ObtainCard(string cardCode) => owned.Add(cardCode);
+    public bool ObtainCard(string cardCode)
+    {
+        if (!App.VerifyCadeCode(cardCode)) return false;
+        if (owned.Contains(cardCode) && owned.Count(s => s == cardCode) >= DeckRules.MaxCount(cardCode)) return false;
+
+        owned.Add(cardCode);
+        return true;
+    }
 }
 
 [Serializable]

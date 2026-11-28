@@ -23,7 +23,7 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     [Header("CardCursor")]
     [SerializeField] bool showCursor = true;
     [SerializeField] Image Cursor;
-    [SerializeField] float cursorMoveLength = 180f;
+    [SerializeField] float cursorMoveLength = 20f;
     [SerializeField] float cursorMoveTime = 0.5f;
 
     public CardDefView Def { get; private set; }
@@ -32,10 +32,13 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
     public event Action<string> Clicked;
 
     private CanvasGroup faceCG;
+    private Vector2 _cursorBase;
+    private Tweener _cursorTween;
 
     public void Awake()
     {
         faceCG = face.GetComponent<CanvasGroup>();
+        _cursorBase = Cursor.rectTransform.anchoredPosition;
 
         frame.gameObject.SetActive(showFrame);
         frameHighLight.gameObject.SetActive(showFrame);
@@ -43,13 +46,15 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
 
         UIUtils.SetAlpha(frameHighLight, 0);
         UIUtils.SetAlpha(Cursor, 0);
+    }
 
-        if (showCursor)
+    void OnDisable()
+    {
+        if (showCursor && Cursor != null)
         {
-            Cursor.rectTransform.DOAnchorPosY(cursorMoveLength, cursorMoveTime)
-                    .SetLoops(-1, LoopType.Yoyo)
-                    .SetEase(Ease.Linear)
-                    .SetLink(gameObject);
+            Cursor.rectTransform.DOKill();
+            Cursor.rectTransform.anchoredPosition = _cursorBase;
+            UIUtils.SetAlpha(Cursor, 0);
         }
     }
 
@@ -59,16 +64,17 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         Bind(def, seat);
     }
 
-    public void Bind(CardDefView def, PlayerSeat seat = PlayerSeat.None)
+    public void Bind(CardDefView def, PlayerSeat seat = PlayerSeat.None, bool animate = false)
     {
         faceCG.DOKill();
 
-        if (def == null) {
-            faceCG.DOFade(0, faceFadeTime).SetLink(gameObject);
-        }
+        float target = def == null ? 0 : 1;
+        if (!animate || Mathf.Approximately(faceCG.alpha, target))
+            faceCG.alpha = target;                                    // 直接赋值
         else
-        {
-            faceCG.DOFade(1, faceFadeTime).SetLink(gameObject);
+            faceCG.DOFade(target, faceFadeTime).SetLink(gameObject);
+
+        if (def != null) {
             face.SetCardInHand(def, seat);
         }
 
@@ -88,7 +94,18 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (showCursor)
         {
             UIUtils.SetAlpha(Cursor, 1);
-            Cursor.rectTransform.DOPlay();
+
+            if (_cursorTween == null)
+            {
+                Cursor.rectTransform.anchoredPosition = _cursorBase;
+                _cursorTween = Cursor.rectTransform
+                    .DOAnchorPosY(_cursorBase.y + cursorMoveLength, cursorMoveTime)
+                    .SetLoops(-1, LoopType.Yoyo)
+                    .SetEase(Ease.Linear)
+                    .SetLink(gameObject, LinkBehaviour.PauseOnDisableRestartOnEnable)
+                    .Pause();
+            }
+            _cursorTween.Restart();
         }
 
         Selected?.Invoke(Def != null ? Def.CardCode : null);
@@ -104,7 +121,8 @@ public class CardUI : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler,
         if (showCursor)
         {
             UIUtils.SetAlpha(Cursor, 0);
-            Cursor.rectTransform.DOPause();
+            _cursorTween?.Pause();
+            Cursor.rectTransform.anchoredPosition = _cursorBase;
         }
 
         Selected?.Invoke(null);

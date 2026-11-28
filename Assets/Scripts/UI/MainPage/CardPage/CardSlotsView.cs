@@ -74,50 +74,10 @@ public class CardSlotsView : MonoBehaviour
         HideFrom(n);
     }
 
-    // public void ShowCards(IReadOnlyList<string> slotSource, IReadOnlyList<string> countSource)
-    // {
-    //     if (slotSource == null) { HideFrom(0); return; }
-
-    //     var stacks = Group(slotSource);
-    //     EnsureSlots(stacks.Count);
-    //     int n = Mathf.Min(stacks.Count, slots.Count);
-
-    //     if (stacks.Count > slots.Count)
-    //         Debug.LogWarning($"[{name}] 需要 {stacks.Count} 槽，当前只有 {slots.Count}");
-
-    //     for (int i = 0; i < n; i++)
-    //     {
-    //         var slot = slots[i];
-    //         if (!slot.gameObject.activeSelf) slot.gameObject.SetActive(true);
-    //         if (slot.CardCode != stacks[i].Code) slot.Bind(stacks[i].Code);
-    //         slot.SetNum(stacks[i].Count);
-    //     }
-
-    //     HideFrom(n);
-    // }
-
     public void HideFrom(int index)
     {
         for (int i = index; i < slots.Count; i++)
             if (slots[i].gameObject.activeSelf) slots[i].gameObject.SetActive(false);
-    }
-
-    List<(string Code, int Count)> Group(IReadOnlyList<string> cards)
-    {
-        var tmp = new Dictionary<string, int>(cards.Count);
-        foreach (var c in cards)
-        {
-            if (c == null) continue;
-            tmp.TryGetValue(c, out int n);
-            tmp[c] = n + 1;
-        }
-
-        var result = new List<(string Code, int Count)>(tmp.Count);
-        foreach (var code in App.Cards.AllCodes)
-        {
-            if (tmp.TryGetValue(code, out int n)) result.Add((code, n));
-        }
-        return result;
     }
 
     void EnsureSlots(int need)

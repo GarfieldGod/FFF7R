@@ -9,6 +9,7 @@ public class CardUISlot : MonoBehaviour
     [SerializeField] private TMP_Text currentNumText;
     [SerializeField] private TMP_Text maxNumText;
     [SerializeField] private Image Mask;
+    [SerializeField] private float maskAlpha = 0.8f;
 
     public string CardCode { get; private set; }
 
@@ -36,7 +37,7 @@ public class CardUISlot : MonoBehaviour
     {
         if (currentNum == 0) {
             currentNumText.color = Color.gray;
-            UIUtils.SetAlpha(Mask, 1);
+            UIUtils.SetAlpha(Mask, maskAlpha);
         }
         else {
             currentNumText.color = TextColor;

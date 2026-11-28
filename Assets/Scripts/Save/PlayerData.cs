@@ -7,8 +7,18 @@ public sealed class PlayerData
     SaveData _data;
     bool _dirty;
 
+    List<string> _unlockAll;
+
     public bool DebugUnlockAll { get; set; }
-    public IReadOnlyList<string> OwnedCards => _data.cardData.OwnedCards;
+
+    public IReadOnlyList<string> OwnedCards {
+        get
+        {
+            if (DebugUnlockAll) return UnlockAllCard();
+            else return _data.cardData.OwnedCards;
+        }
+    }
+
     public IReadOnlyList<string> CardDeck(int index) => _data.cardData.GetDeck(index);
 
     public void Load()
@@ -20,7 +30,7 @@ public sealed class PlayerData
     void SeedNewPlayer()
     {
         var all = App.Cards.AllCodes;
-        var firstDeck = new List<string>(15);
+        var firstDeck = new List<string>(DeckRules.DECK_SIZE);
         for (int i = 0; i < all.Count && i < 25; i++)
         {
             var code = all[i];
@@ -44,8 +54,8 @@ public sealed class PlayerData
         if (string.IsNullOrEmpty(code)) return;
         if (!App.VerifyCadeCode(code)) return;
 
-        _data.cardData.ObtainCard(code);
-        _dirty = true;
+        if (_data.cardData.ObtainCard(code))
+            _dirty = true;
     }
 
     public bool Flush()
@@ -54,5 +64,17 @@ public sealed class PlayerData
         if (!SaveStore.Save(_data)) return false;
         _dirty = false;
         return true;
+    }
+
+    IReadOnlyList<string> UnlockAllCard()
+    {
+        if (_unlockAll == null)
+        {
+            _unlockAll = new List<string>();
+            foreach (var code in App.Cards.AllCodes)
+                for (int i = 0; i < DeckRules.MaxCount(code); i++)
+                    _unlockAll.Add(code);
+        }
+        return _unlockAll.AsReadOnly();
     }
 }
