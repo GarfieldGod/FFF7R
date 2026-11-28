@@ -45,6 +45,7 @@ public class CardDeckEditor : MonoBehaviour
         foreach (var code in cardCodes) _tmpDeckSlot.Add(code);
 
         Flush();
+        CardList.ScrollToTop();
     }
 
     public void Flush()

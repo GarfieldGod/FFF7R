@@ -1553,6 +1553,7 @@ MonoBehaviour:
   root: {fileID: 1680731036}
   cardSlotPrefab: {fileID: 8353791223311042450, guid: 62f9cbf15e42d764380a667182bd8dda, type: 3}
   slotScale: 0.9
+  scrollRect: {fileID: 1051271673}
 --- !u!1 &124900636
 GameObject:
   m_ObjectHideFlags: 0
@@ -1647,6 +1648,7 @@ MonoBehaviour:
   root: {fileID: 1229384787}
   cardSlotPrefab: {fileID: 8353791223311042450, guid: 62f9cbf15e42d764380a667182bd8dda, type: 3}
   slotScale: 0.7
+  scrollRect: {fileID: 0}
 --- !u!224 &130031456 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7886729269015731956, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}
@@ -11091,8 +11093,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1840306181}
   - {fileID: 752306051}
+  - {fileID: 1840306181}
   m_Father: {fileID: 1611908668}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -11151,11 +11153,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultPageIndex: 0
-  pages:
+  pageCanvasGroups:
   - {fileID: 752306052}
   - {fileID: 1840306184}
-  pageFadeTime: 0.1
+  pageFadeTime: 0.2
   pageSwitchMix: 0
+  yOffset: -50
 --- !u!1 &1542410320
 GameObject:
   m_ObjectHideFlags: 0
@@ -11982,13 +11985,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultPageIndex: 2
-  pages:
+  pageCanvasGroups:
   - {fileID: 780696995}
   - {fileID: 1756187819}
   - {fileID: 1537410919}
   - {fileID: 41396394}
-  pageFadeTime: 0
+  pageFadeTime: 0.2
   pageSwitchMix: 0
+  yOffset: 50
 --- !u!114 &1616870051 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 7352871560480013209, guid: 73e4602535ec3da4391e056b8d4db14f, type: 3}

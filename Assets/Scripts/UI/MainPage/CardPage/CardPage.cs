@@ -38,9 +38,10 @@ public class CardPage : MonoBehaviour
 
     void Edit(NavButton button)
     {
-        editPanel.EditDeck(deckPanel.CurrentDeckIndex);
         pageSwitcher.SwitchToPage(1);
         SetHud(false);
+
+        editPanel.EditDeck(deckPanel.CurrentDeckIndex);
     }
 
     void Save(NavButton button)
