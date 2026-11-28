@@ -14,6 +14,7 @@ namespace FFF7R.Adapter
         private readonly Dictionary<string, CardDefView> defs_ = new Dictionary<string, CardDefView>();
         private string[] codes_ = new string[0];
         private bool loaded_;
+        private Dictionary<string, int> rank_;
 
         /// <summary>加载内核卡牌库并重建缓存。可重复调用（热更后重载时用）。</summary>
         public void Load()
@@ -69,6 +70,17 @@ namespace FFF7R.Adapter
         private void EnsureLoaded()
         {
             if (!loaded_) Load();
+        }
+
+        public int RankOf(string cardCode)
+        {
+            EnsureLoaded();
+            if (rank_ == null)
+            {
+                rank_ = new Dictionary<string, int>(codes_.Length);
+                for (int i = 0; i < codes_.Length; i++) rank_[codes_[i]] = i;
+            }
+            return rank_.TryGetValue(cardCode, out int r) ? r : int.MaxValue;
         }
     }
 }

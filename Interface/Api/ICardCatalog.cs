@@ -10,5 +10,6 @@ namespace FFF7R
 
         bool TryGet(string cardCode, out CardDefView def);
         CardDefView Get(string cardCode);
+        int RankOf(string cardCode);
     }
 }
