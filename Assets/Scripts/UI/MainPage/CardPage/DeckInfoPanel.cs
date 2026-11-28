@@ -10,12 +10,14 @@ public class DeckInfoPanel : MonoBehaviour
     [SerializeField] private TMP_Text deckName;
     [SerializeField] private TMP_Text deckCardNum;
 
-    public void SetDeckInfo(DeckSlot deck)
+    public void SetDeckInfo(int index, int count)
     {
-        deckName.text = DECK_NAME + (deck.index + 1).ToString();
-        deckCardNum.text = deck.Count.ToString();
+        deckName.text = DECK_NAME + (index + 1).ToString();
+        deckCardNum.text = count.ToString();
 
-        if (deck.Count < DeckRules.DECK_SIZE) deckCardNum.color = Color.red;
+        if (count != DeckRules.DECK_SIZE) deckCardNum.color = Color.red;
         else deckCardNum.color = DECK_NUM_COLOR;
     }
+
+    public void SetDeckInfo(DeckSlot deck) => SetDeckInfo(deck.index, deck.Count);
 }

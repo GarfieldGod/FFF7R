@@ -7,6 +7,7 @@ public class NavUI : MonoBehaviour
 {
     [SerializeField] private int defaultIndex = 0;
     [SerializeField] private NavButton[] navButtons;
+    [SerializeField] private PageSwitcher pageSwitcher;
 
     public Action<int> OnNavButtonSelected;
 
@@ -15,7 +16,7 @@ public class NavUI : MonoBehaviour
         foreach (var button in navButtons)
         {
             button.Deselect(false);
-            button.OnSelect += SelectButton;
+            button.OnClick += SelectButton;
         }
     }
 
@@ -28,7 +29,7 @@ public class NavUI : MonoBehaviour
     void OnDestroy()
     {
         foreach (var button in navButtons)
-            button.OnSelect -= SelectButton;
+            button.OnClick -= SelectButton;
     }
 
     public void SelectButton(NavButton btn)
@@ -37,5 +38,6 @@ public class NavUI : MonoBehaviour
         int index = Array.IndexOf(navButtons, btn);
         if (index != -1) btn.Select();
         OnNavButtonSelected?.Invoke(index);
+        pageSwitcher?.SwitchToPage(index);
     }
 }

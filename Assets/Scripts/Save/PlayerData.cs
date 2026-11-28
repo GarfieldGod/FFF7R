@@ -24,7 +24,10 @@ public sealed class PlayerData
     public void Load()
     {
         _data = SaveStore.Load();
-        if (OwnedCards.Count == 0) SeedNewPlayer();
+        if (!_data.Initialized) {
+            _data.Initialized = true;
+            SeedNewPlayer();
+        }
     }
 
     void SeedNewPlayer()
@@ -35,7 +38,7 @@ public sealed class PlayerData
         {
             var code = all[i];
             _data.cardData.ObtainCard(code);
-            if (firstDeck.Count < 15) firstDeck.Add(code);
+            if (firstDeck.Count < DeckRules.DECK_SIZE) firstDeck.Add(code);
         }
 
         SetDeck(0, firstDeck);
@@ -44,7 +47,12 @@ public sealed class PlayerData
         Flush();
     }
 
-    public bool SetDeck(int index, List<string> cards) => _data.cardData.SetDeck(index, cards);
+    public bool SetDeck(int index, List<string> cards)
+    {
+        bool ret = _data.cardData.SetDeck(index, cards);
+        if (ret) _dirty = true;
+        return ret;
+    }
 
     public bool IsOwned(string code) =>
         DebugUnlockAll || OwnedCards.Contains(code);

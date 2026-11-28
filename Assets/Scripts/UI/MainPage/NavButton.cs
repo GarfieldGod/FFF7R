@@ -4,13 +4,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class NavButton : MonoBehaviour, IPointerClickHandler
+public class NavButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("选中特效")]
+    [Header("点击特效")]
     [SerializeField] private CanvasGroup selectedEffect;
     [SerializeField] private float selectedEffectDuration = 0.5f;
     [SerializeField] private float selectedEffectMaxAlpha = 1f;
     [SerializeField] private float selectedEffectMinAlpha = 0f;
+
+    [Header("悬浮特效")]
+    [SerializeField] private CanvasGroup hoverEffect;
+    [SerializeField] private float hoverEffectDuration = 0.5f;
+    [SerializeField] private float hoverEffectMaxAlpha = 1f;
+    [SerializeField] private float hoverEffectMinAlpha = 0f;
 
     [Header("文本")]
     [SerializeField] private TMP_Text text;
@@ -18,7 +24,14 @@ public class NavButton : MonoBehaviour, IPointerClickHandler
     [SerializeField] private Color textColorSelected = Color.black;
     [SerializeField] private Color textColorDeselected = Color.white;
 
-    public Action<NavButton> OnSelect { get; set;}
+    public event Action<NavButton> OnClick;
+
+    public void Awake()
+    {
+        if (selectedEffect != null) selectedEffect.alpha = selectedEffectMinAlpha;
+        if (hoverEffect != null) hoverEffect.alpha = hoverEffectMinAlpha;
+        if (text != null) text.color = textColorDeselected;
+    }
 
     public void Select(bool animate = true)
     {
@@ -63,5 +76,19 @@ public class NavButton : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void OnPointerClick(PointerEventData pointer) => OnSelect?.Invoke(this);
+    public void OnPointerClick(PointerEventData pointer) => OnClick?.Invoke(this);
+
+    public void OnPointerEnter(PointerEventData pointer)
+    {
+        hoverEffect.DOKill();
+        if (hoverEffect != null)
+            hoverEffect.DOFade(hoverEffectMaxAlpha, hoverEffectDuration);
+    }
+
+    public void OnPointerExit(PointerEventData pointer)
+    {
+        hoverEffect.DOKill();
+        if (hoverEffect != null)
+            hoverEffect.DOFade(hoverEffectMinAlpha, hoverEffectDuration);
+    }
 }

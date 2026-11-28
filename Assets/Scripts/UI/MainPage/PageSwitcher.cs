@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class PageSwitcher : MonoBehaviour
 {
-    [SerializeField] private NavUI nav;
     [SerializeField] private int defaultPageIndex = 0;
     [SerializeField] private CanvasGroup[] pages;
     [SerializeField] private float pageFadeTime = 0.2f;
@@ -15,9 +14,8 @@ public class PageSwitcher : MonoBehaviour
     private CanvasGroup _current = null;
     Sequence _seq;
 
-    void Start()
+    void Awake()
     {
-        nav.OnNavButtonSelected += OnPageChange;
         foreach(var page in pages)
         {
             page.alpha = 0;
@@ -25,15 +23,10 @@ public class PageSwitcher : MonoBehaviour
             page.blocksRaycasts = false;
         }
 
-        OnPageChange(defaultPageIndex);
+        SwitchToPage(defaultPageIndex);
     }
 
-    void Update()
-    {
-        App.Save.Flush();
-    }
-
-    void OnPageChange(int index)
+    public void SwitchToPage(int index)
     {
         if (index >= pages.Length || index < 0) return;
 

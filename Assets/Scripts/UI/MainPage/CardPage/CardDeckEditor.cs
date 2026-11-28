@@ -31,11 +31,6 @@ public class CardDeckEditor : MonoBehaviour
         DeckList.OnCardClick += RemoveCardFromDeck;
     }
 
-    void Start()
-    {
-        EditDeck(0); // TODO: select deck
-    }
-
     void OnDestroy()
     {
         CardList.OnCardClick -= AddCardToDeck;
@@ -61,7 +56,7 @@ public class CardDeckEditor : MonoBehaviour
 
     public bool SaveDeck()
     {
-        if (_tmpDeckSlot.cards.Count < DeckRules.DECK_SIZE) return false;
+        if (_tmpDeckSlot.cards.Count != DeckRules.DECK_SIZE) return false;
         return App.Save.SetDeck(_tmpDeckSlot.index, _tmpDeckSlot.cards);
     }
 

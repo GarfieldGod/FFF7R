@@ -7,6 +7,7 @@ using System.Linq;
 public class SaveData
 {
     public int version = 1;
+    public bool Initialized = false;
 
     public string username;
     public int userLevel;
