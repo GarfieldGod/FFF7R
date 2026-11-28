@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ public class CardSlotsView : MonoBehaviour
     [SerializeField] CardUISlot cardSlotPrefab;
     [SerializeField] float slotScale;
     [SerializeField] ScrollRect scrollRect;
+    [SerializeField] Image scrollHandle;
 
     List<CardUISlot> slots = new List<CardUISlot>();
     Coroutine _buildCo;
@@ -85,6 +87,10 @@ public class CardSlotsView : MonoBehaviour
         for (int i = 0; i < common; i++)
             if (slots[i].CardCode != items[i].Code) { codeChanged = true; break; }
 
+        bool needRebuild = codeChanged || items.Count > slots.Count;
+        if (needRebuild) HideHandle();
+        else ShowHandle();
+
         if (!codeChanged)
         {
             for (int i = 0; i < common; i++)
@@ -95,8 +101,12 @@ public class CardSlotsView : MonoBehaviour
             HideFrom(common);                       // 点卡场景：common 不变，这里空转
             if (items.Count > common)               // 只有真的追加了新卡才需要建
                 _buildCo = StartCoroutine(BuildRest(items, common));
+            else
+                ShowHandle();
             return;
         }
+
+        if (scrollHandle != null) UIUtils.SetAlpha(scrollHandle, 0f);
 
         const int MinCount = 22;
         int n = Mathf.Min(items.Count, MinCount);
@@ -109,6 +119,8 @@ public class CardSlotsView : MonoBehaviour
         // 创建并绑定剩下的
         if (items.Count > n)
             _buildCo = StartCoroutine(BuildRest(items, n));
+        else
+            ShowHandle();
     }
 
     void BindAt(int i, (string Code, int Cur, int Max) item)
@@ -138,6 +150,7 @@ public class CardSlotsView : MonoBehaviour
             yield return null;
         }
         _buildCo = null;
+        ShowHandle(instant: false);
     }
 
     public void HideFrom(int startIndex)
@@ -155,5 +168,20 @@ public class CardSlotsView : MonoBehaviour
             slot.Clicked += OnClick;
             slots.Add(slot);
         }
+    }
+
+    void HideHandle()
+    {
+        if (scrollHandle == null) return;
+        scrollHandle.DOKill();
+        UIUtils.SetAlpha(scrollHandle, 0f);
+    }
+
+    void ShowHandle(bool instant = true)
+    {
+        if (scrollHandle == null) return;
+        scrollHandle.DOKill();
+        if (instant) UIUtils.SetAlpha(scrollHandle, 1f);
+        else scrollHandle.DOFade(1f, 0.5f).SetLink(gameObject);
     }
 }

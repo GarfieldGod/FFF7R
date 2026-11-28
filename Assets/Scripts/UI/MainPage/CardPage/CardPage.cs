@@ -24,6 +24,7 @@ public class CardPage : MonoBehaviour
         pageSwitcher = GetComponent<PageSwitcher>();
         pageSwitcher.SwitchToPage(0);
 
+        pageSwitcher.OnSwitchComplete += OnSubPageSwitch;
         deckPanel.OnCardSelected += detailPanel.ShowCardDetail;
         editButton.OnClick += Edit;
         SaveButton.OnClick += Save;
@@ -31,6 +32,7 @@ public class CardPage : MonoBehaviour
 
     void OnDestroy()
     {
+        pageSwitcher.OnSwitchComplete -= OnSubPageSwitch;
         deckPanel.OnCardSelected -= detailPanel.ShowCardDetail;
         editButton.OnClick -= Edit;
         SaveButton.OnClick -= Save;
@@ -39,7 +41,6 @@ public class CardPage : MonoBehaviour
     void Edit(NavButton button)
     {
         pageSwitcher.SwitchToPage(1);
-        SetHud(false);
 
         editPanel.EditDeck(deckPanel.CurrentDeckIndex);
     }
@@ -51,9 +52,10 @@ public class CardPage : MonoBehaviour
         {
             pageSwitcher.SwitchToPage(0);
             deckPanel.Flush();
-            SetHud(true);
         }
     }
+
+    void OnSubPageSwitch(int prev, int next) => SetHud(next == 0);
 
     void SetHud(bool visible)
     {

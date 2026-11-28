@@ -60,7 +60,7 @@ public sealed class SpriteCatalog
     {
         if (waiters == null) return;
         foreach (var cb in waiters)
-            try { cb(s); }
+            try { if (cb != null) cb(s); }
             catch (Exception e) { Debug.LogException(e); }
     }
 
